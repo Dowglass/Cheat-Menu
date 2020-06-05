@@ -27,9 +27,9 @@ module.tstat      =
 -- Main function
 function module.StatMain()
     
-    fcommon.Tabs("Stats",{"Vehicle","Weapon","Girlfriend","Search"},{
+    fcommon.Tabs("Estatísticas",{"Veículo","Arma","Namorada","Procurar"},{
         function()
-            if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Estatísticas máximas em veículos",imgui.ImVec2(fcommon.GetSize(1))) then
                 callFunction(0x4399D0,1,1,false)
                 displayNonMinigameHelpMessages(false)
                 fcommon.CheatActivated()
@@ -41,7 +41,7 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Flying",stat = 223})  
         end,
         function()
-            if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Estatísticas máximas em armas",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=69,79,1 do
                     setFloatStat(i,1000)
                 end
@@ -62,7 +62,7 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Rifle",stat = 79})
         end,
         function()
-            if imgui.Button("Max girlfriend stats",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Estatísticas máximas nas namoradas",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=252,257,1 do
                     setFloatStat(i,100)
                 end
@@ -78,7 +78,7 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
         end,
         function()
-            module.tstat.filter:Draw("Filter")
+            module.tstat.filter:Draw("Filtrar")
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then

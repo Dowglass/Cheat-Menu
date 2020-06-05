@@ -105,9 +105,9 @@ function module.ConfigPanel(func_arg_table,func,func_arg_table_func)
         
         if imgui.IsItemClicked(0) then
             tcheatmenu.window.panel_func = function()
-                imgui.TextWrapped(string.format("%s configuraion",func_arg_table[2]))
+                imgui.TextWrapped(string.format("%s configuração",func_arg_table[2]))
                 imgui.Separator()
-                if imgui.Button("Hide",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Ocultar",imgui.ImVec2(fcommon.GetSize(1))) then
                     tcheatmenu.window.panel_func = nil
                 end
                 if func_arg_table[1] ~= nil then
@@ -177,7 +177,7 @@ function module.Tabs(label,names,func)
 
             imgui.SameLine()
         end
-        fcommon.InformationTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
+        fcommon.InformationTooltip("Se a largura da sua janela for pequena, você poderá rolar com as teclas Shift + Mouse.")
         imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
         imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.ColorConvertU32ToFloat4(buttonhovered)
         imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.ColorConvertU32ToFloat4(buttonactive)
@@ -383,7 +383,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     -- Draw all images one by one for search tabs
     if draw_type == fconst.DRAW_TYPE.SEARCH then 
 
-        filter:Draw("Filter")
+        filter:Draw("Filtrar")
         imgui.Spacing()
 
         if imgui.BeginChild("") then 
@@ -466,7 +466,7 @@ function module.RadioButton(label,rb_table,addr_table,default)
     end
 
     if default == true then --  unused in handling section
-        if imgui.RadioButtonIntPtr("Default ##" ..label,button,#addr_table + 1) then
+        if imgui.RadioButtonIntPtr("Padrão ##" ..label,button,#addr_table + 1) then
             for j = 1,#addr_table,1 do
                 writeMemory(addr_table[j],1,0,false)
                 fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",addr_table[j]),{1,0})
@@ -594,34 +594,34 @@ function module.UpdateStat(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text("Minimum = " .. arg.min)
+            imgui.Text("Mínimo = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text("Maximum = " .. arg.max)
+            imgui.Text("Máximo = " .. arg.max)
         end
 
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set##".. arg.name,value) then
+        if imgui.InputInt("Definir##".. arg.name,value) then
             setFloatStat(arg.stat,value[0])
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),value[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Mínimo##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.min)
         end
         imgui.SameLine()
-        if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Padrão##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.default)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Máximo##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.max)
         end
@@ -662,11 +662,11 @@ function module.UpdateAddress(arg)
         
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text("Minimum = " .. arg.min)
+            imgui.Text("Mínimo = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text("Maximum = " .. arg.max)
+            imgui.Text("Máximo = " .. arg.max)
         end
         imgui.Columns(1)
 
@@ -693,10 +693,10 @@ function module.UpdateAddress(arg)
             end
         end
         imgui.SameLine(0.0,4.0)
-        imgui.Text("Set")
+        imgui.Text("Definir")
         if buttons > 0 then
             imgui.Spacing()
-            if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+            if imgui.Button("Mínimo##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.mul)
                 if arg.save then
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.min,arg.is_float,arg.mul})
@@ -705,7 +705,7 @@ function module.UpdateAddress(arg)
 
             if arg.default ~= nil then
                 imgui.SameLine()
-                if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                if imgui.Button("Padrão##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                     module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.mul)
                     if arg.save then
                         fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.default,arg.is_float,arg.mul})
@@ -715,7 +715,7 @@ function module.UpdateAddress(arg)
 
             if arg.max ~= nil then
                 imgui.SameLine()
-                if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                if imgui.Button("Máximo##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                     module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.mul)
                     if arg.save then
                         fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.max,arg.is_float,arg.mul})
@@ -878,7 +878,7 @@ function module.LoadJson(filename)
             return table
         else
             tcheatmenu.window.fail_loading_json = true
-            print("Failed to load json file, " .. filename)
+            print("Falha ao carregar arquivo json " .. filename)
         end
     end
     return {}
@@ -951,7 +951,7 @@ function module.MoveFiles(main_dir,dest_dir)
             end
             if doesFileExist(dest_file) then
                 os.remove(main_file)
-                print("[UPDATE] Unable to delete file " .. dest_file)
+                print("Nao foi possivel excluir o arquivo " .. dest_file)
             else
                 os.rename(main_file,dest_file)
             end
@@ -995,11 +995,11 @@ function module.RwMemory(address,size,value,protect,is_float,mul)
 end
 
 function module.CheatActivated()
-    printHelpString("Cheat ~g~Activated")
+    printHelpString("Cheat ~g~Ativado")
 end
 
 function module.CheatDeactivated()
-    printHelpString("Cheat ~r~Deactivated")
+    printHelpString("Cheat ~g~Desativado")
 end
 
 function module.KeyWait(key1,key2)

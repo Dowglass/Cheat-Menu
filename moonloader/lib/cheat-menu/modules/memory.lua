@@ -54,13 +54,13 @@ function MemoryEntry(name,size,address)
             module.tmemory.size[0] = 0
             module.tmemory.is_float[0] = false
         end
-        printHelpString("Address set")
+        printHelpString("Endereço definido!")
     end
     if imgui.IsItemClicked(1) then
 		module.tmemory.list[size .. "$" .. name] = nil
 		fcommon.SaveJson("memory",module.tmemory.list)
 		module.tmemory.list = fcommon.LoadJson("memory")
-		printHelpString("Address ~r~removed")
+		printHelpString("Endereco ~r~removido!")
 	end
 end
 
@@ -71,21 +71,21 @@ function module.MemoryMain()
         imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
     end)
 
-    fcommon.Tabs("Memory",{"Read","Write","Search","Custom"},{
+    fcommon.Tabs("Memória",{"Ler","Escrever","Procurar","Personalizar"},{
         function()
-            imgui.Text("Pointer")
+            imgui.Text("Ponto")
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
+            imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("Car", module.tmemory.radio_button, 1)
-            fcommon.InformationTooltip("Get pointer of the nearest car")
+            imgui.RadioButtonIntPtr("Carro", module.tmemory.radio_button, 1)
+            fcommon.InformationTooltip("Obter ponto do carro mais próximo.")
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("Char", module.tmemory.radio_button, 2)
-            fcommon.InformationTooltip("Get pointer of the nearest char")
+            imgui.RadioButtonIntPtr("Caractere", module.tmemory.radio_button, 2)
+            fcommon.InformationTooltip("Obter ponto do caractere mais próximo.")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             imgui.Columns(2,nil,false)
-            imgui.Text("Memory value : " .. module.tmemory.value[0])
+            imgui.Text("Valor da memória : " .. module.tmemory.value[0])
             imgui.NextColumn()
 
             local car,ped = storeClosestEntities(PLAYER_PED)
@@ -106,12 +106,12 @@ function module.MemoryMain()
             imgui.Columns(1)
             imgui.Spacing()
 
-            imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
+            imgui.InputText("Endereço", module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " para colar")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
             fcommon.InformationTooltip("Blank = no offset")
-            imgui.SliderInt("Size", module.tmemory.size,1,4)
+            imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
                 imgui.Columns(2,nil,false)
@@ -122,10 +122,10 @@ function module.MemoryMain()
             end
 
 
-            imgui.Checkbox("Virtual protect", module.tmemory.vp)
+            imgui.Checkbox("Proteção virtual", module.tmemory.vp)
             imgui.Columns(1)
             imgui.Dummy(imgui.ImVec2(0,10))
-            if imgui.Button("Read",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Ler",imgui.ImVec2(fcommon.GetSize(2))) then
 
                 if ffi.string(module.tmemory.offset) == "" then 
                     imgui.StrCopy(module.tmemory.offset,"0") 
@@ -136,7 +136,7 @@ function module.MemoryMain()
                 end
             end
             imgui.SameLine()
-            if imgui.Button("Clear",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Limpar",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.tmemory.value[0] = 0
                 imgui.StrCopy(module.tmemory.address,"")
                 imgui.StrCopy(module.tmemory.offset,"0")
@@ -148,15 +148,15 @@ function module.MemoryMain()
             end
         end,
         function()
-            imgui.Text("Pointer")
+            imgui.Text("Ponto")
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
+            imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("Car", module.tmemory.radio_button, 1)
-            fcommon.InformationTooltip("Get pointer of the nearest car")
+            imgui.RadioButtonIntPtr("Carro", module.tmemory.radio_button, 1)
+            fcommon.InformationTooltip("Obter ponto do carro mais próximo.")
             imgui.SameLine()
-            imgui.RadioButtonIntPtr("Char", module.tmemory.radio_button, 2)
-            fcommon.InformationTooltip("Get pointer of the nearest char")
+            imgui.RadioButtonIntPtr("Caractere", module.tmemory.radio_button, 2)
+            fcommon.InformationTooltip("Obter ponto do caractere mais próximo.")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             local car,ped = storeClosestEntities(PLAYER_PED)
@@ -175,12 +175,12 @@ function module.MemoryMain()
                 end
             end
             
-            imgui.InputInt("Value", module.tmemory.value)
-            imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
+            imgui.InputInt("Valor", module.tmemory.value)
+            imgui.InputText("Endereço", module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " para colar")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
             fcommon.InformationTooltip("Blank = no offset")
-            imgui.SliderInt("Size", module.tmemory.size,1,4)
+            imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
                 imgui.Columns(2,nil,false)
@@ -191,11 +191,11 @@ function module.MemoryMain()
             end
 
 
-            imgui.Checkbox("Virtual protect", module.tmemory.vp)
+            imgui.Checkbox("Proteção virtual", module.tmemory.vp)
             imgui.Columns(1)
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            if imgui.Button("Write",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Escrever",imgui.ImVec2(fcommon.GetSize(2))) then
                 
                 if ffi.string(module.tmemory.offset) == "" then 
                     imgui.StrCopy(module.tmemory.offset,"0") 
@@ -203,11 +203,11 @@ function module.MemoryMain()
 
                 if ffi.string(module.tmemory.address) ~= "" then
                     fcommon.RwMemory(tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset)),module.tmemory.size[0],module.tmemory.value[0],module.tmemory.vp[0],module.tmemory.is_float[0])
-                    printHelpString("Value ~g~Updated")
+                    printHelpString("Valor ~g~Atualizado")
                 end
             end
             imgui.SameLine()
-            if imgui.Button("Clear",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Limpar",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.tmemory.value[0] = 0
                 imgui.StrCopy(module.tmemory.address,"")
                 imgui.StrCopy(module.tmemory.offset,"0")
@@ -215,15 +215,15 @@ function module.MemoryMain()
                 module.tmemory.vp[0] = false
                 module.tmemory.is_float[0] = false
                 module.tmemory.radio_button[0] = 0
-                printHelpString("Entries cleared")
+                printHelpString("Entradas limpas")
             end
         end,
         function()
-            module.tmemory.filter:Draw("Filter")
-            fcommon.InformationTooltip("Right click over any of these entries to remove them")
+            module.tmemory.filter:Draw("Filtro")
+            fcommon.InformationTooltip("Clique com o botão direito do mouse em qualquer uma dessas entradas para removê-las.")
             imgui.Spacing()
 
-            if imgui.BeginChild("Stat Entries") then
+            if imgui.BeginChild("Status limpos") then
                 for name_size,address in fcommon.spairs(module.tmemory.list) do
                     size, name = name_size:match("([^$]+)$([^$]+)")
                     if module.tmemory.filter:PassFilter(name) then
@@ -235,9 +235,9 @@ function module.MemoryMain()
             end
         end,
         function()
-            if imgui.InputText("Name",module.tmemory.name,ffi.sizeof(module.tmemory.name)) then end
-            if imgui.InputText("Address",module.tmemory.address,ffi.sizeof(module.tmemory.address)) then end
-            imgui.SliderInt("Size", module.tmemory.size,1,4)
+            if imgui.InputText("Nome",module.tmemory.name,ffi.sizeof(module.tmemory.name)) then end
+            if imgui.InputText("Endereço",module.tmemory.address,ffi.sizeof(module.tmemory.address)) then end
+            imgui.SliderInt("tamanho", module.tmemory.size,1,4)
             imgui.Checkbox("Float",module.tmemory.is_float)
             imgui.Spacing()
             if imgui.Button("Add address",imgui.ImVec2(fcommon.GetSize(1))) then
@@ -260,7 +260,7 @@ function module.MemoryMain()
                 module.tmemory.list[size .. "$" .. ffi.string(module.tmemory.name)] = ffi.string(module.tmemory.address)
                 fcommon.SaveJson("memory",module.tmemory.list)
                 module.tmemory.list = fcommon.LoadJson("memory")
-                printHelpString("Address ~g~added")
+                printHelpString("Endereço ~g~adicionado!")
         end
     end})
 

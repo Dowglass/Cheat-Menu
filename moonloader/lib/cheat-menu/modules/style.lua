@@ -30,7 +30,7 @@ module.tstyle =
     name           = imgui.new.char[256]("Untitled"),
     preparetoapply = false,
     selected       = imgui.new.int(0),
-    selected_name  = fconfig.Get('tstyle.selected_name',"Default"),
+    selected_name  = fconfig.Get('tstyle.selected_name',"Padrão"),
     status         = nil,
     styles_table   = {},
 }
@@ -142,7 +142,7 @@ function module.getStyles()
         table.insert( tmp, k ) 
         module.tstyle.preparetoapply = true 
     end
-    return module.tstyle.preparetoapply and tmp or {"No styles"}
+    return module.tstyle.preparetoapply and tmp or {"Sem estilos"}
 end
 
 function module.applyStyle(style, stylename)
@@ -195,7 +195,7 @@ function module.LoadFonts()
 end
 
 function FontSelector()
-    if imgui.BeginCombo("Select Font", fstyle.tstyle.current_font) then
+    if imgui.BeginCombo("Selecionar fonte", fstyle.tstyle.current_font) then
 
         for name,font in pairs(fstyle.tstyle.fonts) do
             if name ~= fstyle.tstyle.current_font then
@@ -246,7 +246,7 @@ function module.StyleEditor()
     FontSelector()
     imgui.Spacing()
 
-    fcommon.Tabs("Style",{"Borders","Colors","Sizes"},{
+    fcommon.Tabs("Estilos",{"Bordas","Cores","Tamanhos"},{
         function()
             imgui.Columns(2,nil,false)
 
@@ -262,7 +262,7 @@ function module.StyleEditor()
         end,
         function()
 
-            if imgui.RadioButtonIntPtr("Opaque", module.tstyle.alpha_flags,0) then                                    
+            if imgui.RadioButtonIntPtr("Opaco", module.tstyle.alpha_flags,0) then                                    
                 module.tstyle.alpha_flags[0] = 0
             end
 
@@ -274,13 +274,13 @@ function module.StyleEditor()
             
             imgui.SameLine()
 
-            if imgui.RadioButtonIntPtr("Both",  module.tstyle.alpha_flags,imgui.ColorEditFlags.AlphaPreviewHalf) then  
+            if imgui.RadioButtonIntPtr("Ambos",  module.tstyle.alpha_flags,imgui.ColorEditFlags.AlphaPreviewHalf) then  
                 module.tstyle.alpha_flags[0] = imgui.ColorEditFlags.AlphaPreviewHalf
             end
 
-            fcommon.InformationTooltip("Left-click on colored square to open color picker\nRight-click to open edit options menu.")
+            fcommon.InformationTooltip("Clique com o botão esquerdo do mouse no quadrado colorido para abrir o seletor de cores\ne com botão direito do mouse para abrir o menu de opções de edição.")
 
-            imgui.BeginChild("##colors")
+            imgui.BeginChild("##cores")
             imgui.PushItemWidth(-160)
  
             for i=0,imgui.Col.COUNT-1,1 do
@@ -304,7 +304,7 @@ function module.StyleEditor()
 
                     if float[0] ~= s.x or float[1] ~= s.y or float[2] ~= s.z or float[3] ~= s.w then
                         imgui.SameLine(0.0, style.ItemInnerSpacing.x)
-                        if imgui.Button("Revert") then
+                        if imgui.Button("Reverter") then
                             style.Colors[i].x = s.x
                             style.Colors[i].y = s.y
                             style.Colors[i].z = s.z
@@ -318,52 +318,52 @@ function module.StyleEditor()
             imgui.EndChild();
         end,
         function()
-            imgui.BeginChild("##sizes");
+            imgui.BeginChild("##Tamanhos");
             imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50);
 
             imgui.Spacing()
 
-            local string = {"Left","Right"}
+            local string = {"Esquerdo","Direito"}
             local list   = imgui.new['const char*'][#string](string)
             var = imgui.new.int(style.ColorButtonPosition)
 
-            if imgui.Combo("Color button position", var, list,#string) then
+            if imgui.Combo("Posição do botão colorido", var, list,#string) then
                 style.ColorButtonPosition = var[0]
             end
 
-            string = {"None","Left","Right"}
+            string = {"Nenhum","Esquerdo","Direito"}
             list   = imgui.new['const char*'][#string](string)
             var = imgui.new.int(style.WindowMenuButtonPosition + 1)
 
-            if imgui.Combo("Window menu button position", var, list,#string) then
+            if imgui.Combo("Posição do botão de menu da janela", var, list,#string) then
                 style.WindowMenuButtonPosition = var[0] - 1
             end
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            style.DisplaySafeAreaPadding = StylerSliderFloat2("Display safe area padding",style.DisplaySafeAreaPadding,0.0,30.0)
-            style.GrabMinSize = StylerSliderFloat("Grab min size",style.GrabMinSize,0.0,20.0)
-            style.IndentSpacing = StylerSliderFloat("Indent spacing",style.IndentSpacing,0.0,30.0)
-            style.ItemInnerSpacing = StylerSliderFloat2("Item inner spacing",style.ItemInnerSpacing,0.0,20.0)
-            style.ItemSpacing = StylerSliderFloat2("Item spacing",style.ItemSpacing,0.0,20.0)
-            style.ScrollbarSize = StylerSliderFloat("Scrollbar size",style.ScrollbarSize,1.0,20.0)
+            style.DisplaySafeAreaPadding = StylerSliderFloat2("Exibir área de preenchimento seguro",style.DisplaySafeAreaPadding,0.0,30.0)
+            style.GrabMinSize = StylerSliderFloat("Tamanho mínimo da barra",style.GrabMinSize,0.0,20.0)
+            style.IndentSpacing = StylerSliderFloat("Espaçamento entre recursos",style.IndentSpacing,0.0,30.0)
+            style.ItemInnerSpacing = StylerSliderFloat2("Espaçamento interno dos itens",style.ItemInnerSpacing,0.0,20.0)
+            style.ItemSpacing = StylerSliderFloat2("Espaçamento entre itens",style.ItemSpacing,0.0,20.0)
+            style.ScrollbarSize = StylerSliderFloat("Tamanho da barra de rolagem",style.ScrollbarSize,1.0,20.0)
             style.TouchExtraPadding = StylerSliderFloat2("Touch extra padding",style.TouchExtraPadding,0.0,10.0)
-            style.WindowPadding = StylerSliderFloat2("Window padding",style.WindowPadding,0.0,20.0)
+            style.WindowPadding = StylerSliderFloat2("Preenchimento de janela",style.WindowPadding,0.0,20.0)
             
             imgui.Dummy(imgui.ImVec2(0,10))
 
             style.ChildRounding = StylerSliderFloat("Child rounding",style.ChildRounding,0.0,12.0)
-            style.FrameRounding = StylerSliderFloat("Frame rounding",style.FrameRounding,0.0,12.0)
-            style.GrabRounding = StylerSliderFloat("Grab rounding",style.GrabRounding,0.0,12.0)
-            style.PopupRounding = StylerSliderFloat("Popup rounding",style.PopupRounding,0.0,12.0)
-            style.ScrollbarRounding = StylerSliderFloat("Scrollbar rounding",style.ScrollbarRounding,0.0,12.0)
-            style.WindowRounding = StylerSliderFloat("Window rounding",style.WindowRounding,0.0,12.0)
+            style.FrameRounding = StylerSliderFloat("Arredondamento do quadro (menu)",style.FrameRounding,0.0,12.0)
+            style.GrabRounding = StylerSliderFloat("Arredondamento da barra",style.GrabRounding,0.0,12.0)
+            style.PopupRounding = StylerSliderFloat("Arredondamento do menu pop-up",style.PopupRounding,0.0,12.0)
+            style.ScrollbarRounding = StylerSliderFloat("Arredondamento da barra de rolagem",style.ScrollbarRounding,0.0,12.0)
+            style.WindowRounding = StylerSliderFloat("Arredondamento de janela",style.WindowRounding,0.0,12.0)
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            style.ButtonTextAlign = StylerSliderFloat2("Button text align",style.ButtonTextAlign,0.0,20.0)
-            style.SelectableTextAlign = StylerSliderFloat2("Selectable text align",style.SelectableTextAlign,0.0,20.0)
-            style.WindowTitleAlign = StylerSliderFloat2("Window title align",style.WindowTitleAlign,0.0,20.0)
+            style.ButtonTextAlign = StylerSliderFloat2("Alinhamento de texto da caixa",style.ButtonTextAlign,0.0,20.0)
+            style.SelectableTextAlign = StylerSliderFloat2("Alinhamento de texto selecionável",style.SelectableTextAlign,0.0,20.0)
+            style.WindowTitleAlign = StylerSliderFloat2("Alinhamento do título da janela",style.WindowTitleAlign,0.0,20.0)
 
             imgui.PopItemWidth()
             imgui.EndChild()

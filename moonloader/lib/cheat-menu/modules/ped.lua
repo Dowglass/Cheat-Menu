@@ -119,7 +119,7 @@ function module.SpawnPed(model)
             ped = createChar(module.tped.type.index[0]+5,290,x,y,z) -- CIVMALE = PLAYER + 5
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
         end
-        printHelpString("Ped ~g~Spawned")
+        printHelpString("Ped ~g~Criado!")
     end
 end
 
@@ -144,35 +144,35 @@ end
 
 function module.PedMain()
         imgui.Spacing()
-        if imgui.Button("Defensive gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Definir área de gange",imgui.ImVec2(fcommon.GetSize(2))) then
             callFunction(0x444300,0,0)
             setGangWarsActive(true)
         end
         imgui.SameLine()
-        if imgui.Button("Offensive gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Iniciar guerra de gangues",imgui.ImVec2(fcommon.GetSize(2))) then
             callFunction(0x446050,0,0)
             setGangWarsActive(true)
         end
-        if imgui.Button("End gang war",imgui.ImVec2(fcommon.GetSize(1))) then
+        if imgui.Button("Finalizar da guerra de gangues",imgui.ImVec2(fcommon.GetSize(1))) then
             callFunction(0x4464C0,0,0)
             setGangWarsActive(true)
         end      
         imgui.Spacing()
-        fcommon.Tabs("Ped",{"Checkboxes","Menus","Spawn"},{
+        fcommon.Tabs("Ped",{"Caixas de seleção","Menus","Criar"},{
             function()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display)
-                fcommon.CheckBoxValue("Elvis everywhere",0x969157)
-                fcommon.CheckBoxValue("Everyone is armed",0x969140)
-                fcommon.CheckBoxValue("Gangs control the streets",0x96915B)
-                fcommon.CheckBoxValue("Gangs everywhere",0x96915A)
-                fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
+                fcommon.CheckBoxVar("Exibir saúde do ped",module.tped.ped_health_display)
+                fcommon.CheckBoxValue("Elvis em toda parte",0x969157)
+                fcommon.CheckBoxValue("Todo mundo armado",0x969140)
+                fcommon.CheckBoxValue("Gangues controlam as ruas",0x96915B)
+                fcommon.CheckBoxValue("Gangues em todos os lugares",0x96915A)
+                fcommon.CheckBoxVar("Guerra de gangues",module.tped.gang.wars,nil,
                 function()
                     setGangWarsActive(module.tped.gang.wars[0])
                     if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
                 end,
                 function()
-                    imgui.TextWrapped("Gang zone density:")
+                    imgui.TextWrapped("Densidade da zona de gange:")
                     imgui.Spacing()
                     for title,id in pairs(module.tped.gang.names) do
 
@@ -187,30 +187,30 @@ function module.PedMain()
                     end
                     imgui.PopItemWidth()
                     imgui.Spacing()
-                    imgui.TextWrapped("You'll need ExGangWars plugin to display some turf colors")
+                    imgui.TextWrapped("Você precisará do plugin ExGangWars para exibir algumas cores de gange.")
                 end)
                 
                 imgui.NextColumn()
 
-                fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
-                fcommon.CheckBoxValue("Peds attack with golfclub",0x96913E)
-                fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
-                fcommon.CheckBoxValue("Peds riot",0x969175)
-                fcommon.CheckBoxValue("Slut magnet",0x96915D)
+                fcommon.CheckBoxValue("Sem peds nas ruas",0x8D2538,nil,0,25)
+                fcommon.CheckBoxValue("Peds atacam com taco de golfe",0x96913E)
+                fcommon.CheckBoxValue("Peds atacam com RPG",0x969158)
+                fcommon.CheckBoxValue("Motim de Peds",0x969175)
+                fcommon.CheckBoxValue("Ímã de prostituta",0x96915D)
                 
                 imgui.Columns(1)
                 imgui.Spacing()
             end,
             function()
-                fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                fcommon.DropDownMenu("Recruit anyone",function()
-                    fcommon.RadioButton("Select Weapon",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
+                fcommon.UpdateAddress({name = 'Multiplicador de densidade de pedestres',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
+                fcommon.DropDownMenu("Recrutar qualquer ped",function()
+                    fcommon.RadioButton("Selecionar arma",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
                 end)
             end,
             function()
-                imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names)
+                imgui.Combo("Tipo de ped", module.tped.type.index,module.tped.type.array,#module.tped.type.names)
                 imgui.Spacing()
-                fcommon.Tabs("Ped List",{"List","Search"},{
+                fcommon.Tabs("Lista de ped",{"Lista","Procurar"},{
                     function()
                         fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)         
                     end,

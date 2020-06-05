@@ -36,13 +36,13 @@ module.tgame                =
     },
     day                     =
     {    
-        names               = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
+        names               = {"Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"},
         array               = {},
     },    
     disable_cheats          = imgui.new.bool(fconfig.Get('tgame.disable_cheats',false)),
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
     disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
-    fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',30)),
+    fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',60)),
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
@@ -209,7 +209,7 @@ function module.CameraMode()
                         if total_mouse_y > 170 then total_mouse_y = 170 end
                         if total_mouse_y < -170 then total_mouse_y = -170 end
                         factor = 1
-                        
+
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
                             factor = factor*0.5
                         end
@@ -381,18 +381,18 @@ function module.FreezeTime()
 end
 
 function SetTime()
-    fcommon.DropDownMenu("Set time",function()
+    fcommon.DropDownMenu("Definir horário",function()
         imgui.Spacing()
 
         local days_passed = imgui.new.int(memory.read(0xB79038 ,4))
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        if imgui.InputInt("Current hour",hour) then
+        if imgui.InputInt("Hora",hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
 
-        if imgui.InputInt("Current minute",minute) then
+        if imgui.InputInt("Minuto",minute) then
             memory.write(0xB70152 ,minute[0],1)
         end
 
@@ -442,10 +442,10 @@ function module.LoadScriptsOnKeyPress()
                 end
                 if is_loaded == false then
                     script.load(full_file_path)
-                    printHelpString("Script loaded")
+                    printHelpString("Script carregado!")
                 else
                     sc_handle:unload()
-                    printHelpString("Script unloaded")
+                    printHelpString("Script descarregado!")
                 end 
                 module.tgame.script_manager.not_loaded[name .. ".loadonkeypress"] = nil
             end)
@@ -487,20 +487,20 @@ function ShowNotLoadedScripts(name,path)
         imgui.SameLine()
 
         if file_ext ==  "lua" then
-            imgui.Text("Status: Not loaded")
+            imgui.Text("Status: Não carregado")
         end
         if file_ext ==  "neverload" then
-            imgui.Text("Status: Never load")
+            imgui.Text("Status: Nunca carregar")
         end
         if file_ext ==  "loadonkeypress" then
-            imgui.Text("Status: Load on key press")
+            imgui.Text("Status: Carregar ao pressionar a tecla")
         end
         
         imgui.Spacing()
         imgui.SameLine()
         imgui.TextWrapped("Filepath: " .. path)
         
-        if imgui.Button("Load##" .. path,imgui.ImVec2(fcommon.GetSize(1))) then
+        if imgui.Button("Carregar##" .. path,imgui.ImVec2(fcommon.GetSize(1))) then
             if doesFileExist(path) then 
 
                 local load_path = path
@@ -515,7 +515,7 @@ function ShowNotLoadedScripts(name,path)
                 end
                 module.tgame.script_manager.not_loaded[name] = nil
                 script.load(load_path)
-                printHelpString("Script loaded")
+                printHelpString("Script carregado!")
             end
         end
     end,true)
@@ -538,36 +538,36 @@ function ShowLoadedScript(script,index)
         end
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Authors: ")
+        imgui.Text("Autor: ")
         imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(string.sub(authors,1,-3))
-        imgui.Text("Version: " .. tostring(script.version))
-        imgui.Text("Version num: " .. tostring(script.version_num))
+        imgui.Text("Versão: " .. tostring(script.version))
+        imgui.Text("Versão n°: " .. tostring(script.version_num))
         imgui.NextColumn()
         imgui.Text("Script ID: " .. script.id)
-        imgui.Text("Status: Loaded")
-        imgui.Text("Filename: ")
+        imgui.Text("Status: Carregado")
+        imgui.Text("Nome do arquivo: ")
         imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(script.filename)
         imgui.Columns(1)
         if properties ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.Text("Properties: ")
+            imgui.Text("Propriedades: ")
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(string.sub(properties,1,-3))
         end
         if dependencies ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.Text("Dependencies: ")
+            imgui.Text("Dependências: ")
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(string.sub(dependencies,1,-3))
         end
         if description ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.Text("Description: ")
+            imgui.Text("Descrição: ")
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(script.description)
         end
@@ -582,19 +582,19 @@ function ShowLoadedScript(script,index)
         fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Load on keypress hotkey")
         imgui.Spacing()
         
-        if imgui.Button("Never load##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
-            printHelpString("Script set to never load")
+        if imgui.Button("Nunca carregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+            printHelpString("Script definido para nunca carregar")
             os.rename(script.path,script.path.. ".neverload")
             script:unload()
         end
         imgui.SameLine()
 
-        if imgui.Button("Load on keypress##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Carregar ao pressionar a tecla##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             if script.name == thisScript().name then
-                printHelpString("Can't set for Cheat Menu")
+                printHelpString("Nao e possivel definir no Cheat Menu!")
             else
                 module.tgame.script_manager.scripts[file_name] = {tcheatmenu.hot_keys.script_manager_temp[1],tcheatmenu.hot_keys.script_manager_temp[2]}
-                printHelpString("Key set for the script.")
+                printHelpString("Carregar script pressionando a tecla")
 
                 if not script.path:match(".loadonkeypress") then
                     os.rename(script.path,script.path.. ".loadonkeypress")
@@ -603,19 +603,19 @@ function ShowLoadedScript(script,index)
             end
         end
 
-        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Recarregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             if script.name == thisScript().name then
                 module.tgame.script_manager.skip_auto_reload = true
             end  
-            printHelpString("Script reloaded")
+            printHelpString("Script recarregado!")
             script:reload()
         end
         imgui.SameLine()
-        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Descarregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             if script.name == thisScript().name then
                 module.tgame.script_manager.skip_auto_reload = true
             end
-            printHelpString("Script unloaded")
+            printHelpString("Script descarregado!")
             script:unload()
         end
     end)
@@ -643,7 +643,7 @@ end
 
 function SpawnObject(model,x,y,z)
     if model < 700 then
-        printHelpString("Can't spawn object")
+        printHelpString("Nao e possivel criar objeto!")
         return
     end
     requestModel(model)
@@ -656,7 +656,7 @@ function SpawnObject(model,x,y,z)
         setObjectRotation(obj,0,0,0)
         setObjectCollision(obj,false)
         markModelAsNoLongerNeeded(model)
-        printHelpString("Model Spawned")
+        printHelpString("Modelo criado")
         module.tgame.object_spawner.placed[string.format("%d##%d",model,obj)] = 
         {
             collision = imgui.new.bool(false),
@@ -683,7 +683,7 @@ function GenerateIPL()
     write_string = write_string .. "end"
     file:write(write_string)
     file:close()
-    printHelpString("IPL generated")
+    printHelpString("IPL criado!")
 end
 
 function module.RemoveAllObjects()
@@ -699,42 +699,42 @@ end
 
 -- Main function
 function module.GameMain()
-    if imgui.Button("Save game",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Salvar jogo",imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharOnFoot(PLAYER_PED) then
             activateSaveMenu()
         else
-            printHelpString("Player is ~r~not~w~ on foot")
+            printHelpString("O jogador ~r~nao~w~ esta a pe!")
         end
     end
     imgui.SameLine()
-    if imgui.Button("Copy coordinates",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Copiar coordenadas",imgui.ImVec2(fcommon.GetSize(2))) then
         local x,y,z = getCharCoordinates(PLAYER_PED)
         setClipboardText(string.format( "%d,%d,%d",x,y,z))
-        printHelpString("Coordinates copied")
+        printHelpString("Coordenadas copiada!")
     end
     
-    fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager","Object spawner"},{
+    fcommon.Tabs("Jogo",{"Caixas de seleção","Menus","Cheats","Gerenciador de Scripts","Criador de Objetos"},{
         function()
             
             local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
             imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
+            if imgui.Combo("Dia da semana", current_day,module.tgame.day.array,#module.tgame.day.names) then
                 writeMemory(0xB7014E,1,current_day[0]+1,false)
                 fcommon.CheatActivated()
             end
             
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Camera mode",module.tgame.camera.bool,string.format("Toggle: %s\n\nForward: %s\tBackward: %s\
-Left: %s\t\t  Right: %s\n\nSlow movement: %s\nFast movement: %s\n\nRotation: Mouse\nZoom in/out : Mouse wheel \n\
-Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
+            fcommon.CheckBoxVar("Modo câmera",module.tgame.camera.bool,string.format("Atalho: %s\n\nPara frente: %s\tPara trás: %s\
+Esquerda: %s\t\tDireita: %s\n\nMovimento lento: %s\nMovimento rápido: %s\n\nRotação: Mouse\nZoom Cima/Baixo : Roda do mouse \n\
+Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_right),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_fast),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_up),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),nil,
             function()
-                fcommon.CheckBoxVar("Lock on player",module.tgame.camera.lock_on_player,"Locks camera on player")
+                fcommon.CheckBoxVar("Bloquear jogador",module.tgame.camera.lock_on_player,"Trava a câmera no jogador.")
 
                 imgui.Spacing()
                 if imgui.SliderInt("FOV", module.tgame.camera.fov, 5,120) then
@@ -743,15 +743,15 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                         cameraPersistFov(true) 
                     end
                 end
-                imgui.SliderFloat("Movement Speed",module.tgame.camera.movement_speed, 0.0, 5.0)
-                if imgui.SliderFloat("Shake", module.tgame.camera.shake, 0.0,100) then
+                imgui.SliderFloat("Velocidade do movimento",module.tgame.camera.movement_speed, 0.0, 5.0)
+                if imgui.SliderFloat("Mexer", module.tgame.camera.shake, 0.0,100) then
                     if module.tgame.camera.bool[0] then
                         cameraSetShakeSimulationSimple(1,10000,module.tgame.camera.shake[0])
                     end
                 end
                 
                 imgui.Spacing()
-                if imgui.Button("Restore Camera",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Restaurar Câmera",imgui.ImVec2(fcommon.GetSize(2))) then
                     restoreCamera()
                     module.tgame.camera.fov[0] = 70
                     cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
@@ -761,14 +761,14 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     module.tgame.camera.movement_speed[0] = 0.2
                 end
                 imgui.SameLine()
-                if imgui.Button("Warp player",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Criar jogador",imgui.ImVec2(fcommon.GetSize(2))) then
                     local cx,cy,cz = getActiveCameraCoordinates()
                     cz = getGroundZFor3dCoord(cx,cy,cz)
                     setCharCoordinates(PLAYER_PED,cx,cy,cz)
-                    printHelpString("Player warped")
+                    printHelpString("Jogador criado no local")
                 end
             end)
-            fcommon.CheckBoxVar("Disable cheats",module.tgame.disable_cheats,nil,
+            fcommon.CheckBoxVar("Desativar cheats",module.tgame.disable_cheats,nil,
             function()
                 if module.tgame.disable_cheats[0] then
                     writeMemory(0x004384D0 ,1,0xE9 ,false)
@@ -782,9 +782,9 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
-            fcommon.CheckBoxValue('Free PNS',0x96C009)
-            fcommon.CheckBoxVar("Freeze misson timer",module.tgame.freeze_mission_timer,nil,function()
+            fcommon.CheckBoxVar("Desativar caixa de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem em um novo jogo. (Requer reinicialização)")
+            fcommon.CheckBoxValue('PNS grátis',0x96C009)
+            fcommon.CheckBoxVar("Parar tempo em missão",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
                     freezeOnscreenTimer(true)
                     fcommon.CheatActivated()
@@ -793,7 +793,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Disable F1 & F3 replay",module.tgame.disable_replay,nil,function()
+            fcommon.CheckBoxVar("Desativar replay",module.tgame.disable_replay,nil,function()
                 if module.tgame.disable_replay[0] then
                     writeMemory(0x460500,4,0xC3,false)
                     fcommon.CheatActivated()
@@ -802,8 +802,8 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxValue("Faster clock",0x96913B)            
-            fcommon.CheckBoxVar("Freeze time",module.tgame.freeze_time)
+            fcommon.CheckBoxValue("Relógio mais rápido",0x96913B)            
+            fcommon.CheckBoxVar("Parar relógio",module.tgame.freeze_time)
             
             imgui.NextColumn()
 
@@ -816,24 +816,24 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     end
                 end
             end)
-            fcommon.CheckBoxVar("Keep stuff",module.tgame.keep_stuff,"Keep stuff after arrest/death",
+            fcommon.CheckBoxVar("Manter itens",module.tgame.keep_stuff,"Manter itens após prisão/morte.",
             function()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end)
-            fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats.checkbox,"Activates random cheats after certain time",nil,
+            fcommon.CheckBoxVar("Cheats aleatórios",module.tgame.random_cheats.checkbox,"Ativa cheats aleatoriamente após um certo tempo.",nil,
             function()
-                fcommon.CheckBoxVar('Disable cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Disable activated cheats after certain time")
+                fcommon.CheckBoxVar('Desativar cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Desativar cheats ativados após um certo tempo.")
                 imgui.Spacing()
                 imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
-                imgui.SliderInt("Activate cheat timer", module.tgame.random_cheats.cheat_activate_timer, 10, 100)
+                imgui.SliderInt("Ativar temporizador de cheat", module.tgame.random_cheats.cheat_activate_timer, 10, 100)
                 imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
-                imgui.SliderInt("Deactivate cheat timer", module.tgame.random_cheats.cheat_deactivate_timer, 10, 100)
+                imgui.SliderInt("Desativar temporizador de cheat", module.tgame.random_cheats.cheat_deactivate_timer, 10, 100)
                 imgui.Spacing()
 
-                imgui.TextWrapped("Enabled cheats")
+                imgui.TextWrapped("Cheats ativados")
                 imgui.Separator()
-                if imgui.BeginChild("Cheats list") then  
+                if imgui.BeginChild("Lista de cheats") then  
                     for i=0,91,1 do   
                         if module.tgame.random_cheats.disabled_cheats[tostring(i)] then
                             selected = false
@@ -848,27 +848,27 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     imgui.EndChild()
                 end
             end)
-            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
-            fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
-            fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
+            fcommon.CheckBoxVar('Captura de tela',module.tgame.ss_shortcut,"Tire uma captura de tela usando" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
+            fcommon.CheckBoxVar('Água sólida',module.tgame.solid_water)
+            fcommon.CheckBoxVar('Sincronizar hora do sistema',module.tgame.sync_system_time)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
         
         end,
         function()
 
-            fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
+            fcommon.UpdateAddress({name = 'Dias passadas',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
                 imgui.Columns(2,nil,false)
-                imgui.Text("Minimum" .. " = 1")
+                imgui.Text("Mínimo" .. " = 1")
                 
                 imgui.NextColumn()
-                imgui.Text("Maximum" .. " = 999")
+                imgui.Text("Máximo" .. " = 999")
                 imgui.Columns(1)
 
                 imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-                if imgui.InputInt('Set',module.tgame.fps_limit) then
+                if imgui.InputInt('Definir',module.tgame.fps_limit) then
                     memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
                     memory.write(0xBA6794,1,1)
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,module.tgame.fps_limit[0]+1})
@@ -881,7 +881,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                 imgui.PopItemWidth()
 
                 imgui.Spacing()
-                if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+                if imgui.Button("Mínimo",imgui.ImVec2(fcommon.GetSize(3))) then
                     memory.write(0xC1704C,1,1)
                     memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 1
@@ -889,7 +889,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
                 imgui.SameLine()
-                if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+                if imgui.Button("Padrão",imgui.ImVec2(fcommon.GetSize(3))) then
                     memory.write(0xC1704C,30,1)
                     memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 30
@@ -897,7 +897,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
                 imgui.SameLine()
-                if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+                if imgui.Button("Máximo",imgui.ImVec2(fcommon.GetSize(3))) then
                     memory.write(0xBA6794,0,1)
                     memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 999
@@ -905,31 +905,31 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
             end)
-            fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
-            fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
+            fcommon.UpdateAddress({name = 'Velocidade do jogo',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
+            fcommon.UpdateAddress({name = 'Gravidade',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
             SetTime()
-            fcommon.DropDownMenu('Themes',function()
-                fcommon.RadioButton('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+            fcommon.DropDownMenu('Temas',function()
+                fcommon.RadioButton('Selecionar tema',{'Praia','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
             end)
         end,
         function()
-            CheatsEntry({0x439110,0x439150,0x439190},nil,{'Body','Fat','Muscle','Skinny'})
-            CheatsEntry({0x438E40,0x438FF0},nil,{'Fight','Health, armour\n200K money','Suicide'})
-            CheatsEntry({0x438F90,0x438FC0},nil,{'Gameplay','Faster','Slower'})
-            CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangs','Gangs\neverywhere','Gang land'})
-            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Slut magnet','Peds riot','Attack with\nrocket','Everyone Armed','Mayhem'})
-            CheatsEntry({0x439930,0x439940,0x4399D0},nil,{'Skills','Stamina','Weapons','Vehicles'})
-            CheatsEntry({0x4395B0,0x439600},nil,{'Spawn','Parachute','Jetpack'})
-            CheatsEntry({0x439230,0x439720,0x439E50},{0x969159,0x969176,0x96915C},{'Themes','Beach','Fun house','Ninja'})
-            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{0x969150,0x969151,0x96915E,0x96915F},{'Traffic','Pink','Black','Cheap','Fast'})
-            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},nil,{'Weather','Very sunny','Overcast','Rainy','Foggy','Thunderstorm','Sandstorm'})
-            CheatsEntry({0x439D80,0x4398D0},{nil,0x969179},{'Vehicles','Blow up','Aim while\ndriving'})
-            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
-            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
-            CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Weapons','Set1','Set2','Set3'})
+            CheatsEntry({0x439110,0x439150,0x439190},nil,{'Corpo','Gordo','Musculoso','Magro'})
+            CheatsEntry({0x438E40,0x438FF0},nil,{'Vida','Saúde, Armadura\n$2500K','Suicídio'})
+            CheatsEntry({0x438F90,0x438FC0},nil,{'Jogabilidade','Rápido','Devagar'})
+            CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangues','Gangues em \ntodos lugares','Área de gangue'})
+            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Ímã de prostituta','Tumulto','Ataque de peds','Todos armados','Caos'})
+            CheatsEntry({0x439930,0x439940,0x4399D0},nil,{'Habilidades','Stamina','Armas','Veículos'})
+            CheatsEntry({0x4395B0,0x439600},nil,{'Criar','Paraquedas','Jetpack'})
+            CheatsEntry({0x439230,0x439720,0x439E50},{0x969159,0x969176,0x96915C},{'Temas','Praia','Fun house','Ninja'})
+            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{0x969150,0x969151,0x96915E,0x96915F},{'Tráfego','Rosa','Preto','Cheap','Rápido'})
+            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},nil,{'Clima','Ensolarado','Céu nublado','Chuvoso','Nebuloso','Tempestade','Tempestade de areia'})
+            CheatsEntry({0x439D80,0x4398D0},{nil,0x969179},{'Veículos','Explodir','Mirar enquanto dirige'})
+            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Parar relógio','Elvis em todos os lugares','Campo de invasão','Predator','Adrenalina'})
+            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Nível procurado','+2 estrelas','Limpar estrelas','6 estrelas','Nunca ser procurado'})
+            CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Pack de armas','1','2','3'})
         end,
         function()
-            if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Recarregar todos scripts",imgui.ImVec2(fcommon.GetSize(1))) then
                 fgame.tgame.script_manager.skip_auto_reload = true
                 reloadScripts()
             end
@@ -941,7 +941,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
 
                 local filter = module.tgame.script_manager.filter
 
-                filter:Draw("Filter")
+                filter:Draw("Filtrar")
                 imgui.Spacing()
                 
                 for index, script in ipairs(script.list()) do
@@ -959,41 +959,41 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
 			end
         end,
         function()
-            if imgui.Button("Browse images",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Procurar imagens",imgui.ImVec2(fcommon.GetSize(2))) then
                 os.execute('explorer "https://dev.prineside.com/en/gtasa_samp_model_id"')
             end
             imgui.SameLine()
-            if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Criar IPL",imgui.ImVec2(fcommon.GetSize(2))) then
                 GenerateIPL()
             end
-            fcommon.Tabs("Object Spawner Tabs",{"Spawn","Placed"},{
+            fcommon.Tabs("Criador de objetos",{"Criar","Objetos criados"},{
             function()
-                fcommon.CheckBoxVar('Insert player coord',module.tgame.object_spawner.set_player_coord)
+                fcommon.CheckBoxVar('Inserir coordenada do jogador',module.tgame.object_spawner.set_player_coord)
 
                 if module.tgame.object_spawner.set_player_coord[0] then
                     module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0] = getCharCoordinates(PLAYER_PED)
                 end
                 imgui.Spacing()
-                imgui.InputInt("Model",module.tgame.object_spawner.model)
+                imgui.InputInt("Modelo",module.tgame.object_spawner.model)
                 imgui.Spacing()
-                imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
-                imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
-                imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                imgui.InputFloat("Coordenada X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                imgui.InputFloat("Coordenada Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
                 imgui.Dummy(imgui.ImVec2(0,10))
-                if imgui.Button("Spawn object",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Criar objeto",imgui.ImVec2(fcommon.GetSize(1))) then
                     lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
                 end
             end,
             function()
-                if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Remover todos objetos",imgui.ImVec2(fcommon.GetSize(1))) then
                     module.RemoveAllObjects()
-                    printHelpString("Objects removed")
+                    printHelpString("Objetos removidos!")
                 end
                 imgui.Spacing()
                 local filter = module.tgame.object_spawner.filter
 
-                filter:Draw("Filter")
-                fcommon.InformationTooltip("All objects will be removed if\nCheat Menu gets terminated")
+                filter:Draw("Filtrar")
+                fcommon.InformationTooltip("Todos os objetos serão removidos ao \nencerrar o Cheat Menu.")
                 imgui.Spacing()
 
                 if imgui.BeginChild("") then 
@@ -1007,19 +1007,19 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             module.tgame.object_spawner.coord.y[0] = y
                             module.tgame.object_spawner.coord.z[0] = z
 
-                            if imgui.Checkbox("Collision",value.collision) then
+                            if imgui.Checkbox("Colisão",value.collision) then
                                 setObjectCollision(handle,value.collision[0])
                             end
-                            imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
-                            imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
-                            imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                            imgui.InputFloat("Coordenada X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                            imgui.InputFloat("Coordenada Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                            imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
                             setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
                             
                             imgui.Spacing()
                             
-                            imgui.SliderFloat("Rotation X",value.rotx,0,360, "%.5f")
-                            imgui.SliderFloat("Rotation Y",value.roty,0,360, "%.5f")
-                            imgui.SliderFloat("Rotation Z",value.rotz,0,360, "%.5f")
+                            imgui.SliderFloat("Rotação X",value.rotx,0,360, "%.5f")
+                            imgui.SliderFloat("Rotação Y",value.roty,0,360, "%.5f")
+                            imgui.SliderFloat("Rotação Z",value.rotz,0,360, "%.5f")
                             setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
                         end)
                     end

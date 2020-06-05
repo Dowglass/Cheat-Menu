@@ -20,7 +20,7 @@ module.tvisual =
     car_names                   = imgui.new.bool(true),
     disable_motion_blur         = imgui.new.bool(fconfig.Get('tvisual.disable_motion_blur',false)),   
     lock_weather                = imgui.new.bool(fconfig.Get('tvisual.lock_weather',false)),   
-    radio_channel_names         = imgui.new.bool(fconfig.Get('tvisual.radio_channel_names',true)),   
+    radio_channel_names         = imgui.new.bool(fconfig.Get('tvisual.radio_channel_names',true)),
     timecyc                     =
     {   timecyc_24_plugin       = getModuleHandle("timecycle24"),
         ambient                 = imgui.new.float[3](),
@@ -344,19 +344,19 @@ end
 
 -- Main function
 function module.VisualMain()
-    fcommon.Tabs("Visual",{"Checkboxes","Menus","Timecyc editor"},{
+    fcommon.Tabs("Visual",{"Caixas de seleção","Menus","Timecyc editor"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxValue('Armour border',0x589123)
-            fcommon.CheckBoxValue('Armour percentage',0x589125)
-            fcommon.CheckBoxValue('Breath border',0x589207)
-            fcommon.CheckBoxValue('Breath percentage',0x589209)
-            fcommon.CheckBoxVar('Display car names',module.tvisual.car_names,nil,
+            fcommon.CheckBoxValue('Borda do colete',0x589123)
+            fcommon.CheckBoxValue('Porcentagem do colete',0x589125)
+            fcommon.CheckBoxValue('Borda da respiração',0x589207)
+            fcommon.CheckBoxValue('Porcentagem da respiração',0x589209)
+            fcommon.CheckBoxVar('Exibir nome dos carros',module.tvisual.car_names,nil,
             function()    
                 displayCarNames(module.tvisual.car_names[0]) 
-                fconfig.Set(fconfig.tconfig.misc_data,"Display Car Names",module.tvisual.car_names[0])
+                fconfig.Set(fconfig.tconfig.misc_data,"Mostrar nomes de carros",module.tvisual.car_names[0])
             end)
-            fcommon.CheckBoxVar('Disable motion blur',module.tvisual.disable_motion_blur,nil,
+            fcommon.CheckBoxVar('Desativar desfoque de movimento (motion blur)',module.tvisual.disable_motion_blur,nil,
             function()    
                 if module.tvisual.disable_motion_blur[0] then
                     writeMemory(0x7030A0,4,0xC3,false)
@@ -364,22 +364,22 @@ function module.VisualMain()
                     writeMemory(0x7030A0,4,0xF3CEC83,false)
                 end
             end)
-            fcommon.CheckBoxVar('Display zone names',module.tvisual.zone_names,nil,
+            fcommon.CheckBoxVar('Mostrar nome das zonas',module.tvisual.zone_names,nil,
             function()     
                 displayZoneNames(module.tvisual.zone_names[0])
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Zone Names",module.tvisual.zone_names[0])
             end)
-            fcommon.CheckBoxValue('Enable hud',0xBA6769)
+            fcommon.CheckBoxValue('Ativar hud',0xBA6769)
 
             imgui.NextColumn()
-            
-            fcommon.CheckBoxValue('Enable radar',0xBA676C,nil,0,2)
-            fcommon.CheckBoxValue('Gray radar',0xA444A4)
-            fcommon.CheckBoxValue('Health border',0x589353)
-            fcommon.CheckBoxValue('Health percentage',0x589355)
-            fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
-            fcommon.CheckBoxVar('Lock weather',module.tvisual.lock_weather)
-            fcommon.CheckBoxVar('Radio channel names',module.tvisual.radio_channel_names,nil,
+
+            fcommon.CheckBoxValue('Ativar radar',0xBA676C,nil,0,2)
+            fcommon.CheckBoxValue('Radar cinzento',0xA444A4)
+            fcommon.CheckBoxValue('Borda da saúde',0x589353)
+            fcommon.CheckBoxValue('Porcentagem da saúde',0x589355)
+            fcommon.CheckBoxValue('Ocultar nível de procurado',0x58DD1B,nil,0x90)
+            fcommon.CheckBoxVar('Bloquear tempo',module.tvisual.lock_weather)
+            fcommon.CheckBoxVar('Nomes de canais de rádio',module.tvisual.radio_channel_names,nil,
             function()     
                 if module.tvisual.radio_channel_names[0] then
                     writeMemory(0x507035,5,-30533911,false)
@@ -390,18 +390,18 @@ function module.VisualMain()
             imgui.Columns(1)
         end,
         function()
-            fcommon.RadioButtonFunc("Debt color",{"Red (Default)","Green","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
-            fcommon.RadioButtonFunc("Money color",{"Red","Green (Default)","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
-            fcommon.RadioButtonFunc("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
-            fcommon.RadioButtonFunc("Money font style",{"Style 1","Style 2","Default style"},{1,2,3},0x58F57F)
-            fcommon.UpdateAddress({ name = 'Radar Height',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
-            fcommon.UpdateAddress({ name = 'Radar Width',address = 0x866B78,size = 4,min=0,default = 94,max = 999,is_float = true})
-            fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
-            fcommon.UpdateAddress({ name = 'Radar Y position',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
-            fcommon.UpdateAddress({ name = 'Radar zoom',address = 0xA444A3,size = 1,min=0,default = 0,max = 170})
-            fcommon.RadioButtonFunc("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
-            fcommon.RadioButtonFunc("Wanted star color",{"Red","Green","Purple","Light purple","White","Black","Yellow (Default)","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
-            fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
+            fcommon.RadioButtonFunc("Cor da saúde",{"Vermelho (Padrão)","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
+            fcommon.RadioButtonFunc("Cor do dinheiro",{"Vermelho","Verde (Padrão)","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
+            fcommon.RadioButtonFunc("Contorno do dinheiro",{"Sem contornoe","Contorno fino","Contorno padrão"},{0,1,2},0x58F58D)
+            fcommon.RadioButtonFunc("Estilo da fonte do dinheiro",{"Estilo 1","Estilo 2","Estilo padrão"},{1,2,3},0x58F57F)
+            fcommon.UpdateAddress({ name = 'Altura do radar',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
+            fcommon.UpdateAddress({ name = 'Largura do radar',address = 0x866B78,size = 4,min=0,default = 94,max = 999,is_float = true})
+            fcommon.UpdateAddress({ name = 'Posição X do radar',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
+            fcommon.UpdateAddress({ name = 'Posição Y do radar',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
+            fcommon.UpdateAddress({ name = 'Zoom no radar',address = 0xA444A3,size = 1,min=0,default = 0,max = 170})
+            fcommon.RadioButtonFunc("Borda da estrela de procurado",{"Sem borda","Padrão","Borda em negrito"},{0,1,2},0x58DD41)
+            fcommon.RadioButtonFunc("Cor da estrela de procurado",{"Vermelho","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo (Padrão)","Rosa","Cinzento","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
+            fcommon.UpdateAddress({ name = 'Posição Y da estrela de procurado',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
         function()
             if module.tvisual.timecyc.timecyc_24_plugin ~= 0 then
@@ -414,61 +414,61 @@ function module.VisualMain()
             UpdateTimecycData(val)
 
             imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Button("Reset timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Resetar timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
                 CTimecyc.initialise()
-                printHelpString("Timecyc reset")
+                printHelpString("Timecyc resetado!")
             end
             imgui.SameLine()
-            if imgui.Button("Generate timecyc file",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Criar arquivo timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
                 GenerateTimecycFile(HOUR)
-                printHelpString("File generated")
+                printHelpString("Arquivo criado!")
             end
             imgui.Spacing()
             local weather = imgui.new.int(CTimecyc.curr_weather[0])
-            if imgui.Combo("Current weather", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
+            if imgui.Combo("Clima atual", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
                 if module.tvisual.lock_weather[0] then
-                    printHelpString("Weather locked")
+                    printHelpString("Clima bloqueado!")
                 else
                     CTimecyc.curr_weather[0] = weather[0]
-                    printHelpString("Current weather set")
+                    printHelpString("Clima atual definido")
                 end
             end
 
             weather = imgui.new.int(CTimecyc.next_weather[0])
-            if imgui.Combo("Next weather", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
+            if imgui.Combo("Próximo clima", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
                 if module.tvisual.lock_weather[0] then
-                    printHelpString("Weather locked")
+                    printHelpString("Clima bloqueado!")
                 else
                     CTimecyc.next_weather[0] = weather[0]
-                    printHelpString("Next weather set")
+                    printHelpString("Próximo clima definido!")
                 end
             end
             imgui.Spacing()
 
-            fcommon.Tabs("Timecyc sub tab",{"Colors","Misc"},{
+            fcommon.Tabs("Guias Timecyc",{"Cores","Misc"},{
             function()
                 
-                if imgui.ColorEdit3("Ambient",module.tvisual.timecyc.ambient) then
+                if imgui.ColorEdit3("Ambiente",module.tvisual.timecyc.ambient) then
                     CTimecyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
                     CTimecyc.ambient_green[val] = module.tvisual.timecyc.ambient[1]*255
                     CTimecyc.ambient_blue[val]  = module.tvisual.timecyc.ambient[2]*255
                 end
-                fcommon.InformationTooltip("Ambient color on static map objects")
+                fcommon.InformationTooltip("Cor ambiente em objetos estático do mapa")
 
-                if imgui.ColorEdit3("Ambient obj",module.tvisual.timecyc.ambient_obj) then
+                if imgui.ColorEdit3("Objeto Ambiente",module.tvisual.timecyc.ambient_obj) then
                     CTimecyc.ambient_obj_red[val]   = module.tvisual.timecyc.ambient_obj[0]*255
                     CTimecyc.ambient_obj_green[val] = module.tvisual.timecyc.ambient_obj[1]*255
                     CTimecyc.ambient_obj_blue[val]  = module.tvisual.timecyc.ambient_obj[2]*255
                 end
-                fcommon.InformationTooltip("Ambient color on dynamic map objects")
+                fcommon.InformationTooltip("Cor ambiente em objetos dinâmicos do mapas")
 
-                if imgui.ColorEdit3("Fluffy clouds",module.tvisual.timecyc.fluffy_clouds) then
+                if imgui.ColorEdit3("Nuvens fofas",module.tvisual.timecyc.fluffy_clouds) then
                     CTimecyc.fluffy_clouds_red[val]   = module.tvisual.timecyc.fluffy_clouds[0]*255
                     CTimecyc.fluffy_clouds_green[val] = module.tvisual.timecyc.fluffy_clouds[1]*255
                     CTimecyc.fluffy_clouds_blue[val]  = module.tvisual.timecyc.fluffy_clouds[2]*255
                 end
 
-                if imgui.ColorEdit3("Low clouds",module.tvisual.timecyc.low_clouds) then
+                if imgui.ColorEdit3("Nuvens baixas",module.tvisual.timecyc.low_clouds) then
                     CTimecyc.low_clouds_red[val]   = module.tvisual.timecyc.low_clouds[0]*255
                     CTimecyc.low_clouds_green[val] = module.tvisual.timecyc.low_clouds[1]*255
                     CTimecyc.low_clouds_blue[val]  = module.tvisual.timecyc.low_clouds[2]*255
@@ -480,7 +480,7 @@ function module.VisualMain()
                     CTimecyc.postfx1_blue[val]  = module.tvisual.timecyc.postfx1[2]*255
                     CTimecyc.postfx1_alpha[val] = module.tvisual.timecyc.postfx1[3]*255
                 end
-                fcommon.InformationTooltip("Color correction 1")
+                fcommon.InformationTooltip("Correção de cor 1")
 
                 if imgui.ColorEdit4("Postfx 2",module.tvisual.timecyc.postfx2) then
                     CTimecyc.postfx2_red[val]   = module.tvisual.timecyc.postfx2[0]*255
@@ -488,15 +488,15 @@ function module.VisualMain()
                     CTimecyc.postfx2_blue[val]  = module.tvisual.timecyc.postfx2[2]*255
                     CTimecyc.postfx2_alpha[val] = module.tvisual.timecyc.postfx2[3]*255
                 end
-                fcommon.InformationTooltip("Color correction 2")
+                fcommon.InformationTooltip("Correção de cor 2")
 
-                if imgui.ColorEdit3("Sky bottom",module.tvisual.timecyc.sky_bottom) then
+                if imgui.ColorEdit3("Fundo do céu",module.tvisual.timecyc.sky_bottom) then
                     CTimecyc.sky_bottom_red[val]   = module.tvisual.timecyc.sky_bottom[0]*255
                     CTimecyc.sky_bottom_green[val] = module.tvisual.timecyc.sky_bottom[1]*255
                     CTimecyc.sky_bottom_blue[val]  = module.tvisual.timecyc.sky_bottom[2]*255
                 end
                 
-                if imgui.ColorEdit3("Sun core",module.tvisual.timecyc.sun_core) then
+                if imgui.ColorEdit3("Núcleo do sol",module.tvisual.timecyc.sun_core) then
                     CTimecyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
                     CTimecyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
                     CTimecyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
@@ -514,7 +514,7 @@ function module.VisualMain()
                     CTimecyc.sky_top_blue[val]  = module.tvisual.timecyc.sky_top[2]*255
                 end
 
-                if imgui.ColorEdit4("Water",module.tvisual.timecyc.water) then
+                if imgui.ColorEdit4("Água",module.tvisual.timecyc.water) then
                     CTimecyc.water_red[val]   = module.tvisual.timecyc.water[0]*255
                     CTimecyc.water_green[val] = module.tvisual.timecyc.water[1]*255
                     CTimecyc.water_blue[val]  = module.tvisual.timecyc.water[2]*255
@@ -524,58 +524,58 @@ function module.VisualMain()
             function()
 
                 imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
-                if imgui.SliderInt("Cloud alpha", module.tvisual.timecyc.cloud_alpha, 0, 255) then
+                if imgui.SliderInt("Alfa da nuvem", module.tvisual.timecyc.cloud_alpha, 0, 255) then
                     CTimecyc.cloud_alpha[val]   = module.tvisual.timecyc.cloud_alpha[0]
                 end
 
-                if imgui.SliderInt("Directional mult", module.tvisual.timecyc.directional_mult, 0, 255) then
+                if imgui.SliderInt("Multidirecional", module.tvisual.timecyc.directional_mult, 0, 255) then
                     CTimecyc.directional_mult[val]   = module.tvisual.timecyc.directional_mult[0]
                 end
-                fcommon.InformationTooltip("Direct light on peds & vehicles")
+                fcommon.InformationTooltip("Luz em peds & veículo")
 
                 if imgui.SliderInt("Far clip", module.tvisual.timecyc.far_clip, 0, 2000) then
                     CTimecyc.far_clip[val]   = module.tvisual.timecyc.far_clip[0]
                 end
-                fcommon.InformationTooltip("Visibility range")
+                fcommon.InformationTooltip("Alcanse de visibilidade")
 
-                if imgui.SliderInt("High light min intensity", module.tvisual.timecyc.high_light_min_intensity, 0, 255) then
+                if imgui.SliderInt("Intensidade mínima de luz alta", module.tvisual.timecyc.high_light_min_intensity, 0, 255) then
                     CTimecyc.high_light_min_intensity[val]   = module.tvisual.timecyc.high_light_min_intensity[0]
                 end
-                fcommon.InformationTooltip("Intensity limit for PS2 radiosity effect")
+                fcommon.InformationTooltip("Limite de intensidade de radiosity do PS2")
 
-                if imgui.SliderInt("Fog start", module.tvisual.timecyc.fog_start, 0, 2000) then
+                if imgui.SliderInt("Início de nevoeiro", module.tvisual.timecyc.fog_start, 0, 2000) then
                     CTimecyc.fog_start[val]   = module.tvisual.timecyc.fog_start[0]
                 end
 
-                if imgui.SliderInt("Light on ground brightness", module.tvisual.timecyc.lights_on_ground_brightness, 0, 255) then
+                if imgui.SliderInt("Luz no brilho do solo", module.tvisual.timecyc.lights_on_ground_brightness, 0, 255) then
                     CTimecyc.lights_on_ground_brightness[val]   = module.tvisual.timecyc.lights_on_ground_brightness[0]
                 end
 
-                if imgui.SliderInt("Light shadow strength", module.tvisual.timecyc.light_shadow_strength, 0, 255) then
+                if imgui.SliderInt("Força da sombra clara", module.tvisual.timecyc.light_shadow_strength, 0, 255) then
                     CTimecyc.light_shadow_strength[val]   = module.tvisual.timecyc.light_shadow_strength[0]
                 end
 
-                if imgui.SliderInt("Pole shadow strength", module.tvisual.timecyc.pole_shadow_strength, 0, 255) then
+                if imgui.SliderInt("Força da sombra do poste", module.tvisual.timecyc.pole_shadow_strength, 0, 255) then
                     CTimecyc.pole_shadow_strength[val]   = module.tvisual.timecyc.pole_shadow_strength[0]
                 end
 
-                if imgui.SliderInt("Shadow strength", module.tvisual.timecyc.shadow_strength, 0, 255) then
+                if imgui.SliderInt("Força das sombras", module.tvisual.timecyc.shadow_strength, 0, 255) then
                     CTimecyc.shadow_strength[val]   = module.tvisual.timecyc.shadow_strength[0]
                 end
 
-                if imgui.SliderInt("Sprite brightness", module.tvisual.timecyc.sprite_brightness, 0, 127) then
+                if imgui.SliderInt("Brilho de Sprite", module.tvisual.timecyc.sprite_brightness, 0, 127) then
                     CTimecyc.sprite_brightness[val]   = module.tvisual.timecyc.sprite_brightness[0]
                 end
 
-                if imgui.SliderInt("Sprite size", module.tvisual.timecyc.sprite_size, 0, 127) then
+                if imgui.SliderInt("Tamanho do sprite", module.tvisual.timecyc.sprite_size, 0, 127) then
                     CTimecyc.sprite_size[val]   = module.tvisual.timecyc.sprite_size[0]
                 end
                 
-                if imgui.SliderInt("Sun size", module.tvisual.timecyc.sun_size, 0, 127) then
+                if imgui.SliderInt("Tamanho do sol", module.tvisual.timecyc.sun_size, 0, 127) then
                     CTimecyc.sun_size[val]   = module.tvisual.timecyc.sun_size[0]
                 end
 
-                if imgui.SliderInt("Water fog alpha", module.tvisual.timecyc.waterfog_alpha, 0, 255) then
+                if imgui.SliderInt("Alfa de névoa de água", module.tvisual.timecyc.waterfog_alpha, 0, 255) then
                     CTimecyc.waterfog_alpha[val]   = module.tvisual.timecyc.waterfog_alpha[0]
                 end
             end})

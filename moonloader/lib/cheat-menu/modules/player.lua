@@ -101,45 +101,45 @@ function module.ChangePlayerModel(model)
             taskWarpCharIntoCarAsDriver(PLAYER_PED,hveh)
             setCarForwardSpeed(hveh,speed)
         end
-        printHelpString("~g~Skin~w~ changed")
+        printHelpString("~g~Skin~w~ alterada")
     end
 end
 
 function WantedLevelMenu()
     
-    fcommon.DropDownMenu("Wanted level",function()
+    fcommon.DropDownMenu("Nível de procurado",function()
         local  _,wl = storeWantedLevel(PLAYER_HANDLE)
         local wanted_level = imgui.new.int(wl)
         local max_wanted_level = imgui.new.int(readMemory(0x58DFE4,1,false))
         
         imgui.Columns(2,nil,false)
-        imgui.Text("Minimum" .. " = " .. tostring(0))
+        imgui.Text("Mínimo" .. " = " .. tostring(0))
         imgui.NextColumn()
-        imgui.Text("Maximum" .. " = " .. tostring(6))
+        imgui.Text("Máximo" .. " = " .. tostring(6))
         imgui.Columns(1)
 
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
 
-        if imgui.InputInt("Set",wanted_level) then
+        if imgui.InputInt("Definir",wanted_level) then
             callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,wanted_level[0])
         end
         imgui.PopItemWidth()
    
         imgui.Spacing()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Mínimo",imgui.ImVec2(fcommon.GetSize(3))) then
             callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,0)
         end
         imgui.SameLine()
-        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Padrão",imgui.ImVec2(fcommon.GetSize(3))) then
             callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,0)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Máximo",imgui.ImVec2(fcommon.GetSize(3))) then
             callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,max_wanted_level[0])
         end
@@ -156,7 +156,7 @@ function module.ChangePlayerCloth(name)
     givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
     givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
     buildPlayerModel(PLAYER_HANDLE)
-    printHelpString("Clothes changed")
+    printHelpString("Roupa alterada!")
     local veh = nil
     local speed = 0
     if isCharInAnyCar(PLAYER_PED) then
@@ -179,25 +179,25 @@ end
 
 -- Main function
 function module.PlayerMain()
-    if imgui.Button("Suicide",imgui.ImVec2(fcommon.GetSize(1))) then
+    if imgui.Button("Suicidar",imgui.ImVec2(fcommon.GetSize(1))) then
         setCharHealth(PLAYER_PED,0)
     end
     imgui.Spacing()
 
-    fcommon.Tabs("Player",{"Checkboxes","Menus","Skins","Clothes"},{
+    fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Skins","Roupas"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxValue("Aim while driving",0x969179)
-            fcommon.CheckBoxVar("God mode",module.tplayer.god)
-            fcommon.CheckBoxValue("Have bounty on head",0x96913F)
-            fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
-            fcommon.CheckBoxValue("Infinite ammo",0x969178)
-            fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
-            fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
+            fcommon.CheckBoxValue("Mirar enquanto estiver dirigindo",0x969179)
+            fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
+            fcommon.CheckBoxValue("Recompensa na cabeça",0x96913F)
+            fcommon.CheckBoxValue("Saltos mais altos do ciclo",0x969161)
+            fcommon.CheckBoxValue("Munição infinita",0x969178)
+            fcommon.CheckBoxValue("Oxigênio infinito",0x96916E)
+            fcommon.CheckBoxValue("Corrida infinita",0xB7CEE4)
         
             imgui.NextColumn()
 
-            fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,"Player can't enter/exit vehicle",
+            fcommon.CheckBoxVar("Jogador invisível",module.tplayer.invisible,"O jogador não poderá entrar/sair do veículo.",
             function()
                 if module.tplayer.invisible[0] then
                     module.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
@@ -208,14 +208,14 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")
-            fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
-            fcommon.CheckBoxValue("Mega jump",0x96916C)
-            fcommon.CheckBoxValue("Mega punch",0x969173)
-            fcommon.CheckBoxValue("Never get hungry",0x969174)
+            fcommon.CheckBoxVar("Manter posição",module.tplayer.keep_position,"Teleporte automático para a posição em que você morreu.")
+            fcommon.CheckBoxValue("Bloquear controle do jogador",getCharPointer(PLAYER_PED)+0x598)
+            fcommon.CheckBoxValue("Super pulo",0x96916C)
+            fcommon.CheckBoxValue("Super soco",0x969173)
+            fcommon.CheckBoxValue("Nunca sentir fome",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted,nil,
+            fcommon.CheckBoxVar("Nunca ser procurado",module.tplayer.never_wanted,nil,
             function()
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
@@ -229,43 +229,43 @@ function module.PlayerMain()
             imgui.Columns(1)
         end,
         function()
-            fcommon.UpdateAddress({name = "Armour",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
-            fcommon.DropDownMenu("Body",function()
-                if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
+            fcommon.UpdateAddress({name = "Colete",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
+            fcommon.DropDownMenu("Corpo",function()
+                if imgui.RadioButtonIntPtr("Gordo",module.tplayer.cjBody,1) then
                     callFunction(0x439110,1,1,false)
                     fconfig.Set(fconfig.tconfig.misc_data,"Body",1)
                     fcommon.CheatActivated()
                 end
-                if imgui.RadioButtonIntPtr("Muscle",module.tplayer.cjBody,2) then
+                if imgui.RadioButtonIntPtr("Musculoso",module.tplayer.cjBody,2) then
                     -- body not changing to muscular after changing to fat fix
                     callFunction(0x439190,1,1,false)
                     callFunction(0x439150,1,1,false)
                     fconfig.Set(fconfig.tconfig.misc_data,"Body",2)
                     fcommon.CheatActivated()
                 end
-                if imgui.RadioButtonIntPtr("Skinny",module.tplayer.cjBody,3) then
+                if imgui.RadioButtonIntPtr("Magro",module.tplayer.cjBody,3) then
                     callFunction(0x439190,1,1,false)
                     fconfig.Set(fconfig.tconfig.misc_data,"Body",3)
                     fcommon.CheatActivated()
                 end
             end)
-            fcommon.UpdateStat({ name = "Energy",stat = 165})
-            fcommon.UpdateStat({ name = "Fat",stat = 21})
-            fcommon.UpdateAddress({name = "Health",address = getCharPointer(PLAYER_PED)+0x540,size = 4,min = 0,default =100,max = 255, is_float = true})
-            fcommon.UpdateStat({ name = "Lung capacity",stat = 225})
-            fcommon.UpdateStat({ name = "Max health",stat = 24,min = 0,default = 569,max = 1450})
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
-            fcommon.UpdateStat({ name = "Muscle",stat = 23})
-            fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
+            fcommon.UpdateStat({ name = "Energia",stat = 165})
+            fcommon.UpdateStat({ name = "Gordura",stat = 21})
+            fcommon.UpdateAddress({name = "Saúde",address = getCharPointer(PLAYER_PED)+0x540,size = 4,min = 0,default =100,max = 255, is_float = true})
+            fcommon.UpdateStat({ name = "Capacidade pulmonar",stat = 225})
+            fcommon.UpdateStat({ name = "Saúde máxima",stat = 24,min = 0,default = 569,max = 1450})
+            fcommon.UpdateAddress({name = "Dinheiro",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
+            fcommon.UpdateStat({ name = "Músculo",stat = 23})
+            fcommon.UpdateStat({ name = "Respeito",stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
             
             WantedLevelMenu()
         end,
         function()
-            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
+            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Comandos: Mire no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
             imgui.Spacing()
-            fcommon.Tabs("Skins",{"List","Search","Custom"},{
+            fcommon.Tabs("Skins",{"Lista","Procurar","Personalizar"},{
                 function()
                     fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
                 end,
@@ -274,12 +274,12 @@ function module.PlayerMain()
                 end,
                 function()
                     if module.tplayer.custom_skins.is_modloader_installed then
-                        module.tplayer.custom_skins.filter:Draw("Filter")
-                        fcommon.InformationTooltip(string.format("Place your dff & txd files inside,\n'%s'\n\
-Note:\nFile names can't exceed 8 characters.\nDon't change names while the game is running",fplayer.tplayer.custom_skins.path))
+                        module.tplayer.custom_skins.filter:Draw("Filtrar")
+                        fcommon.InformationTooltip(string.format("Coloque os arquivos dff & txd dentro,\n'%s'\n\
+Nota:\nOs nomes dos arquivos não podem exceder 8 caracteres.\nNão mude os nomes enquanto o jogo estiver em execução.",fplayer.tplayer.custom_skins.path))
                         imgui.Spacing()
 
-                        if imgui.BeginChild("Custom skins") then
+                        if imgui.BeginChild("Skins personalizadas") then
                             for model_name,_ in pairs(fplayer.tplayer.custom_skins.names) do
                                 if module.tplayer.custom_skins.filter:PassFilter(model_name) then
                                     model_name = string.sub(model_name,1,-5)
@@ -291,23 +291,23 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
                             imgui.EndChild()
                         end
                     else
-                        if imgui.Button("Download Modloader",imgui.ImVec2(fcommon.GetSize(1))) then
+                        if imgui.Button("Baixar Modloader",imgui.ImVec2(fcommon.GetSize(1))) then
                             os.execute('explorer "https://gtaforums.com/topic/669520-mod-loader/"')
                         end
                         imgui.Spacing()
-                        imgui.TextWrapped("Modloader is not installed. Please install modloader.")
+                        imgui.TextWrapped("O Modloader não está instalado. Por favor, instale o modloader.")
                     end
                 end
             })
         end,
         function()
-            if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Remover roupas",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
                 buildPlayerModel(PLAYER_HANDLE)
-                printHelpString("Clothes ~r~removed")
+                printHelpString("Roupas ~r~removidas")
             end
             imgui.Text("Info")
-            fcommon.InformationTooltip("Right click to add clothes\nLeft click to remove clothes")
+            fcommon.InformationTooltip("Clique com o botão direito para adicionar \ne botão esquerdo para remover a roupa.")
             imgui.Spacing()          
             fcommon.DrawImages(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,module.RemoveThisCloth)
         end

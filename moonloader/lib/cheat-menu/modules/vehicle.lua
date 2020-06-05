@@ -48,13 +48,13 @@ module.tvehicle =
     },
     doors = 
     {
-        "Hood",
-    	"Boot",
-    	"Front left door",
-    	"Front right door",
-    	"Rear left door",
-        "Rear right door",
-        "All",
+        "Capô",
+    	"Porta-malas",
+    	"Porta dianteira esquerdo",
+    	"Porta dianteira direita",
+    	"Porta traseira esquerda",
+        "Porta traseira direita",
+        "Tudo",
     },
     door_menu_button = imgui.new.int(0),
     disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
@@ -313,7 +313,7 @@ function module.GSXProcessVehicles()
             if not doesVehicleExist(car) then 
                 t[pveh] = nil
                 s[car] = nil
-                print("REMOVED")
+                print("Removido!")
             end
         end
         
@@ -465,7 +465,7 @@ function module.AircraftCamera()
             or isCharInAnyPlane(PLAYER_PED) do
                 
                 -- FirstPersonCamera controls the camera if its enabled
-                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
+                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end
 
                 local vehicle = getCarCharIsUsing(PLAYER_PED)
                 local roll = getCarRoll(vehicle)
@@ -502,8 +502,8 @@ function module.FirstPersonCamera()
                 if isCharOnFoot(PLAYER_PED) or getCarModel(hveh) ~= model then
                     break 
                 end
-            
                 
+
                 x,y = getPcMouseMovement()
                 total_x = total_x + x
                 total_y = total_y + y
@@ -541,7 +541,7 @@ function module.ForEachCarComponent(func,skip,car)
             ::_skip::
         end
     else
-        printHelpString("Player ~r~not ~w~in car")
+        printHelpString("O jogador ~r~nao ~w~esta no carro!")
     end
 end
 
@@ -765,7 +765,7 @@ function module.AddComponentToVehicle(component,car,hide_msg)
             loadAllModelsNow()
             addVehicleMod(car,component)
             if hide_msg ~= true then
-                printHelpString("Component ~g~added")
+                printHelpString("Componente ~g~adicionado")
             end
             markModelAsNoLongerNeeded(component)
         end
@@ -780,7 +780,7 @@ function module.RemoveComponentFromVehicle(component,car,hide_msg)
     if doesVehicleExist(car) then
         removeVehicleMod(car,component)
         if hide_msg ~= true then
-            printHelpString("Component ~r~removed")
+            printHelpString("Componente ~r~removido")
         end
     end
 end
@@ -837,7 +837,7 @@ function module.OnEnterVehicle()
 
             module.tvehicle.first_person_camera.offsets[tostring(model)].x = module.tvehicle.first_person_camera.offset_x_var[0]
             module.tvehicle.first_person_camera.offsets[tostring(model)].y = module.tvehicle.first_person_camera.offset_y_var[0] 
-            module.tvehicle.first_person_camera.offsets[tostring(model)].z = module.tvehicle.first_person_camera.offset_z_var[0] 
+            module.tvehicle.first_person_camera.offsets[tostring(model)].z = module.tvehicle.first_person_camera.offset_z_var[0]
             module.tvehicle.max_velocity_temp[0] = -1
         end
         wait(0)
@@ -905,7 +905,7 @@ end
 function module.VehicleMain()
     imgui.Spacing()
     
-    if imgui.Button("Repair vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Reparar veículo",imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
             fixCar(car)
@@ -913,7 +913,7 @@ function module.VehicleMain()
         end
     end
     imgui.SameLine()
-    if imgui.Button("Flip vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Girar veículo",imgui.ImVec2(fcommon.GetSize(2))) then
         
         if isCharInAnyCar(PLAYER_PED) then
             local car   = getCarCharIsUsing(PLAYER_PED)
@@ -923,30 +923,30 @@ function module.VehicleMain()
             fcommon.CheatActivated()
         end
     end
-    fcommon.Tabs("Vehicles",{"Checkboxes","Menus","Spawn","Paint","Tune","Handling"},{
+    fcommon.Tabs("Veículos",{"Caixas de seleção","Menus","Criar","Pintura","Tunar","Handling"},{
         function()
             imgui.Columns(2,nil,false)
                 
-            fcommon.CheckBoxValue("Aggressive drivers",0x96914F)
-            fcommon.CheckBoxValue("All cars have nitro",0x969165)
-            fcommon.CheckBoxValue("All taxis have nitro",0x96918B)
-            fcommon.CheckBoxValue("Boats fly",0x969153)
-            fcommon.CheckBoxValue("Cars fly",0x969160)
-            fcommon.CheckBoxVar("Car heavy",module.tvehicle.heavy)
-            fcommon.CheckBoxValue("Decreased traffic",0x96917A)
-            fcommon.CheckBoxVar("Don't fall off bike",module.tvehicle.stay_on_bike)
-            fcommon.CheckBoxValue("Drive on water",0x969152)
-            fcommon.CheckBoxVar("Disable car engine",module.tvehicle.disable_car_engine)
-            fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,nil,
+            fcommon.CheckBoxValue("Motoristas agressivos",0x96914F)
+            fcommon.CheckBoxValue("Todos carros com nitro",0x969165)
+            fcommon.CheckBoxValue("Todos taxis com nitro",0x96918B)
+            fcommon.CheckBoxValue("Barcos voam",0x969153)
+            fcommon.CheckBoxValue("Carros voam",0x969160)
+            fcommon.CheckBoxVar("Pesar carro",module.tvehicle.heavy)
+            fcommon.CheckBoxValue("Diminuir tráfego",0x96917A)
+            fcommon.CheckBoxVar("Não cair de bicicletas/motos",module.tvehicle.stay_on_bike)
+            fcommon.CheckBoxValue("Dirigir na água",0x969152)
+            fcommon.CheckBoxVar("Desligar motor",module.tvehicle.disable_car_engine)
+            fcommon.CheckBoxVar("Câmera em primeira pessoa",module.tvehicle.first_person_camera.bool,nil,nil,
             function()
-                fcommon.InputFloat("Offset X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
-                fcommon.InputFloat("Offset Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
-                fcommon.InputFloat("Offset Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Ângulo X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Ângulo Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Ângulo Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
             end)
 
-            fcommon.CheckBoxValue("Float away when hit",0x969166)
-            fcommon.CheckBoxValue("Green traffic lights",0x96914E)
-            fcommon.CheckBoxVar("Invisible car",module.tvehicle.invisible_car,nil,
+            fcommon.CheckBoxValue("Carros flutuam ao ser atingidos",0x969166)
+            fcommon.CheckBoxValue("Semáforos verde",0x96914E)
+            fcommon.CheckBoxVar("Carro invisível",module.tvehicle.invisible_car,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
@@ -954,7 +954,7 @@ function module.VehicleMain()
                 end
             end)
 
-            fcommon.CheckBoxVar("Lights on",module.tvehicle.lights,nil,
+            fcommon.CheckBoxVar("Ligar luzes",module.tvehicle.lights,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
                     car = getCarCharIsUsing(PLAYER_PED)
@@ -968,13 +968,13 @@ function module.VehicleMain()
                         fcommon.CheatDeactivated()
                     end
                 else
-                    printHelpString("Player ~r~not~w~ in car")
+                    printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
             end,nil,false)
 
             imgui.NextColumn()
 
-            fcommon.CheckBoxVar("Lock doors",module.tvehicle.lock_doors,nil,
+            fcommon.CheckBoxVar("Trancar portas",module.tvehicle.lock_doors,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
                     local car   = getCarCharIsUsing(PLAYER_PED)
@@ -986,13 +986,13 @@ function module.VehicleMain()
                         fcommon.CheatActivated()
                     end
                 else
-                    printHelpString("Player ~r~not~w~ in car")
+                    printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
             end,nil,false)
-            fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
-            fcommon.CheckBoxValue("New train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
-            fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
-            fcommon.CheckBoxVar("No traffic vehicles",module.tvehicle.no_vehicles,nil,
+            fcommon.CheckBoxVar("Nova câmera aérea",module.tvehicle.aircraft.camera)
+            fcommon.CheckBoxValue("Nova câmera no trem",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
+            fcommon.CheckBoxVar("Sem dano",module.tvehicle.no_damage)
+            fcommon.CheckBoxVar("Sem trânsito de veículos",module.tvehicle.no_vehicles,nil,
             function()
                 if module.tvehicle.no_vehicles[0] then
                     writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
@@ -1009,13 +1009,13 @@ function module.VehicleMain()
                 end
             end,nil,false)
             
-            fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
-            fcommon.CheckBoxValue("Perfect handling",0x96914C)
-            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random\ncolors every second")
-            fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
-            fcommon.CheckBoxValue("Tank mode",0x969164) 
-            fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.")
-            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Nitro will activate when left clicked\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro")
+            fcommon.CheckBoxVar("Não mostrar dano",module.tvehicle.visual_damage)
+            fcommon.CheckBoxValue("Handling perfeito",0x96914C)
+            fcommon.CheckBoxVar("Cores aleatórias",module.tvehicle.random_colors,"Pinta o carro dos jogadores com cores aleatórias\na cada segundo.")
+            fcommon.CheckBoxVar("Tráfego com cores aleatórias",module.tvehicle.random_colors_traffic,"Pinta carros de tráfego com cores aleatórias a cada segundo.")
+            fcommon.CheckBoxValue("Modo tanque",0x969164) 
+            fcommon.CheckBoxVar("Tráfego neon",module.tvehicle.neon.checkbox,"Adiciona luzes de neon aos veículos de trânsito.\nApenas alguns veículos terão.")
+            fcommon.CheckBoxVar("Nitro ilimitado",module.tvehicle.unlimited_nitro,"O Nitro será ativado quando clicado com o botão esquerdo\n\nAtivar isso desativa: \n'Todos os carros e taxis tem nitro'")
             fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -1023,12 +1023,12 @@ function module.VehicleMain()
                     setCarWatertight(car,module.tvehicle.watertight_car[0])
                 end
             end)
-            fcommon.CheckBoxValue("Wheels only",0x96914B)
+            fcommon.CheckBoxValue("Apenas rodas",0x96914B)
     
             imgui.Columns(1)
         end,
         function()
-            fcommon.DropDownMenu("Enter nearest vehicle as",function()
+            fcommon.DropDownMenu("Entrar no veículo mais próximo",function()
                 local vehicle,ped = storeClosestEntities(PLAYER_PED)
                 if vehicle ~= -1 then
                     local seats = getMaximumNumberOfPassengers(vehicle)
@@ -1036,34 +1036,34 @@ function module.VehicleMain()
                     imgui.Columns(2,nil,false)
                     imgui.Text(module.GetNameOfVehicleModel(getCarModel(vehicle)))
                     imgui.NextColumn()
-                    imgui.Text(string.format("Total seats: %d",seats+1))
+                    imgui.Text(string.format("Total de bancos: %d",seats+1))
                     imgui.Columns(1)
 
                     imgui.Spacing()
-                    if imgui.Button("Driver",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if imgui.Button("Motorista",imgui.ImVec2(fcommon.GetSize(2))) then
                         warpCharIntoCar(PLAYER_PED,vehicle)
                     end
                     for i=0,seats-1,1 do
                         if i%2 ~= 1 then
                             imgui.SameLine()
                         end
-                        if imgui.Button("Passenger " .. tostring(i+1),imgui.ImVec2(fcommon.GetSize(2))) then
+                        if imgui.Button("Passageiro " .. tostring(i+1),imgui.ImVec2(fcommon.GetSize(2))) then
                             warpCharIntoCarAsPassenger(PLAYER_PED,vehicle,i)
                         end
                     end
                 else
-                    imgui.Text("No near by vehicles")
+                    imgui.Text("Não há veículos por perto")
                 end
             end)
-            fcommon.DropDownMenu("License plate text",function()
-                imgui.InputText("Text", module.tvehicle.license_plate_text,ffi.sizeof(module.tvehicle.license_plate_text))
-                fcommon.InformationTooltip("The text of vehicle license plate\nwhich you spawn using cheat-menu")
+            fcommon.DropDownMenu("Texto da placa",function()
+                imgui.InputText("Texto", module.tvehicle.license_plate_text,ffi.sizeof(module.tvehicle.license_plate_text))
+                fcommon.InformationTooltip("Texto da placa do veículo\n criado pelo cheat menu.")
             end)
 
-            fcommon.DropDownMenu("Traffic options",function()
-                fcommon.RadioButton("Color",{"Black","Pink"},{0x969151,0x969150})
+            fcommon.DropDownMenu("Opções de tráfego",function()
+                fcommon.RadioButton("Cor",{"Preto","Rosa"},{0x969151,0x969150})
                 imgui.Spacing()
-                fcommon.RadioButton("Type",{"Cheap","Country","Fast"},{0x96915E,0x96917B,0x96915F})
+                fcommon.RadioButton("Tipo",{"'Cheap'","Country","Rápido"},{0x96915E,0x96917B,0x96915F})
             end)
 
             if isCharInAnyCar(PLAYER_PED) then
@@ -1071,17 +1071,17 @@ function module.VehicleMain()
                 local pCar = getCarPointer(car)
                 local model = getCarModel(car)
 
-                fcommon.UpdateAddress({name = 'Density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                fcommon.UpdateAddress({name = 'Dirt level',address = pCar + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
-                fcommon.DropDownMenu("Doors",function()
+                fcommon.UpdateAddress({name = 'Multiplicador de densidade',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
+                fcommon.UpdateAddress({name = 'Nível de sujeira',address = pCar + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
+                fcommon.DropDownMenu("Portas",function()
                     if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
                     or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then    
                         imgui.Columns(2,nil,false)
-                        imgui.RadioButtonIntPtr("Damage", module.tvehicle.door_menu_button,0) 
-                        imgui.RadioButtonIntPtr("Fix", module.tvehicle.door_menu_button,1) 
+                        imgui.RadioButtonIntPtr("Dano", module.tvehicle.door_menu_button,0) 
+                        imgui.RadioButtonIntPtr("Corrigir", module.tvehicle.door_menu_button,1) 
                         imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("Open", module.tvehicle.door_menu_button,2) 
-                        imgui.RadioButtonIntPtr("Pop", module.tvehicle.door_menu_button,3)
+                        imgui.RadioButtonIntPtr("Abrir", module.tvehicle.door_menu_button,2) 
+                        imgui.RadioButtonIntPtr("Soltar", module.tvehicle.door_menu_button,3)
                         imgui.Columns(1)
 
                         imgui.Spacing()
@@ -1092,7 +1092,7 @@ function module.VehicleMain()
                                     damageCarDoor(vehicle,door)
                                 end)
                             else
-                                imgui.Text("No visual damage enabled")
+                                imgui.Text("Nenhum dano visual ativado")
                             end
                         end
                         if module.tvehicle.door_menu_button[0] == 1 then
@@ -1111,7 +1111,7 @@ function module.VehicleMain()
                             end)
                         end
                     else
-                        imgui.Text("Player not in car")
+                        imgui.Text("O jogador não está no carro")
                     end
                     
                 end)
@@ -1142,65 +1142,65 @@ function module.VehicleMain()
                 fcommon.DropDownMenu("Neons",function()
                     if module.tvehicle.neon["Handle"] ~= 0 then
                         imgui.Columns(3,nil,false)
-                        imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
-                        imgui.RadioButtonIntPtr("Cyan", module.tvehicle.neon.rb_value,5)
-                        imgui.RadioButtonIntPtr("Green", module.tvehicle.neon.rb_value,1) 
+                        imgui.RadioButtonIntPtr("Azul", module.tvehicle.neon.rb_value,2) 
+                        imgui.RadioButtonIntPtr("Ciano", module.tvehicle.neon.rb_value,5)
+                        imgui.RadioButtonIntPtr("Verde", module.tvehicle.neon.rb_value,1) 
                         imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("None", module.tvehicle.neon.rb_value,-1)
-                        imgui.RadioButtonIntPtr("Purple", module.tvehicle.neon.rb_value,6)
-                        imgui.RadioButtonIntPtr("Red", module.tvehicle.neon.rb_value,0) 
+                        imgui.RadioButtonIntPtr("Nenhum", module.tvehicle.neon.rb_value,-1)
+                        imgui.RadioButtonIntPtr("Roxo", module.tvehicle.neon.rb_value,6)
+                        imgui.RadioButtonIntPtr("Vermelho", module.tvehicle.neon.rb_value,0) 
                         imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("White", module.tvehicle.neon.rb_value,3)
-                        imgui.RadioButtonIntPtr("Yellow", module.tvehicle.neon.rb_value,4)
+                        imgui.RadioButtonIntPtr("Branco", module.tvehicle.neon.rb_value,3)
+                        imgui.RadioButtonIntPtr("Amarelo", module.tvehicle.neon.rb_value,4)
                         imgui.Columns(1)
 
                         imgui.Dummy(imgui.ImVec2(0,20))
-                        fcommon.CheckBoxVar("Pulsing",module.tvehicle.neon.pulsing,"Neons will blink continuously")
+                        fcommon.CheckBoxVar("Pulsante",module.tvehicle.neon.pulsing,"Neons piscarão continuamente.")
                         imgui.Spacing()
 
-                        if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
+                        if imgui.Button("Instalar Neon",imgui.ImVec2(fcommon.GetSize(1))) then
                             InstallNeon(pCar)
                         end
                     else
-                        imgui.TextWrapped("Unable to find 'neon_api.asi'. Please reinstall Cheat Menu.")
+                        imgui.TextWrapped("Não foi possível encontrar 'neon_api.asi'. Por favor, reinstale o cheat menu.")
                     end
                 end)
-                fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
-                fcommon.DropDownMenu("Set name",function()
+                fcommon.UpdateAddress({name = 'Quantidade de nitro',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
+                fcommon.DropDownMenu("Definir nome",function()
 
-                    imgui.Text(string.format( "Model name = %s",module.GetNameOfVehicleModel(getCarModel(car))))
+                    imgui.Text(string.format( "Nome do carro = %s",module.GetNameOfVehicleModel(getCarModel(car))))
                     imgui.Spacing()
-                    imgui.InputText("Name", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
+                    imgui.InputText("Nome", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
 
                     imgui.Spacing()
-                    if imgui.Button("Set",imgui.ImVec2(fcommon.GetSize(3))) then
+                    if imgui.Button("Definir",imgui.ImVec2(fcommon.GetSize(3))) then
                         setGxtEntry(module.GetNameOfVehicleModel(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
                         fcommon.CheatActivated()
                     end
                     imgui.SameLine()
-                    if imgui.Button("Save",imgui.ImVec2(fcommon.GetSize(3))) then
+                    if imgui.Button("Salvar",imgui.ImVec2(fcommon.GetSize(3))) then
                         module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
                     end
                     imgui.SameLine()
-                    if imgui.Button("Clear all",imgui.ImVec2(fcommon.GetSize(3))) then
+                    if imgui.Button("Limpar tudo",imgui.ImVec2(fcommon.GetSize(3))) then
                         module.tvehicle.gxt_name_table = {}
                     end
                 end)
-                fcommon.DropDownMenu("Set speed",function()
+                fcommon.DropDownMenu("Definir velocidade",function()
                     
-                    fcommon.CheckBoxVar("Lock speed",module.tvehicle.lock_speed)
+                    fcommon.CheckBoxVar("Bloquear velocidade",module.tvehicle.lock_speed)
                     imgui.Spacing()
-                    imgui.InputInt("Set",module.tvehicle.speed)
+                    imgui.InputInt("Definir",module.tvehicle.speed)
                      
                     imgui.Spacing()
-                    if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if imgui.Button("Definir velocidade",imgui.ImVec2(fcommon.GetSize(2))) then
                         if isCharInAnyCar(PLAYER_PED) then
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,module.tvehicle.speed[0])
                         end
                     end
                     imgui.SameLine()
-                    if imgui.Button("Instant stop",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if imgui.Button("Parada instantânea",imgui.ImVec2(fcommon.GetSize(2))) then
                         if isCharInAnyCar(PLAYER_PED) then
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,0.0)
@@ -1213,21 +1213,21 @@ function module.VehicleMain()
                         module.tvehicle.speed[0] = 0
                     end
                 end)
-                fcommon.UpdateAddress({name = 'Wheel scale',address = pCar+0x458,size = 4,min = 0,max = 10, default = 1,is_float = true})
+                fcommon.UpdateAddress({name = 'Tamanho da roda',address = pCar+0x458,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 --fcommon.UpdateAddress({name = 'ZZZZZ',address = pCar+0x489,size = 4,min = -10,max = 10, default = 1,is_float = false})
 
             end            
         end,
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Spawn inside",module.tvehicle.spawn_inside,"Spawn inside vehicle as driver")
+            fcommon.CheckBoxVar("Criar dentro do carro",module.tvehicle.spawn_inside,"Criar dentro do veículo como motorista.")
 
             imgui.NextColumn()
-            fcommon.CheckBoxVar("Spawn aircraft in air",module.tvehicle.aircraft.spawn_in_air)
+            fcommon.CheckBoxVar("Criar aeronaves no ar",module.tvehicle.aircraft.spawn_in_air)
             imgui.Columns(1)
 
             imgui.Spacing()
-            fcommon.Tabs("Vehicles list",{"List","Search"},{
+            fcommon.Tabs("Lista de veículos",{"Lista","Procura"},{
                 function()
                     fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetNameOfVehicleModel,module.tvehicle.filter)
                 end,
@@ -1241,7 +1241,7 @@ function module.VehicleMain()
                 local car = getCarCharIsUsing(PLAYER_PED)
                 local model = getCarModel(car)
             
-                if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Resetar cor",imgui.ImVec2(fcommon.GetSize(2))) then
 
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
@@ -1252,10 +1252,10 @@ function module.VehicleMain()
                         end
                     end)
                     module.tvehicle.color.default = -1
-                    printHelpString("Color reset")
+                    printHelpString("Cor resetada!")
                 end
                 imgui.SameLine()
-                if imgui.Button("Reset texture",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Resetar textura",imgui.ImVec2(fcommon.GetSize(2))) then
                     fconfig.tconfig.temp_texture_name = nil
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_texture()
@@ -1264,44 +1264,44 @@ function module.VehicleMain()
                         end 
                     end)
                     module.tvehicle.paintjobs.texture = nil
-                    printHelpString("Texture reset")
+                    printHelpString("Textura resetada!")
                 end
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
+                fcommon.CheckBoxVar("Filtrar material",module.tvehicle.apply_material_filter,"Filtra o material ao aplicar cor/textura.\nDesative se algo não funcionar corretamente.")
                 imgui.NextColumn()
                 imgui.Columns(1)
                 imgui.Spacing()
                 
-                if imgui.ColorEdit3("Color",module.tvehicle.color.rgb) then
+                if imgui.ColorEdit3("Cor",module.tvehicle.color.rgb) then
                     ApplyColor()
                 end
-                fcommon.ConfigPanel({nil,"Color"},function()
+                fcommon.ConfigPanel({nil,"Cor"},function()
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
-                    fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
+                    fcommon.CheckBoxVar("Mostrar tudo", module.tvehicle.color.show_all,"Mostrar todas as cores do 'carcols.dat'.")
                     imgui.Spacing()
                     
                     local name = module.GetNameOfVehicleModel(getCarModel(car))
                     
                     if module.tvehicle.color.car_data_table[name] ~= nil then
                         local shown_colors = {}
-                        imgui.Text("Color:")
+                        imgui.Text("Cores:")
                         imgui.Spacing()
                         imgui.Columns(2,nil,false)
-                        imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
-                        imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                        imgui.RadioButtonIntPtr("Cor 1", module.tvehicle.color.radio_btn, 1)
+                        imgui.RadioButtonIntPtr("Cor 2", module.tvehicle.color.radio_btn, 2)
                         imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
-                        imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                        imgui.RadioButtonIntPtr("Cor 3", module.tvehicle.color.radio_btn, 3)
+                        imgui.RadioButtonIntPtr("Cor 4", module.tvehicle.color.radio_btn, 4)
                         imgui.Spacing()
                         imgui.Columns(1)
-                        imgui.Text("Select color preset:")
+                        imgui.Text("Selecionar cor predefinida::")
                         imgui.Spacing()
 
-                        if imgui.BeginChild("Colors") then
+                        if imgui.BeginChild("Cores") then
                             local x,y = fcommon.GetSize(1)
                             local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
                             local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
@@ -1352,7 +1352,7 @@ function module.VehicleMain()
                         end
                     end
                 end)
-                imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
+                imgui.Combo("Componente",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
                 
                 local paintjobs_count =  getNumAvailablePaintjobs(car)
                 
@@ -1368,7 +1368,7 @@ function module.VehicleMain()
 
                 fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName,module.tvehicle.paintjobs.filter)
             else
-                imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
+                imgui.TextWrapped("O jogador precisa estar dentro de um veículo para que as opções apareçam aqui.")
             end
         end,
         function()
@@ -1376,7 +1376,7 @@ function module.VehicleMain()
                 local car = getCarCharIsUsing(PLAYER_PED)
                 local model = getCarModel(car)
 
-                if imgui.Button("Reset vehicle components",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Resetar componentes do veículo",imgui.ImVec2(fcommon.GetSize(1))) then
                     for x=1,fconst.COMPONENT.TOTAL_SLOTS,1 do
                         local comp_model = getCurrentCarMod(car,x)
 
@@ -1384,19 +1384,19 @@ function module.VehicleMain()
                             module.RemoveComponentFromVehicle(comp_model,car,true)
                         end
                     end
-                    printHelpString("Vehicle components reset")
+                    printHelpString("Componentes do veiculo resetados!")
                 end
                 imgui.Spacing()
                 imgui.Text("Info")
                 fcommon.InformationTooltip("Left click to add component\nRight click to remove component")
                 imgui.Spacing()
-                if imgui.BeginChild("Tune") then
+                if imgui.BeginChild("Tunar") then
                     imgui.Spacing()
                     fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,nil,module.tvehicle.components.filter)
                     imgui.EndChild()
                 end
             else
-                imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
+                imgui.TextWrapped("O jogador precisa estar dentro de um veículo para que as opções apareçam aqui.")
             end
         end,
         function()
@@ -1415,13 +1415,13 @@ function module.VehicleMain()
                     module.tvehicle.max_velocity_temp[0] = velocity
                 end
 
-                if imgui.Button("Reset game handling",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Resetar handling do jogo",imgui.ImVec2(fcommon.GetSize(2))) then
                     local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
-                    printHelpString("Handling reset")
+                    printHelpString("Handling resetado!")
                 end
                 imgui.SameLine()
-                if imgui.Button("Save data to file",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Salvar dados no arquivo",imgui.ImVec2(fcommon.GetSize(2))) then
                     local name = module.tvehicle.handling_name[model]
                     local fMass =  memory.getfloat(phandling + 0x4)
                     local fTurnMass = memory.getfloat(phandling + 0xC)
@@ -1469,62 +1469,62 @@ function module.VehicleMain()
                     fCollisionDamageMultiplier,nMonetaryValue,tostring(modelFlags),tostring(handlingFlags),front_lights,rear_lights,vehicle_anim_group)
                     file:write(data)
                     file:close()
-                    printHelpString("Data saved")
+                    printHelpString("Dados salvos!")
                 end
-                if imgui.Button("Read more about handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Ler mais sobre handling",imgui.ImVec2(fcommon.GetSize(1))) then
                     os.execute('explorer "https://projectcerbera.com/gta/sa/tutorials/handling"')
                 end
 
                 imgui.Spacing()
                 if imgui.BeginChild("Handling") then
-                    fcommon.RadioButtonFunc("ABS",{"On","Off"},{1.0,0.0},phandling + 0x9C,false)
-                    fcommon.UpdateAddress({name = 'Anti dive multiplier',address = phandling + 0xC4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Brake bias',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 20,is_float = true,mul = 2500,cvalue = 0.1, save = false})
-                    fcommon.UpdateAddress({name = 'Centre of mass X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Centre of mass Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Centre of mass Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Collision damage multiplier',address = phandling + 0xC8,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01,mul = 0.3381, save = false})                    
-                    fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.RadioButtonFunc("ABS",{"Ligado","Desligado"},{1.0,0.0},phandling + 0x9C,false)
+                    fcommon.UpdateAddress({name = 'Multiplicador anti-mergulho',address = phandling + 0xC4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Viés de freio',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Desaceleração do freio',address = phandling + 0x94 ,size = 4,min = 0.1,max = 20,is_float = true,mul = 2500,cvalue = 0.1, save = false})
+                    fcommon.UpdateAddress({name = 'Centro da massa X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Centro da massa Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Centro da massa Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Multiplicador de danos por colisão',address = phandling + 0xC8,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01,mul = 0.3381, save = false})                    
+                    fcommon.UpdateAddress({name = 'Nível de amortecimento',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 0,max = 30.0,is_float = true, save = false})
-                    fcommon.RadioButtonFunc("Drive type",{"Front wheel drive","Rear wheel drive","Four wheel drive"},{70,82,52},phandling + 0x74,false)
-                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 0,max = 49,is_float = true,mul = 12500, save = false})
-                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 400,is_float = true, save = false})
-                    fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{80,68,69},phandling + 0x75,false)
-                    fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{0,1,2,3},phandling + 0xDC,false)
-                    fcommon.UpdateAddress({name = 'Force level',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1, save = false})
-                    fcommon.UpdateBits("Handling flags",module.tvehicle.handling_flags,phandling + 0xD0,4)
-                    fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
-                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
+                    fcommon.RadioButtonFunc("Tipo de direção",{"Tração dianteira","Tração Traseira","Tração nas quatro rodas"},{70,82,52},phandling + 0x74,false)
+                    fcommon.UpdateAddress({name = 'Aceleração do motor',address = phandling + 0x7C ,size = 4,min = 0,max = 49,is_float = true,mul = 12500, save = false})
+                    fcommon.UpdateAddress({name = 'Inércia do motor',address = phandling + 0x80 ,size = 4,min = 0,max = 400,is_float = true, save = false})
+                    fcommon.RadioButtonFunc("Tipo de motor",{"Gasolina","Diesel","Elétrico"},{80,68,69},phandling + 0x75,false)
+                    fcommon.RadioButtonFunc("Luzes dianteiras",{"Longa","Pequena","Grande"},{0,1,2,3},phandling + 0xDC,false)
+                    fcommon.UpdateAddress({name = 'Nível de força',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1, save = false})
+                    fcommon.UpdateBits("Manipulação de sinalizadores",module.tvehicle.handling_flags,phandling + 0xD0,4)
+                    fcommon.UpdateAddress({name = 'Amortecimento em alta velocidade',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
+                    fcommon.UpdateAddress({name = 'Limite inferior',address = phandling + 0xBC ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Massa',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
                     
                     -- fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 0,max = 2,is_float = true,cvalue = 0.01 , save = false})
-                    fcommon.DropDownMenu("Max velocity",function()
+                    fcommon.DropDownMenu("Velocidade máxima",function()
                         imgui.Text("Info")
-                        fcommon.InformationTooltip("Due to an issue, any changes made here won't\nbe applied in game. You can still generate your\
-data file with these values changed here")
+                        fcommon.InformationTooltip("Devido a um problema, quaisquer alterações feitas aqui não serão\naplicados no jogo. Você ainda pode gerar seu\
+arquivo de dados com esses valores alterados aqui.")
                         imgui.Columns(2,nil,false)
-                        imgui.Text("Minimum = 0")
+                        imgui.Text("Mínimo= 0")
                         imgui.NextColumn()
-                        imgui.Text("Maximum = 500")
+                        imgui.Text("Máximo = 500")
                         imgui.Columns(1)
                         imgui.Spacing()
                 
-                        imgui.InputInt("Set##MaxVelocity",module.tvehicle.max_velocity_temp)
+                        imgui.InputInt("Definir##MaxVelocity",module.tvehicle.max_velocity_temp)
 
-                        if imgui.Button("Minimum##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                        if imgui.Button("Mínimo##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
                             module.tvehicle.max_velocity_temp[0] = 0
                         end
             
                         imgui.SameLine()
-                        if imgui.Button("Default##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                        if imgui.Button("Padrão##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
                             local fMaxVelocity = memory.getfloat(phandling + 0x84)
                             fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
                             module.tvehicle.max_velocity_temp[0] = math.floor(fMaxVelocity)
                         end
             
                         imgui.SameLine()
-                        if imgui.Button("Maximum##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                        if imgui.Button("Mínimo##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
                             module.tvehicle.max_velocity_temp[0] = 500
                         end
 
@@ -1538,23 +1538,23 @@ data file with these values changed here")
                     end)
 
                     fcommon.UpdateBits("Model flags",module.tvehicle.model_flags,phandling + 0xCC,4)
-                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4, save = false})
-                    fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
-                    fcommon.UpdateAddress({name = 'Percent submerged',address = phandling + 0x20 ,size = 1,min = 10,max = 120, save = false})
-                    fcommon.RadioButtonFunc("Rear lights",{"Long","Small","Big","Tall"},{0,1,2,3},phandling + 0xDD,false)
-                    fcommon.UpdateAddress({name = 'Seat offset distance',address = phandling + 0xD4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 50,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Traction bias',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Traction loss',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.5,max = 2,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,min = 20,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Vehicle anim group',address = phandling + 0xDE ,size = 1, save = false})
+                    fcommon.UpdateAddress({name = 'Valor monetário',address = phandling + 0xD8 ,size = 4, save = false})
+                    fcommon.UpdateAddress({name = 'Número de engrenagens',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
+                    fcommon.UpdateAddress({name = 'Porcentagem submersa',address = phandling + 0x20 ,size = 1,min = 10,max = 120, save = false})
+                    fcommon.RadioButtonFunc("Luzes traseiras",{"Longa","Pequena","Grande","Alta"},{0,1,2,3},phandling + 0xDD,false)
+                    fcommon.UpdateAddress({name = 'Distância do deslocamento do assento',address = phandling + 0xD4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Trava de direção',address = phandling + 0xA0 ,size = 4,min = 10,max = 50,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Viés de suspensão',address = phandling + 0xC0 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Tração de viés',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Perda de tração',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Multiplicador de tração',address = phandling + 0x28 ,size = 4,min = 0.5,max = 2,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Virar massa',address = phandling + 0xC ,size = 4,min = 20,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Limite superior',address = phandling + 0xB8 ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Grupo de anim de veículo',address = phandling + 0xDE ,size = 1, save = false})
                     imgui.EndChild()
                 end
             else
-                imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
+                imgui.TextWrapped("O jogador precisa estar dentro de um veículo para que as opções apareçam aqui.")
             end
         end
     })

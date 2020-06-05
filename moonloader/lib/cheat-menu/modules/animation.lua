@@ -22,7 +22,7 @@ module.tanimation =
     fighting      =
     {
         selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',0)),
-        names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
+        names     = {"default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
         array     = {},
     }, 
     filter = imgui.ImGuiTextFilter(),
@@ -56,7 +56,7 @@ function AnimationEntry(file,animation)
 		module.tanimation.list[file .. "$" .. animation] = nil
 		fcommon.SaveJson("animation",module.tanimation.list)
 		module.tanimation.list = fcommon.LoadJson("animation")
-		printHelpString("Animation ~r~removed")
+		printHelpString("Animacao ~r~removida!")
 	end
 end
 
@@ -65,7 +65,7 @@ function PlayAnimation(file,animation)
         if doesCharExist(fped.tped.selected) then
             char = fped.tped.selected
         else
-            printHelpString("~r~No~w~ ped selected")
+            printHelpString("~r~Nenhum~w~ ped selecionado!")
             return
         end
     else
@@ -86,13 +86,13 @@ end
 -- Main function
 function module.AnimationMain()
     imgui.Spacing()
-    if imgui.Button("Stop animation",imgui.ImVec2(fcommon.GetSize(1))) then
+    if imgui.Button("Parar animação",imgui.ImVec2(fcommon.GetSize(1))) then
         local char = nil
         if module.tanimation.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 char = fped.tped.selected
             else
-                printHelpString("~r~No~w~ ped selected")
+                printHelpString("~r~Nenhum~w~ ped selecionado!")
                 return
             end
         else
@@ -106,13 +106,13 @@ function module.AnimationMain()
     -- Checkboxes
     imgui.Columns(2,nil,false)
     fcommon.CheckBoxVar("Loop",module.tanimation.loop)
-    fcommon.CheckBoxVar("Ped ##Animation",module.tanimation.ped,"Play animation on ped.Aim with a gun to select.")
+    fcommon.CheckBoxVar("Ped ##Animação",module.tanimation.ped,"Animação no ped:Mire no ped para selecionar.")
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Secondary",module.tanimation.secondary)
+    fcommon.CheckBoxVar("Secundária",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 
-    fcommon.Tabs("Animation",{"List","Search","Misc","Custom"},{
+    fcommon.Tabs("Animação",{"Animações","Pesquisa","Misc","Personalizado"},{
         function()
             local menus_shown = {}
             for key,value in fcommon.spairs(module.tanimation.list) do
@@ -139,7 +139,7 @@ function module.AnimationMain()
             end   
         end,
         function()
-            module.tanimation.filter:Draw("Filter")
+            module.tanimation.filter:Draw("Filtrar")
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then
@@ -154,12 +154,12 @@ function module.AnimationMain()
             end
         end,
         function()
-            if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
+            if imgui.Combo("Luta", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
                 giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
             end
 
-            if imgui.Combo("Walking", module.tanimation.walking.selected,module.tanimation.walking.array,#module.tanimation.walking.names) then
+            if imgui.Combo("Caminhada", module.tanimation.walking.selected,module.tanimation.walking.array,#module.tanimation.walking.names) then
               
                 if module.tanimation.walking.names[module.tanimation.walking.selected[0]+1] == "default" then
                     writeMemory(0x609A4E,4,0x4D48689,false)
@@ -177,14 +177,14 @@ function module.AnimationMain()
             end
         end,
         function()
-            imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
-            imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name))
+            imgui.InputText("Nome do IFP",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
+            imgui.InputText("Nome da animação",module.tanimation.name,ffi.sizeof(module.tanimation.name))
             imgui.Spacing()
-            if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Adicionar animação",imgui.ImVec2(fcommon.GetSize(1))) then
                 module.tanimation.list[ffi.string(module.tanimation.ifp_name) .. "$" .. ffi.string(module.tanimation.name)] = "Animation"
                 fcommon.SaveJson("animation",module.tanimation.list)
                 module.tanimation.list = fcommon.LoadJson("animation")
-                printHelpString("Animation ~g~added")
+                printHelpString("Animacao ~g~adicionada!")
             end
         end
     })

@@ -39,7 +39,7 @@ module.tmenu =
 		show            = imgui.new.bool(true),
 		location    	= imgui.new.bool(fconfig.Get('tmenu.overlay.location',false)),
 		offset          = imgui.new.int(10),
-    	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right"},
+    	position        = {"Customizar","Superior esquerdo","Superior direito","Inferior esquerdo","Inferior direito"},
     	position_array  = {},
 		position_index  = imgui.new.int(fconfig.Get('tmenu.overlay.position_index',4)),
 		health          = imgui.new.bool(fconfig.Get('tmenu.overlay.health',false)),
@@ -92,63 +92,63 @@ function module.RegisterAllCommands()
 
 	module.RegisterCommand("reload",function(t)
 		thisScript():reload()
-	end,"Reload cheat menu")
+	end,"Recarrega o cheat menu")
 
 	module.RegisterCommand("reloadall",function(t)
 		reloadScripts()
-	end,"Reload all moonloader scripts")
+	end,"Recarrega todos scripts no moonloader")
 
 	module.RegisterCommand("tp",function(t)
         if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
 		lua_thread.create(fteleport.Teleport,tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
-	end,"Teleport to coordinates","{int X} {int Y} {int Z}(optional)")
+	end,"Teleporta para a coordenada","{X} {Y} {Z}(opcional)")
 	
 	module.RegisterCommand("settime",function(t)
         setTimeOfDay(t[2],t[3])
-        printHelpString("Time set")
-	end,"Sets in-game time","{int hour} {int minute}")
+        printHelpString("Horario definido as")
+	end,"Define o horário no jogo","{hora} {minuto}")
 	
 	module.RegisterCommand("cheatmenu",function(t)
         tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
-    end,"Open or close cheat menu")
+    end,"Abre ou fecha o cheat menu")
 
     module.RegisterCommand("sethealth",function(t)
        setCharHealth(PLAYER_PED,tonumber(t[2]))
-       printHelpString("Set health to " .. t[2])
-	end,"Sets player health to value","{int health}")
+       printHelpString("Saude definida como " .. t[2])
+	end,"Define o valor da saúde do jogador","{valor}")
 	
     module.RegisterCommand("setmaxhealth",function(t)
         setCharMaxHealth(PLAYER_PED,tonumber(t[2]))
-        printHelpString("Set max health to " .. t[2])
-	end,"Sets player max health to value","{int max_health}")
+        printHelpString("Saude maxima definida como " .. t[2])
+	end,"Define o valor máximo de vida do jogador","{saúde_max}")
 	
     module.RegisterCommand("copycoordinates",function(t)
         local x,y,z = getCharCoordinates(PLAYER_PED)
         setClipboardText(string.format("%s %s %s",math.floor(x),math.floor(y),math.floor(z)))
-        printHelpString("Coordinates copied to clipboard")
-    end,"Copies coordinates to clipboard")
+        printHelpString("Coordenadas copiadas para a area de transferencia")
+    end,"Copia coordenadas para a área de transferência")
 
     module.RegisterCommand("setcarspeed",function(t)
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
             setCarForwardSpeed(car,tonumber(t[2]))
-            printHelpString("Car speed set to " ..t[2])
+            printHelpString("Velocidade do carro definida como " ..t[2])
         else
-            printHelpString("Player is not in any car")
+            printHelpString("O jogador nao esta no carro")
         end
-    end,"Sets vehicle speed","{int speed}")
+    end,"Define a velocidade do veículo","{velocidade}")
 
     module.RegisterCommand("restorecam",function(t)
         restoreCamera()
-	end,"Restores camera to default")
+	end,"Restaura a câmera padrão")
 
 	module.RegisterCommand("cameramode",function(t)
         fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
-	end,"Enable or disable camera mode")
+	end,"Ativa ou desativa o modo câmera")
 	
 	module.RegisterCommand("veh",function(t)
 		if t[2] == nil then 
-			printHelpString("No vehicle name provided") 
+			printHelpString("Nenhum nome de veiculo fornecido") 
 			return 
 		end
 
@@ -164,19 +164,19 @@ function module.RegisterAllCommands()
 				or isThisModelAPlane(model) then
 					fvehicle.GiveVehicleToPlayer(model)
 				else
-					printHelpString("This is not a vehicle model")
+					printHelpString("Isso nao e um modelo de veiculo!")
 				end
 			else
-				printHelpString("Invalid vehicle name")
+				printHelpString("Nome de veiculo invalido!")
 			end
 		end
 		
 
-	end,"Spawns vehicle","{vehicle name}")
+	end,"Criar veículo","{nome do veículo}")
 
     module.RegisterCommand("wep",function(t)
 		if t[2] == nil then 
-			printHelpString("No weapon name provided") 
+			printHelpString("Nenhum nome de arma fornecido") 
 			return 
 		end
 
@@ -185,13 +185,13 @@ function module.RegisterAllCommands()
         if type(model) == "nil" then
             model = fweapon.CBaseWeaponInfo(string.upper(t[2]))  
             if model == 0 then  
-                printHelpString("Invalid weapon name")
+                printHelpString("Nome de arma invalido!")
                 return
             end
 			t[2] = model
 			fweapon.GiveWeapon(t[2])
         end
-    end,"Spawns weapon","{weapon name}")
+    end,"Criar arma","{nome da arma}")
 end
 --------------------------------------------------
 
@@ -250,17 +250,17 @@ function module.GetPlayerLocation()
 		local x,y,z = getCharCoordinates(PLAYER_PED)
 		local zone_name = getGxtText(getNameOfZone(x,y,z))
 
-		return string.format("Location: %s, %s",zone_name,town_name)
+		return string.format("Localização: %s, %s",zone_name,town_name)
 	else
-		return string.format("Location: Interior %d, %s",getCharActiveInterior(PLAYER_PED),town_name)
+		return string.format("Localização: Interior %d, %s",getCharActiveInterior(PLAYER_PED),town_name)
 	end
 end
 
 function module.CheckUpdates()
 	if string.find( script.this.version,"beta") then
-		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/moonloader/cheat-menu.lua"
+		link = "https://raw.githubusercontent.com/Dowglass/Cheat-Menu/master/moonloader/cheat-menu.lua"
 	else
-		link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags"
+		link = "https://api.github.com/repos/Dowglass/Cheat-Menu/tags"
 	end
 
 	module.httpRequest(link, nil, function(body, code, headers, status)
@@ -277,95 +277,95 @@ function module.CheckUpdates()
 			if  repo_version ~= nil then
 				if tostring(repo_version) > tostring(this_version) then
 					module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
-					printHelpString("New update available")
+					printHelpString("Nova atualizacao disponivel!")
 				else
-					printHelpString("No updates found")
+					printHelpString("Nenhuma atualizacao disponivel")
 				end
 			else
-				printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+				printHelpString("Nao foi possivel conectar ao github. O restante do menu ainda esta funcional. Voce pode desativar a verificacao de atualizacao automatica em 'Menu'.")
 			end
 		else
-			print(link, 'Error', code)
+			print(link, 'Erro', code)
 		end
 	end)
 end
 
 function module.DownloadHandler(id, status, p1, p2)
-	print("Update status: " .. status)
+	print("Status da atualizacao: " .. status)
 	if status == fconst.UPDATE_STATUS.INSTALL then
 		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
-		printHelpString("Download complete. Click the 'Install update' button to finish.")
+		printHelpString("Download completo. Clique no botao 'Instalar atualizacao' para finalizar.")
 	end
 end
 
 function DownloadUpdate()
 	if string.find( script.this.version,"beta") then
-		module.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
+		module.httpRequest("https://github.com/Dowglass/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
 			print(link, 'OK', status)
-			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
+			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
 	else
-		module.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  
+		module.httpRequest("https://api.github.com/repos/Dowglass/Cheat-Menu/tags", nil, function(body, code, headers, status)  
 			print(link, 'OK', status)
 			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
-			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
+			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
 	end
 	
-	printHelpString("Download has started. You'll get notified when the download completes.")
+	printHelpString("O download foi iniciado. Voce sera notificado quando o download for concluido.")
 	module.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
 end
 
 -- Main function
 function module.MenuMain()
 
-	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hoykeys","Styles","License","About"},{
+	fcommon.Tabs("Menu",{"Config","Info","Comandos","Teclas de atalho","Estilos","Licença","Sobre"},{
 		function()
-			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
-				module.tmenu.crash_text = "Default configuration ~g~restored"
+			if imgui.Button("Configurações padrão",imgui.ImVec2(fcommon.GetSize(2))) then
+				module.tmenu.crash_text = "Configuraçoes padrao ~g~definida"
 				fconfig.tconfig.reset = true
 				thisScript():reload()
 			end
 			imgui.SameLine()
-			if imgui.Button("Reload",imgui.ImVec2(fcommon.GetSize(2))) then
-				module.tmenu.crash_text = "Cheat Menu ~g~reloaded"
+			if imgui.Button("Recarregar",imgui.ImVec2(fcommon.GetSize(2))) then
+				module.tmenu.crash_text = "Cheat Menu ~g~recarregado"
 				thisScript():reload()
 			end
 			imgui.Dummy(imgui.ImVec2(0,5))
 			imgui.Columns(2,nil,false)
-			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
-			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
-will download files from github repository.")
-			fcommon.CheckBoxVar("Draw text only",module.tmenu.draw_text_only,"Replace the menu images with text names\
-This might improve the menu performance")	
-			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
-This may increase game startup time or\nfreeze it for few seconds but improve\nmenu performance.")
-			
+			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
+			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
+a internet para baixar arquivos do github.")
+			fcommon.CheckBoxVar("Apenas texto",module.tmenu.draw_text_only,"Substitua as imagens do menu por nomes de texto.\
+Isso pode melhorar o desempenho do menu.")	
+			fcommon.CheckBoxVar("Carregamento rápido de imagens",module.tmenu.fast_load_images,"Carregamento rápido de imagens de veículos, armas, peds e etc.\n \
+Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segundos, mas melhora o desempenho do menu.")
+				
 			imgui.NextColumn()
-			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
-			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
-			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options.")
+			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
+			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
+			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
 			imgui.Columns(1)
 			
 		end,
 		function()
 			imgui.Columns(2,nil,false)
-			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
-			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
-			fcommon.CheckBoxVar("Show location",module.tmenu.overlay.location)
+			fcommon.CheckBoxVar("Mostrar coordenadas",module.tmenu.overlay.coordinates)
+			fcommon.CheckBoxVar("Mostrar FPS",module.tmenu.overlay.fps)	
+			fcommon.CheckBoxVar("Mostrar localização",module.tmenu.overlay.location)
 			imgui.NextColumn()
 
-			fcommon.CheckBoxVar("Show vehicle health",module.tmenu.overlay.health)
-			fcommon.CheckBoxVar("Show vehicle speed",module.tmenu.overlay.speed)
+			fcommon.CheckBoxVar("Mostrar integridade do veículo",module.tmenu.overlay.health)
+			fcommon.CheckBoxVar("Mostrar velocidade do veículo",module.tmenu.overlay.speed)
 			imgui.Columns(1)
 
 			imgui.Spacing()
-			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
-			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
+			imgui.Combo("Posição", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
+			fcommon.InformationTooltip("Você também pode clicar com o botão direito do mouse na\nsobreposição para acessar essas opções.")
 		end,
 		function()
-			module.tmenu.command.filter:Draw("Filter")
-			fcommon.InformationTooltip(string.format("Open command window using %s\nand close using Enter",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
+			module.tmenu.command.filter:Draw("Filtrar")
+			fcommon.InformationTooltip(string.format("Abra a janela de comando usando %s\n e feche usando Enter.",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
 			imgui.Spacing()
 
 			if imgui.BeginChild("Command entries") then
@@ -373,11 +373,11 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					if module.tmenu.command.filter:PassFilter(v) and imgui.CollapsingHeader(v) then
 						imgui.Spacing()
 						if k[2] ~= nil then
-							imgui.TextWrapped("Description: " .. k[2])
+							imgui.TextWrapped("Descrição: " .. k[2])
 						end
 
 						if k[3] == nil then k[3] = "" end
-						imgui.TextWrapped("Usage: " .. v .. " " .. k[3])
+						imgui.TextWrapped("Uso: " .. v .. " " .. k[3])
 
 						imgui.Separator()
 					end
@@ -386,39 +386,39 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			end
 		end,
 		function()
-			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open/ close cheat menu")
-			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
+			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Abre/Fecha o cheat menu")
+			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Abre a janela de comandos")
 
 			imgui.Dummy(imgui.ImVec2(0,10))
 
-			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
-			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
+			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Ativa o 'aim skin changer'")
+			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Colar endereço de memória")
+			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Fazer uma captura de tela")
+			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Teleportar com 'Quick teleport'")
 
 			imgui.Dummy(imgui.ImVec2(0,10))
 			
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode,"Enable/ disable camera mode")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Camera mode left")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Camera mode right")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Camera mode slower movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Camera mode faster movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Camera mode up (lock on player)")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Camera mode down (lock on player)")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode,"Ativa/Desativa o modo câmera")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Câmera para frente")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Câmera para trás")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Câmera para esquerda")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Câmera para direita")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Movimento da câmera mais lento")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Movimento da câmera mais rápido")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Modo de câmera pra cima (jogador bloqueado)")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Modo de câmera para baixo (jogador bloqueado)")
 			imgui.Dummy(imgui.ImVec2(0,10))
 
-			imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")
+			imgui.TextWrapped("Você pode redefinir essas configurações para o padrão no botão 'Configurações padrão' na guia 'Config'.")
 		end,
 		function()
 			if fstyle.tstyle.status then
-				if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
+				if imgui.Button("Excluir estilo",imgui.ImVec2(fcommon.GetSize(2))) then
 					if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == nil then
-						printHelpString("No style selected")
+						printHelpString("Estilo nao selecionado")
 					else
 						if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == "Default" then
-							printHelpString("Can't delete default style")
+							printHelpString("Nao e possivel excluir o estilo padrao")
 						else
 							fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
 							fstyle.tstyle.list = fstyle.getStyles()
@@ -436,28 +436,28 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 							end
 							fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
 							fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
-							printHelpString("Style deleted")
+							printHelpString("Estilo deletado")
 						end
 					end
 				end
 				imgui.SameLine()
-				if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
+				if imgui.Button("Salvar estilo",imgui.ImVec2(fcommon.GetSize(2))) then
 					fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
 					fstyle.tstyle.list  = fstyle.getStyles()
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
-					printHelpString("Style saved")
+					printHelpString("Estilo salvo")
 				end
 			end
 
 			imgui.Spacing()
 
-			imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
+			imgui.InputText('##Nomedoestilo', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
 			imgui.SameLine()
 			local vec_size = imgui.GetItemRectSize()
 			vec_size.x = fcommon.GetSize(3)
-			if imgui.Button("Add new style",vec_size) then
+			if imgui.Button("Adicionar novo estilo",vec_size) then
 				fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
 				fstyle.tstyle.list = fstyle.getStyles()
 				fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
@@ -467,7 +467,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					end
 				end
 				fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
-				printHelpString("Style added")
+				printHelpString("Estilo adicionado!")
 			end
 
 			if fstyle.tstyle.status then
@@ -481,51 +481,52 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			end
 		end,
 		function()
-			imgui.TextWrapped("This program is free software: you can redistribute it and/or modify it under the terms of the \z
-			GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or \z
-			(at your option) any later version. \n\n\z
-
-			This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied \z
-			warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. \n\n\z
-
-			You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.\n\n\n\z
-
-			Copyright (C) 2019-2020 Grinch_ \n")
+			imgui.TextWrapped("Este programa é um software gratuito. Você pode modificá-lo e/ou redistribuí-lo ao seu critério sob os termos da \z
+				GNU General Public License conforme publicado pela Free Software Foundation na 3° versão da licença. \z
+				 \n\n\z
+	
+				Este programa é distribuído na esperança de que seja útil, mas SEM QUALQUER GARANTIA, sem sequer o implícito \z
+				garantido de COMERCIALIZAÇÃO ou ADEQUAÇÃO PARA UMA FINALIDADE ESPECÍFICA. Veja a Licença Pública Geral GNU para mais detalhes. \n\n\z
+	
+				Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este programa. Caso contrário, consulte: <http://www.gnu.org/licenses/>.\n\n\n\z
+	
+				Copyright (C) 2019-2020 Grinch_ \n")
 		end,
 		function()
-			if imgui.Button("Check for updates",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Verificar se há atualizações",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.CheckUpdates()
 			end
 			imgui.SameLine()
-			if imgui.Button("Goto GitHub repo",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Ir para repo oficial no Github",imgui.ImVec2(fcommon.GetSize(2))) then
 				os.execute('explorer "https://github.com/user-grinch/Cheat-Menu"')
 			end
 			imgui.Spacing()
 
-			if imgui.BeginChild("About2") then
+			if imgui.BeginChild("Sobre") then
 
 				imgui.Columns(2,nil,false)
 				imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
 				imgui.Text(string.format("Build: %d",script.this.version_num))
 	
 				imgui.NextColumn()
-				imgui.Text(string.format("Author: %s",script.this.authors[1]))
-				imgui.Text(string.format("Imgui:   v%s",imgui._VERSION))
+				imgui.Text(string.format("Autor: %s",script.this.authors[1]))
+				imgui.Text(string.format("Imgui: v%s",imgui._VERSION))
 				imgui.Columns(1)
 
 				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
-				imgui.TextWrapped("\nPlease provide 'moonloader.log' in case of debugging.")
+				imgui.TextWrapped("Precisa de ajuda?/Enfrentando problemas?/Tem sugestões?\nEntre em contato comigo no discord: Grinch_#3311 ou no fórum.")
+				imgui.TextWrapped("Por favor, em caso de crash's forneça o 'moonloader.log'.")
 				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Minimum resolution: 1024x768")
-				imgui.TextWrapped(string.format("Your resolution: %dx%d",resX,resY))
-				imgui.TextWrapped("Maximum resolution: 1920x1080")
+				imgui.TextWrapped("Resolução mínima: 1024x768")
+				imgui.TextWrapped(string.format("Sua resolução: %dx%d",resX,resY))
+				imgui.TextWrapped("Resolução máxima: 1920x1080")
 				imgui.Spacing()
-				imgui.TextWrapped("The menu will work properly on other resolutions but the gui & fonts might have issues.")
+				imgui.TextWrapped("O menu funcionará corretamente em outras resoluções, mas a GUI e as fontes poderam ter problemas.")
 				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Special thanks to,")
+				imgui.TextWrapped("Agradecimentos especiais para: ")
 				imgui.Columns(2,nil,false)
 				
+				imgui.TextWrapped("Dowglas_")
 				imgui.TextWrapped("Fabio")
 				imgui.TextWrapped("guru guru")
 				imgui.TextWrapped("Israel")
@@ -533,16 +534,17 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 				imgui.TextWrapped("kuba--")
 				imgui.TextWrapped("randazz0")
 				imgui.TextWrapped("Um_Geek")
-				imgui.TextWrapped("Modding community")
+				imgui.TextWrapped("Comunidade Modding")
 				imgui.TextWrapped("Rockstar Games")
 				imgui.NextColumn()
-				imgui.TextWrapped("For GSX")
-				imgui.TextWrapped("For Timecyc stuff")
-				imgui.TextWrapped("For Neon api")
-				imgui.TextWrapped("For his help")
-				imgui.TextWrapped("For C zip library")
-				imgui.TextWrapped("For ImStyleSerializer")
-				imgui.TextWrapped("For his help")
+				imgui.TextWrapped("Pela Tradução em português")
+				imgui.TextWrapped("Pelo GSX")
+				imgui.TextWrapped("Pelo Timecyc stuff")
+				imgui.TextWrapped("Pelo api Neon")
+				imgui.TextWrapped("Por sua ajuda")
+				imgui.TextWrapped("Pela C zip library")
+				imgui.TextWrapped("Pelo ImStyleSerializer")
+				imgui.TextWrapped("Por sua ajuda")
 				imgui.EndChild()
 			end
 			imgui.Columns(1)

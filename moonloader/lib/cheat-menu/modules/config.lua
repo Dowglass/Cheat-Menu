@@ -47,7 +47,7 @@ function module.Get(s,default)
     if status then
         return rtn
     else
-        print(string.format("Error occured while getting value of %s. Returning default value %s",s,tostring(default)))
+        print(string.format("Ocorreu um erro ao obter o valor de %s. Retornando valor padrão %s",s,tostring(default)))
         return default
     end
 end

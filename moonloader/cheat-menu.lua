@@ -20,7 +20,7 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.1-beta")
+script_version("2.1-beta (PT-BR)")
 script_version_number(2020060301) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -130,7 +130,7 @@ imgui.OnInitialize(function() -- Called once
    fstyle.LoadFonts()
 
     if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then 
-        fstyle.saveStyles(imgui.GetStyle(), "Default") 
+        fstyle.saveStyles(imgui.GetStyle(), "Padrão") 
     end
     
     fstyle.tstyle.status = fstyle.loadStyles() 
@@ -147,7 +147,7 @@ imgui.OnInitialize(function() -- Called once
 
         fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
     else 
-        print("Can't load styles")
+        print("Nao foi possivel carregar estilos!")
     end
 
     -- Indexing images
@@ -181,62 +181,62 @@ function(self) -- render frame
 
 
     if tcheatmenu.window.show_unsupported_resolution_msg[0] and ((resX < 1024 and resY < 720) or (resX > 1920 and resY > 1080)) then
-        imgui.Button("Unsupported resolution",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Read more",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("Resolução não suportada",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Ler mais",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.current_menu = 12
             tcheatmenu.tab_data["Menu"] = 7
         end
         imgui.SameLine()
-        if imgui.Button("Don't show again",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Não mostrar novamente",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.window.show_unsupported_resolution_msg[0] = false
         end
         imgui.Spacing()
     end
 
     if tcheatmenu.window.fail_loading_json then
-        imgui.Button("Failed to load some json files!",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("Falha ao carregar alguns arquivos .json!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Reinstalar",imgui.ImVec2(fcommon.GetSize(2))) then
             DownloadUpdate()
             tcheatmenu.window.fail_loading_json = false
         end
         imgui.SameLine()
-        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.window.fail_loading_json = false
         end
         imgui.Spacing()
     end
 
     if tcheatmenu.window.missing_components then
-        imgui.Button("Some components of Cheat Menu are missing!",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("Alguns componentes do Cheat Menu estão faltando!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Reinstalar",imgui.ImVec2(fcommon.GetSize(2))) then
             DownloadUpdate()
             tcheatmenu.window.missing_components = false
         end
         imgui.SameLine()
-        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.window.missing_components = false
         end
         imgui.Spacing()
     end
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
-        imgui.Button("A new update is available",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("Nova atualização disponível!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Baixar",imgui.ImVec2(fcommon.GetSize(2))) then
             DownloadUpdate()
         end
         imgui.SameLine()
-        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(2))) then
             fmenu.tmenu.update_status =fconst.UPDATE_STATUS.HIDE_MSG
         end
         imgui.Spacing()
     end
 
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADING then
-        imgui.Button("Downloading update...",imgui.ImVec2(fcommon.GetSize(1)))
+        imgui.Button("Baixando atualização...",imgui.ImVec2(fcommon.GetSize(1)))
         imgui.Spacing()
     end
 
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.INSTALL then
-        if imgui.Button("Install update. This might take a while.",imgui.ImVec2(fcommon.GetSize(1))) then
+        if imgui.Button("Instalar atualização (Isso pode demorar um pouco).",imgui.ImVec2(fcommon.GetSize(1))) then
             fmenu.tmenu.update_status = fconst.UPDATE_STATUS.HIDE_MSG
             fgame.tgame.script_manager.skip_auto_reload = true
             ziplib.zip_extract(tcheatmenu.dir .. "update.zip",tcheatmenu.dir,nil,nil)
@@ -249,51 +249,51 @@ function(self) -- render frame
             end
             
             os.remove(tcheatmenu.dir .. "update.zip")
-            printHelpString("Update ~g~Installed")
-            print("Update installed. Reloading script.")
+            printHelpString("Atualizacao ~g~Instalada")
+            print("Atualizacao instalada! Recarregando script.")
             thisScript():reload()
         end
         imgui.Spacing()
     end
 
-    fcommon.CreateMenus({"Teleport","Memory","Player","Ped","Animation","Vehicle","Weapon","Mission","Stat","Game","Visual","Menu"},
+    fcommon.CreateMenus({"Teleporte","Memória","Jogador","Ped","Animação","Veículo","Arma","Missão","Estatísticas","Jogo","Visual","Menu"},
     {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
     
     -- Welcome page
     if tcheatmenu.current_menu == 0 then
 
-        if imgui.BeginChild("Welcome") then
+        if imgui.BeginChild("Bem-vindo") then
             imgui.Dummy(imgui.ImVec2(0,10))
-            imgui.TextWrapped("Welcome to " .. tcheatmenu.window.title .. " by Grinch_")
+            imgui.TextWrapped("Bem-vindo ao " .. tcheatmenu.window.title .. " by Grinch_")
             imgui.Dummy(imgui.ImVec2(0,10))
-            imgui.TextWrapped("Please configure the settings below,\n(Recommanded settings are already applied)")
+            imgui.TextWrapped("Por favor defina as configurações abaixo.\n(As configurações recomendadas já estão aplicadas)")
             imgui.Dummy(imgui.ImVec2(0,20))
 
             if fstyle.tstyle.status then	
-                if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
+                if imgui.Combo('Selecionar estilo', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
                     fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
                     fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
                 end
             end
             imgui.Spacing()
-            fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Cheat Menu open/close hotkey")
+            fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Tecla para abrir/fechar o Cheat Menu")
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Auto reload",fmenu.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
-            fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
-will download files from github repository.")
+            fcommon.CheckBoxVar("Auto recarregar",fmenu.tmenu.auto_reload,"Recarrega o  cheat menu automaticamente\nem caso de crash.\n\nÁs vezes, pode causar crash no loop.")
+            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações\nonline. Isso requer uma conexão com internet \
+para baixar arquivos do repo do github.")
             imgui.NextColumn()
-            fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
-This may increase game startup time or\nfreeze it for few seconds.")
-            fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips,"Shows usage tips beside options.")
+            fcommon.CheckBoxVar("Carregamento rápido de imagens",fmenu.tmenu.fast_load_images,"Carrega imagens de veículos, armas, peds etc\nna inicialização do menu.\n \
+Isso pode aumentar o tempo de inicialização do jogo ou\ntravar por alguns segundos.")
+            fcommon.CheckBoxVar("Mostrar dicas",fmenu.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
             imgui.Columns(1)
             imgui.Spacing()
-            imgui.TextWrapped("You can configure everything here anytime from the 'Menu' section.")
+            imgui.TextWrapped("Você pode configurar tudo daqui a qualquer momento na seção 'Menu'.")
             imgui.Spacing()
-            imgui.TextWrapped("This modification is licensed under the terms of GPLv3. For more details see <http://www.gnu.org/licenses/>")
+            imgui.TextWrapped("Esta modificação está licenciada sob os termos da GPLv3. Para mais detalhes, consulte: <http://www.gnu.org/licenses/>")
             imgui.EndChild()
         end
     end
@@ -346,11 +346,11 @@ function()
                 speed = getCarSpeed(car)
                 total_gears = getCarNumberOfGears(car)
                 current_gear = getCarCurrentGear(car)
-                imgui.Text(string.format("Speed: %d %d/%d",math.floor(speed),current_gear,total_gears))
+                imgui.Text(string.format("Velocidade: %d %d/%d",math.floor(speed),current_gear,total_gears))
             end
 
             if fmenu.tmenu.overlay.health[0] then
-                imgui.Text(string.format("Health: %.0f%%",getCarHealth(car)/10))
+                imgui.Text(string.format("Saúde: %.0f%%",getCarHealth(car)/10))
             end
         end
 
@@ -360,12 +360,12 @@ function()
 
         if fmenu.tmenu.overlay.coordinates[0] then
             x,y,z = getCharCoordinates(PLAYER_PED)
-            imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
+            imgui.Text(string.format("Coordenadas: %d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
         end
 
         imgui.PopStyleVar()
         if imgui.BeginPopupContextWindow() then
-            imgui.Text("Position")
+            imgui.Text("Posição")
             imgui.Separator()
 
             if imgui.MenuItemBool("Custom",nil,fmenu.tmenu.overlay.position_index[0] == 0) then 
@@ -383,17 +383,17 @@ function()
             if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
                 fmenu.tmenu.overlay.position_index[0] = 4 
             end
-            if imgui.MenuItemBool("Close") then
+            if imgui.MenuItemBool("Fechar") then
                 fmenu.tmenu.overlay.fps[0] = false
                 fmenu.tmenu.overlay.speed[0] = false
                 fmenu.tmenu.overlay.health[0] = false
                 fmenu.tmenu.overlay.coordinates[0] = false
             end
             imgui.Separator()
-            if imgui.MenuItemBool("Copy coordinates") then 
+            if imgui.MenuItemBool("Copiar coordenadas") then 
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 setClipboardText(string.format( "%d,%d,%d",x,y,z))
-                printHelpString("Coordinates copied")
+                printHelpString("Coordenadas copiada!")
             end
             imgui.EndPopup()        
         end
@@ -447,7 +447,7 @@ function main()
 
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
-        print("SAMP detected, unloading script.")
+        print("SAMP detectado, desativando script.")
         thisScript():unload()
     end
 
@@ -623,9 +623,9 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
-                printHelpString("Camera mode enabled")
+                printHelpString("Modo camera ativado!")
             else
-                printHelpString("Camera mode disabled")
+                printHelpString("Modo camera desativado!")
             end
         end)
 
@@ -633,7 +633,7 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
             if fgame.tgame.ss_shortcut[0] then
                 takePhoto(true)
-                printHelpString("Screenshot ~g~taken")
+                printHelpString("Tela ~g~capturada!")
             end
         end)
 
@@ -733,16 +733,16 @@ function onScriptTerminate(script, quitGame)
 
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
-                fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
+                fmenu.tmenu.crash_text = "O Cheat menu parou de funcionar!"
 
                 if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
                     for index, script in ipairs(script.list()) do
                         if script.name ~= thisScript().name then
                             script.this:reload()
-                            print("Reloading script")
+                            print("Recarregando script")
                         end
                     end
-                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " mas recarregado"
                 end
             end
         end

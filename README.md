@@ -5,42 +5,45 @@
 
 #
 ![GitHub repo size](https://img.shields.io/github/repo-size/user-grinch/Cheat-Menu?label=Size&style=for-the-badge)
-[![License](https://img.shields.io/github/license/user-grinch/Cheat-Menu?style=for-the-badge)](https://github.com/user-grinch/Cheat-Menu/blob/master/LICENSE)
+[![Licensa](https://img.shields.io/github/license/user-grinch/Cheat-Menu?style=for-the-badge)](https://github.com/user-grinch/Cheat-Menu/blob/master/LICENSE)
 [![Discord](https://img.shields.io/discord/689515979847237649?label=Discord&style=for-the-badge)](https://discord.gg/ZzW7kmf)
 
 [![MixMods](https://img.shields.io/badge/Topic-Mixmods-%234e4784?style=for-the-badge)](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu)
 [![GTAF](https://img.shields.io/badge/Topic-GTA%20Forums-%23244052?style=for-the-badge)](https://gtaforums.com/topic/930023-mooncheat-menu/)
-## Introduction
+## Introdução
 
-Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
+O Cheat Menu permite que um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
 
-It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [mimgui](https://github.com/THE-FYP/mimgui) for its interface.
 
-## Versions
+É baseado no [Moonloader](https://gtaforums.com/topic/890987-moonloader/) e usa [mimgui](https://github.com/THE-FYP/mimgui) como interface.
+
+## Versões oficiais
 
 ### Releases
-[Releases](https://github.com/inanahammad/Cheat-Menu/releases) are the most up to date & stable versions. If you want a smooth experience with minimal bugs as possible this is the one to get.
+[Releases](https://github.com/inanahammad/Cheat-Menu/releases) são as versões atualizadas e estáveis. Se você deseja uma experiência tranquila com o mínimo de erros possível, esse e o recomendado.
 
 ### Master Branch
-[Master branch](https://github.com/inanahammad/Cheat-Menu) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
+[Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu e é traduzida [aqui](https://github.com/Dowglass/Cheat-Menu). Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
 
-A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat-Menu)
+### Cheat menu
+[Cheat menu](https://github.com/user-grinch/Cheat-Menu) versão oficial.
 
-## Installation
 
-1. Install [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
-2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Download [Moonloader](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-026.zip).Then extract all these files to your game folder (replace if necessary).
-4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
-5. Open up that achieve file and extract everything in game directory (replace if necessary).
+## Instalação:
 
-Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
+1. Instale [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) e [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) se ainda não estiver instalado.
+2. Se a sua versão do jogo não for a v1.0, será necessário fazer [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
+3. Baixe o [Moonloader](https://gtaforums.com/topic/890987-moonloader/) [aqui](https://blast.hk/moonloader/files/moonloader-026.zip). Em seguida, extraia os arquivos para a pasta do jogo (substitua, se necessário).
+4. Baixe o Cheat Menu [aqui](https://github.com/Dowglass/Cheat-Menu) .
+5. Abra o arquivo e extraia tudo no diretório do jogo (substitua, se necessário).
+
+No jogo, pressione CRTL+M para abrir. Se não funcionar, crie uma postagem em um dos tópicos no [repositório oficial](https://github.com/user-grinch/Cheat-Menu) com 'moonloader.log'. 
 
 ## Youtubers
 
-If you're making videos about this mod link to this GitHub repository, don't reupload this mod simply cause you can. It'll help me to provide better support & in development. Also it'd be great if you keep my name in your video description. Thanks.
+Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lugar. Coloque o link do [repositório oficial](https://github.com/user-grinch/Cheat-Menu). Isso ajudará o autor a fornecer um melhor suporte e desenvolvimento. Também seria ótimo se você mantivesse o nome do autor (Grinch_) na descrição do seu vídeo.
 
-## Images
+## Imagens (EN)
 ![Image](https://i.imgur.com/XPbm13b.jpg)
 ![Image](https://i.imgur.com/GabImU1.jpg)
 ![Image](https://i.imgur.com/pCpsX2v.jpg)
@@ -51,38 +54,39 @@ If you're making videos about this mod link to this GitHub repository, don't reu
 ![Image](https://i.imgur.com/2Feogff.jpg)
 ![Image](https://i.imgur.com/DnsXweQ.jpg)
 ![Image](https://i.imgur.com/MwmZqjM.jpg)
+(Em breve a versão em PT-BR).
 
-## Video
+## Vídeo (EN)
 
 [![Youtube Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
 
 
-## Docs 
+## Documentos 
 
-### Adding custom peds/skin images - jpg
+### Adicionando imagens personalizadas de peds/skin - jpg
 
-Ped/skin images are loaded from '\moonloader\lib\cheat-menu\peds\' directory. The image name should contain the ped model id. Names for custom peds have to be added inside '\moonloader\lib\cheat-menu\json\ped.json' file.
+Imagens de ped/skin são carregadas em '\moonloader\lib\cheat-menu\peds\' .O nome da imagem deve conter o ID do modelo ped. Os nomes dos peds personalizados devem ser adicionados no arquivo ped.json em '\moonloader\lib\cheat-menu\json\ped.json'.
 
-### Add custom player skins #2
+### Adicionando skin de jogador personalizado #2
 
-You can also add player skins by using a different method. Place your skin txd & dff files inside 'modloader\Custom Skins\' folder. Note, [Modloader](https://gtaforums.com/topic/669520-mod-loader/) is required & names can't exceed 8 characters. 
+Você também pode adicionar skins de jogadores usando um método diferente. Coloque os arquivos txd e dff dentro da pasta 'modloader\Custom Skins\'. Nota, o uso do [Modloader](https://gtaforums.com/topic/669520-mod-loader/) é obrigatório e os nomes não podem exceder de 8 caracteres.
 
-### Adding custom vehicle images - jpg
+### Adicionando imagens de veículo personalizadas - jpg
 
-Vehicle images are loaded from '\moonloader\lib\cheat-menu\vehicles\images\' directory. The image name should contain the vehicle model id. You don't need to add custom vehicle names in v2.0-beta & above.
+As imagens do veículo são carregadas em '\moonloader\lib\cheat-menu\vehicles\images\'. O nome da imagem deve conter o ID do modelo do veículo. Você não precisa adicionar nomes de veículos personalizados na v2.0-beta e adiante.
 
-### Adding custom vehicle component images - jpg
+### Adicionando imagens personalizadas de componentes de veículos - jpg
 
-Vehicle component images are loaded from '\moonloader\lib\cheat-menu\vehicles\component \' directory. The image name should contain the component model id.
+As imagens dos componentes do veículo são carregadas em '\moonloader\lib\cheat-menu\vehicles\component\'. O nome da imagem deve conter o ID do modelo do componente.
 
-### Adding custom vehicle paint jobs images - png
+### Adicionando imagens de pintura de veículos personalizados - png
 
-Paintjob images are loaded from '\moonloader\lib\cheat-menu\vehicles\paintjobs\' directory. Image names can be any string and their name will show up on the menu.
+As imagens são carregadas em '\moonloader\lib\cheat-menu\vehicles\paintjobs\'. Os nomes das imagens podem ser qualquer sequência e o nome deles será exibido no menu.
 
-### Adding custom weapons images - jpg
+### Adicionando imagens de armas personalizadas - jpg
 
-Weapon images are loaded from '\moonloader\lib\cheat-menu\weapons\' directory. The image name should contain the weapon model id. Names for custom weapons have to be added inside '\moonloader\lib\cheat-menu\json\weapon.json' file.
+As imagens de armas são carregadas em '\moonloader\lib\cheat-menu\weapons\'. O nome da imagem deve conter o ID do modelo da arma. Nomes de armas personalizadas devem ser adicionados no arquivo weapon.json em '\moonloader\lib\cheat-menu\json\weapon.json'.
 
-### Adding custom clothes - jpg
+### Adicionando roupas personalizadas - jpg
 
-Cloth images are loaded from '\moonloader\lib\cheat-menu\clothes\' directory. The image name should in this format 'body_part$model_name$texture_name'
+Imagens de roupas são carregadas em '\moonloader\lib\cheat-menu\clothes\'. O nome da imagem deve neste formato 'body_part$model_name$texture_name'
