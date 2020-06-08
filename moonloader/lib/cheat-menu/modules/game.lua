@@ -46,6 +46,7 @@ module.tgame                =
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
+    gxt_save_name           = imgui.new.char[22]("Sem titulo"),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     object_spawner          = 
     {
@@ -856,7 +857,18 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
         
         end,
         function()
-
+            fcommon.DropDownMenu('Personalizar nome do Save',function()
+                imgui.InputText("Nome", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
+                imgui.Spacing()
+                if imgui.Button("Salvar jogo com este nome",imgui.ImVec2(fcommon.GetSize(1))) then
+                    if isCharOnFoot(PLAYER_PED) then
+                        registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
+                        activateSaveMenu()
+                    else
+                        printHelpString("O jogador ~r~nao~w~ esta a pe!")
+                    end
+                end
+            end)
             fcommon.UpdateAddress({name = 'Dias passadas',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
@@ -1027,7 +1039,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                 end
             end
             })
-        end
+        end,
     })
 end
 
