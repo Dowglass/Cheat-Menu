@@ -187,13 +187,13 @@ function module.WeaponMain()
         if module.tweapon.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
-                printHelpString("Arma atual removida!")
+                printHelpString("Arma atual removida")
             else
                 printHelpString("~r~Nenhum~w~ ped selecionado!")
             end
         else
             removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
-            printHelpString("Arma atual removida!")
+            printHelpString("Arma atual removida")
         end
     end
 
@@ -208,7 +208,7 @@ function module.WeaponMain()
             end
         else
             removeAllCharWeapons(PLAYER_PED)
-            printHelpString("Todas as armas removidas")
+            printHelpString("Armas removidas")
         end
     end
     if imgui.Button("Dropar arma",imgui.ImVec2(fcommon.GetSize(1))) then   
@@ -233,7 +233,7 @@ function module.WeaponMain()
                 local pickup = createPickupWithAmmo(weapon_model,3,weapon_ammo,x,y,z)
                 table.insert(module.tweapon.weapon_drops,pickup)
                 removeWeaponFromChar(PLAYER_PED,weapon_type)
-                printHelpString("Arma dropada!")
+                printHelpString("Arma dropada")
             end
         end
     end

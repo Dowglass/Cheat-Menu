@@ -60,7 +60,7 @@ function MemoryEntry(name,size,address)
 		module.tmemory.list[size .. "$" .. name] = nil
 		fcommon.SaveJson("memory",module.tmemory.list)
 		module.tmemory.list = fcommon.LoadJson("memory")
-		printHelpString("Endereco ~r~removido!")
+		printHelpString("Endereco ~r~removido")
 	end
 end
 

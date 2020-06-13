@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta (PT-BR)")
-script_version_number(2020060902) -- YYYYMMDDNN
+script_version_number(2020061301) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -267,7 +267,7 @@ function(self) -- render frame
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.TextWrapped("Bem-vindo ao " .. tcheatmenu.window.title .. " by Grinch_")
             imgui.Dummy(imgui.ImVec2(0,10))
-            imgui.TextWrapped("Por favor defina as configurações abaixo.\n(As configurações recomendadas já estão aplicadas)")
+            imgui.TextWrapped("Por favor defina as configurações abaixo.\n(Configurações recomendadas já estão aplicadas)")
             imgui.Dummy(imgui.ImVec2(0,20))
 
             if fstyle.tstyle.status then	
@@ -444,7 +444,6 @@ function main()
 
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
-
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
         print("SAMP detectado, desativando script.")
@@ -623,9 +622,9 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
-                printHelpString("Modo camera ativado!")
+                printHelpString("Modo camera ativado")
             else
-                printHelpString("Modo camera desativado!")
+                printHelpString("Modo camera desativado")
             end
         end)
 

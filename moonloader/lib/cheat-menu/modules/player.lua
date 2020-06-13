@@ -265,7 +265,7 @@ function module.PlayerMain()
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Comandos: Mire no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
             imgui.Spacing()
-            fcommon.Tabs("Skins",{"Lista","Procurar","Personalizar"},{
+            fcommon.Tabs("Skins",{"Lista","Procurar","Skins personalizadas"},{
                 function()
                     fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
                 end,

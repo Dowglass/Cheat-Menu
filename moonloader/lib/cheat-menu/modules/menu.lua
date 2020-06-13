@@ -393,7 +393,7 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 
 			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Ativa o 'aim skin changer'")
 			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Colar endereço de memória")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Fazer uma captura de tela")
+			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Captura de tela")
 			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Teleportar com 'Quick teleport'")
 
 			imgui.Dummy(imgui.ImVec2(0,10))
@@ -405,8 +405,8 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Câmera para direita")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Movimento da câmera mais lento")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Movimento da câmera mais rápido")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Modo de câmera pra cima (jogador bloqueado)")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Modo de câmera para baixo (jogador bloqueado)")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Modo de câmera pra cima (Câmera travada)")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Modo de câmera para baixo (Câmera travada)")
 			imgui.Dummy(imgui.ImVec2(0,10))
 
 			imgui.TextWrapped("Você pode redefinir essas configurações para o padrão no botão 'Configurações padrão' na guia 'Config'.")
@@ -418,7 +418,7 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 						printHelpString("Estilo nao selecionado")
 					else
 						if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == "Default" then
-							printHelpString("Nao e possivel excluir o estilo padrao")
+							printHelpString("Nao e possivel excluir o estilo padrao!")
 						else
 							fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
 							fstyle.tstyle.list = fstyle.getStyles()

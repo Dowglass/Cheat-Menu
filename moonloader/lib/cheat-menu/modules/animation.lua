@@ -56,7 +56,7 @@ function AnimationEntry(file,animation)
 		module.tanimation.list[file .. "$" .. animation] = nil
 		fcommon.SaveJson("animation",module.tanimation.list)
 		module.tanimation.list = fcommon.LoadJson("animation")
-		printHelpString("Animacao ~r~removida!")
+		printHelpString("Animacao ~r~removida")
 	end
 end
 
@@ -184,7 +184,7 @@ function module.AnimationMain()
                 module.tanimation.list[ffi.string(module.tanimation.ifp_name) .. "$" .. ffi.string(module.tanimation.name)] = "Animation"
                 fcommon.SaveJson("animation",module.tanimation.list)
                 module.tanimation.list = fcommon.LoadJson("animation")
-                printHelpString("Animacao ~g~adicionada!")
+                printHelpString("Animacao ~g~adicionada")
             end
         end
     })

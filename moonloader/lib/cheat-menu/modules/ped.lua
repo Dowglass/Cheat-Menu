@@ -187,7 +187,7 @@ function module.PedMain()
                     end
                     imgui.PopItemWidth()
                     imgui.Spacing()
-                    imgui.TextWrapped("Você precisará do plugin ExGangWars para exibir algumas cores de gange.")
+                    imgui.TextWrapped("Você precisará do plugin ExGangWars para exibir cores de gange.")
                 end)
                 
                 imgui.NextColumn()

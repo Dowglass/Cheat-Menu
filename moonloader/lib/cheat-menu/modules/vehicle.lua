@@ -492,7 +492,7 @@ function module.FirstPersonCamera()
     while true do
         local total_x = 0
         local total_y = 0
-        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) then
+        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] then
 
             local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
             while module.tvehicle.first_person_camera.bool[0] do
@@ -512,7 +512,10 @@ function module.FirstPersonCamera()
                 if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
                     roll = getCarRoll(hveh)
                 end
-
+                
+                if fgame.tgame.camera.bool[0] then
+                    break
+                end
                 attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
                 wait(0)
             end
@@ -1287,20 +1290,20 @@ function module.VehicleMain()
                     local name = module.GetNameOfVehicleModel(getCarModel(car))
                     
                     local shown_colors = {}
-                    imgui.Text("Color:")
+                    imgui.Text("Cores:")
                     imgui.Spacing()
                     imgui.Columns(2,nil,false)
-                    imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
-                    imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                    imgui.RadioButtonIntPtr("Cor 1", module.tvehicle.color.radio_btn, 1)
+                    imgui.RadioButtonIntPtr("Cor 2", module.tvehicle.color.radio_btn, 2)
                     imgui.NextColumn()
-                    imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
-                    imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                    imgui.RadioButtonIntPtr("Cor 3", module.tvehicle.color.radio_btn, 3)
+                    imgui.RadioButtonIntPtr("Cor 4", module.tvehicle.color.radio_btn, 4)
                     imgui.Spacing()
                     imgui.Columns(1)
-                    imgui.Text("Select color preset:")
+                    imgui.Text("Selecionar cor predefinida:")
                     imgui.Spacing()
 
-                    if imgui.BeginChild("Colors") then
+                    if imgui.BeginChild("Cores") then
                         local x,y = fcommon.GetSize(1)
                         local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
                         local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
@@ -1315,7 +1318,7 @@ function module.VehicleMain()
                                     table.insert( t,tonumber(i))
                                 end
 
-                                if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
+                                if imgui.ColorButton("Cor " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
                                     writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
                                     module.ForEachCarComponent(function(mat,comp,car)
                                         mat:reset_color()

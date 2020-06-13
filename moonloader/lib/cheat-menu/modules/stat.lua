@@ -35,10 +35,10 @@ function module.StatMain()
                 fcommon.CheatActivated()
             end
             imgui.Spacing()
-            fcommon.UpdateStat({ name = "Bike",stat = 229})
-            fcommon.UpdateStat({ name = "Cycling",stat = 230})
-            fcommon.UpdateStat({ name = "Driving",stat = 160})
-            fcommon.UpdateStat({ name = "Flying",stat = 223})  
+            fcommon.UpdateStat({ name = "Bicicleta",stat = 229})
+            fcommon.UpdateStat({ name = "Ciclismo",stat = 230})
+            fcommon.UpdateStat({ name = "Direção",stat = 160})
+            fcommon.UpdateStat({ name = "Vôo",stat = 223})  
         end,
         function()
             if imgui.Button("Estatísticas máximas em armas",imgui.ImVec2(fcommon.GetSize(1))) then

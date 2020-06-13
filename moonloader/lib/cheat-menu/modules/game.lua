@@ -57,6 +57,8 @@ module.tgame                =
             z               = imgui.new.float(0),
         },
         filter              = imgui.ImGuiTextFilter(),
+        group_name          = imgui.new.char[32]("Groupo 1"),
+        obj_name            = imgui.new.char[32]("Novo objeto"),
         model               = imgui.new.int(1427),
         placed              = {},
         set_player_coord    = imgui.new.bool(fconfig.Get('tgame.object_spawner.set_player_coord',false)),
@@ -210,7 +212,7 @@ function module.CameraMode()
                         if total_mouse_y > 170 then total_mouse_y = 170 end
                         if total_mouse_y < -170 then total_mouse_y = -170 end
                         factor = 1
-
+                        
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
                             factor = factor*0.5
                         end
@@ -443,10 +445,10 @@ function module.LoadScriptsOnKeyPress()
                 end
                 if is_loaded == false then
                     script.load(full_file_path)
-                    printHelpString("Script carregado!")
+                    printHelpString("Script carregado")
                 else
                     sc_handle:unload()
-                    printHelpString("Script descarregado!")
+                    printHelpString("Script descarregado")
                 end 
                 module.tgame.script_manager.not_loaded[name .. ".loadonkeypress"] = nil
             end)
@@ -516,7 +518,7 @@ function ShowNotLoadedScripts(name,path)
                 end
                 module.tgame.script_manager.not_loaded[name] = nil
                 script.load(load_path)
-                printHelpString("Script carregado!")
+                printHelpString("Script carregado")
             end
         end
     end,true)
@@ -580,7 +582,7 @@ function ShowLoadedScript(script,index)
 
         tcheatmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  tcheatmenu.hot_keys.script_manager_temp
 
-        fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Load on keypress hotkey")
+        fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Tecla para carregar")
         imgui.Spacing()
         
         if imgui.Button("Nunca carregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
@@ -642,7 +644,7 @@ function FollowPed(ped)
     end
 end
 
-function SpawnObject(model,x,y,z)
+function SpawnObject(model,obj_name,grp_name,x,y,z)
     if model < 700 then
         printHelpString("Nao e possivel criar objeto!")
         return
@@ -658,8 +660,12 @@ function SpawnObject(model,x,y,z)
         setObjectCollision(obj,false)
         markModelAsNoLongerNeeded(model)
         printHelpString("Modelo criado")
-        module.tgame.object_spawner.placed[string.format("%d##%d",model,obj)] = 
+        if module.tgame.object_spawner.placed[grp_name] == nil then
+            module.tgame.object_spawner.placed[grp_name] = {}
+        end
+        module.tgame.object_spawner.placed[grp_name][string.format("%d##%d",model,obj)] = 
         {
+            name = obj_name,
             collision = imgui.new.bool(false),
             rotx = imgui.new.float(0),
             roty = imgui.new.float(0),
@@ -672,26 +678,30 @@ function GenerateIPL()
     local file = io.open("generated.ipl","w")
     local write_string = "inst\n"
 
-    for key,value in pairs(module.tgame.object_spawner.placed) do
-        local model, handle = string.match(key,"(%w+)##(%w+)")
-        local _,posx,posy,posz = getObjectCoordinates(handle)
-        local rotx,roty,rotz,rotw = getObjectQuaternion(handle)
-        local interior =  getActiveInterior()
+    for grp,data in pairs(module.tgame.object_spawner.placed) do
+        for key,value in pairs(data) do
+            local model, handle = string.match(key,"(%w+)##(%w+)")
+            local _,posx,posy,posz = getObjectCoordinates(handle)
+            local rotx,roty,rotz,rotw = getObjectQuaternion(handle)
+            local interior =  getActiveInterior()
 
-        local inst_line = string.format("%d, dummy, %d, %f, %f, %f, %f, %f, %f, %f, -1\n",model,interior,posx,posy,posz,rotx,roty,rotz,rotw)
-        write_string = write_string .. inst_line
+            local inst_line = string.format("%d, dummy, %d, %f, %f, %f, %f, %f, %f, %f, -1\n",model,interior,posx,posy,posz,rotx,roty,rotz,rotw)
+            write_string = write_string .. inst_line
+        end
     end
     write_string = write_string .. "end"
     file:write(write_string)
     file:close()
-    printHelpString("IPL criado!")
+    printHelpString("IPL criado")
 end
 
 function module.RemoveAllObjects()
-    for key,value in pairs(module.tgame.object_spawner.placed) do
-        local model, handle = string.match(key,"(%w+)##(%w+)")
-        deleteObject(tonumber(handle))
-        module.tgame.object_spawner.placed[key] = nil
+    for grp,data in pairs(module.tgame.object_spawner.placed) do
+        for key,value in pairs(data) do
+            local model, handle = string.match(key,"(%w+)##(%w+)")
+            deleteObject(tonumber(handle))
+            module.tgame.object_spawner.placed[grp][key] = nil
+        end
     end
 end
 
@@ -711,7 +721,7 @@ function module.GameMain()
     if imgui.Button("Copiar coordenadas",imgui.ImVec2(fcommon.GetSize(2))) then
         local x,y,z = getCharCoordinates(PLAYER_PED)
         setClipboardText(string.format( "%d,%d,%d",x,y,z))
-        printHelpString("Coordenadas copiada!")
+        printHelpString("Coordenadas copiada")
     end
     
     fcommon.Tabs("Jogo",{"Caixas de seleção","Menus","Cheats","Gerenciador de Scripts","Criador de Objetos"},{
@@ -728,14 +738,14 @@ function module.GameMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo câmera",module.tgame.camera.bool,string.format("Atalho: %s\n\nPara frente: %s\tPara trás: %s\
 Esquerda: %s\t\tDireita: %s\n\nMovimento lento: %s\nMovimento rápido: %s\n\nRotação: Mouse\nZoom Cima/Baixo : Roda do mouse \n\
-Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
+Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_right),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_fast),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_up),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),nil,
             function()
-                fcommon.CheckBoxVar("Bloquear jogador",module.tgame.camera.lock_on_player,"Trava a câmera no jogador.")
+                fcommon.CheckBoxVar("Travar câmera",module.tgame.camera.lock_on_player,"Trava a câmera no jogador.")
 
                 imgui.Spacing()
                 if imgui.SliderInt("FOV", module.tgame.camera.fov, 5,120) then
@@ -744,7 +754,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                         cameraPersistFov(true) 
                     end
                 end
-                imgui.SliderFloat("Velocidade do movimento",module.tgame.camera.movement_speed, 0.0, 5.0)
+                imgui.SliderFloat("Velocidade de movimento",module.tgame.camera.movement_speed, 0.0, 5.0)
                 if imgui.SliderFloat("Mexer", module.tgame.camera.shake, 0.0,100) then
                     if module.tgame.camera.bool[0] then
                         cameraSetShakeSimulationSimple(1,10000,module.tgame.camera.shake[0])
@@ -766,7 +776,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                     local cx,cy,cz = getActiveCameraCoordinates()
                     cz = getGroundZFor3dCoord(cx,cy,cz)
                     setCharCoordinates(PLAYER_PED,cx,cy,cz)
-                    printHelpString("Jogador criado no local")
+                    printHelpString("Jogador criado")
                 end
             end)
             fcommon.CheckBoxVar("Desativar cheats",module.tgame.disable_cheats,nil,
@@ -783,7 +793,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Desativar caixa de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem em um novo jogo. (Requer reinicialização)")
+            fcommon.CheckBoxVar("Desativar caixas de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem um novo jogo. (Requer reinicialização)")
             fcommon.CheckBoxValue('PNS grátis',0x96C009)
             fcommon.CheckBoxVar("Parar tempo em missão",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
@@ -857,10 +867,10 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
         
         end,
         function()
-            fcommon.DropDownMenu('Personalizar nome do Save',function()
+            fcommon.DropDownMenu('Personalizar nome do save',function()
                 imgui.InputText("Nome", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
                 imgui.Spacing()
-                if imgui.Button("Salvar jogo com este nome",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Salvar jogo",imgui.ImVec2(fcommon.GetSize(1))) then
                     if isCharOnFoot(PLAYER_PED) then
                         registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
                         activateSaveMenu()
@@ -869,7 +879,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                     end
                 end
             end)
-            fcommon.UpdateAddress({name = 'Dias passadas',address = 0xB79038 ,size = 4,min = 0,max = 9999})
+            fcommon.UpdateAddress({name = 'Dias se passaram',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
                 imgui.Columns(2,nil,false)
@@ -926,7 +936,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
         end,
         function()
             CheatsEntry({0x439110,0x439150,0x439190},nil,{'Corpo','Gordo','Musculoso','Magro'})
-            CheatsEntry({0x438E40,0x438FF0},nil,{'Vida','Saúde, Armadura\n$2500K','Suicídio'})
+            CheatsEntry({0x438E40,0x438FF0},nil,{'Jogador','Saúde, Armadura\n$2500K','Suicídio'})
             CheatsEntry({0x438F90,0x438FC0},nil,{'Jogabilidade','Rápido','Devagar'})
             CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangues','Gangues em \ntodos lugares','Área de gangue'})
             CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Ímã de prostituta','Tumulto','Ataque de peds','Todos armados','Caos'})
@@ -978,10 +988,12 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
             if imgui.Button("Criar IPL",imgui.ImVec2(fcommon.GetSize(2))) then
                 GenerateIPL()
             end
-            fcommon.Tabs("Criador de objetos",{"Criar","Objetos criados"},{
+            fcommon.Tabs("Criador de objetos",{"Criar","Objetos criados","Grupos"},{
             function()
                 fcommon.CheckBoxVar('Inserir coordenada do jogador',module.tgame.object_spawner.set_player_coord)
-
+                imgui.Spacing()
+                imgui.InputText("Nome do objeto", module.tgame.object_spawner.obj_name,ffi.sizeof(module.tgame.object_spawner.obj_name))
+                imgui.InputText("Nome do grupo", module.tgame.object_spawner.group_name,ffi.sizeof(module.tgame.object_spawner.group_name))
                 if module.tgame.object_spawner.set_player_coord[0] then
                     module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0] = getCharCoordinates(PLAYER_PED)
                 end
@@ -993,7 +1005,7 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                 imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
                 imgui.Dummy(imgui.ImVec2(0,10))
                 if imgui.Button("Criar objeto",imgui.ImVec2(fcommon.GetSize(1))) then
-                    lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                    lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],ffi.string(module.tgame.object_spawner.obj_name),ffi.string(module.tgame.object_spawner.group_name),module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
                 end
             end,
             function()
@@ -1008,31 +1020,260 @@ Cima : %s (jogador bloqueado)\nBaixo: %s (Jogador bloqueado)",fcommon.GetHotKeyN
                 fcommon.InformationTooltip("Todos os objetos serão removidos ao \nencerrar o Cheat Menu.")
                 imgui.Spacing()
 
-                if imgui.BeginChild("") then 
-                    for key,value in pairs(module.tgame.object_spawner.placed) do
-                        local model, handle = string.match(key,"(%w+)##(%w+)")
-                        handle = tonumber(handle)
-                        fcommon.DropDownMenu(key,function()
-                            local _,x,y,z = getObjectCoordinates(handle)
-                            
-                            module.tgame.object_spawner.coord.x[0] = x
-                            module.tgame.object_spawner.coord.y[0] = y
-                            module.tgame.object_spawner.coord.z[0] = z
+                if imgui.BeginChild("Placed") then 
+                    for grp,data in pairs(module.tgame.object_spawner.placed) do
+                        for key,value in pairs(data) do
+                            local model, handle = string.match(key,"(%w+)##(%w+)")
+                            if filter:PassFilter(tostring(model)) or filter:PassFilter(value.name) then
+                                handle = tonumber(handle)
+                                fcommon.DropDownMenu(string.format("%s - %s - %s",grp,value.name,key),function()
+                                    local _,x,y,z = getObjectCoordinates(handle)
+                                    
+                                    module.tgame.object_spawner.coord.x[0] = x
+                                    module.tgame.object_spawner.coord.y[0] = y
+                                    module.tgame.object_spawner.coord.z[0] = z
 
-                            if imgui.Checkbox("Colisão",value.collision) then
-                                setObjectCollision(handle,value.collision[0])
+                                    if imgui.Checkbox("Colisão",value.collision) then
+                                        setObjectCollision(handle,value.collision[0])
+                                    end
+                                    imgui.InputFloat("Coordenada X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                                    imgui.InputFloat("Coordenada Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                                    imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                                    setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                                    
+                                    imgui.Spacing()
+                                    
+                                    imgui.SliderFloat("Rotação X",value.rotx,0,360, "%.5f")
+                                    imgui.SliderFloat("Rotação Y",value.roty,0,360, "%.5f")
+                                    imgui.SliderFloat("Rotação Z",value.rotz,0,360, "%.5f")
+                                    setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
+                                    imgui.Spacing()
+                                    if imgui.Button("Remover objeto",imgui.ImVec2(fcommon.GetSize(1))) then
+                                        for lgrp,data in pairs(module.tgame.object_spawner.placed) do
+                                            if grp == lgrp then
+                                                for lkey,value in pairs(data) do
+                                                    if key == lkey then
+                                                        local model, handle = string.match(key,"(%w+)##(%w+)")
+                                                        deleteObject(tonumber(handle))
+                                                        module.tgame.object_spawner.placed[grp][key] = nil
+                                                    end
+                                                end
+                                                break
+                                            end
+                                        end
+                                        printHelpString("Objeto removido")
+                                    end
+                                end)
                             end
-                            imgui.InputFloat("Coordenada X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
-                            imgui.InputFloat("Coordenada Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
-                            imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
-                            setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                        end
+                    end
+                    imgui.EndChild()
+                end
+            end,
+            function()
+                local filter = module.tgame.object_spawner.filter
+                filter:Draw("Filtrar")
+                fcommon.InformationTooltip("As alterações aqui afetam todos os objetos\ndo grupo.")
+                imgui.Spacing()
+
+                if imgui.BeginChild("Grupos") then 
+                    for grp,data in pairs(module.tgame.object_spawner.placed) do
+                        fcommon.DropDownMenu(grp,function()
+
+                            if imgui.Button("Aumentar##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            x = x + 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            x = x - 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Mover coordenada X ")
+
+                            if imgui.Button("Aumentar##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            y = y + 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            y = y - 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Mover coordenada Y ")
                             
+                            if imgui.Button("Aumentar##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            z = z + 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            _,x,y,z = getObjectCoordinates(handle)
+                                            z = z - 1
+                                            setObjectCoordinates(handle,x,y,z)
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Mover coordenada Z ")
                             imgui.Spacing()
                             
-                            imgui.SliderFloat("Rotação X",value.rotx,0,360, "%.5f")
-                            imgui.SliderFloat("Rotação Y",value.roty,0,360, "%.5f")
-                            imgui.SliderFloat("Rotação Z",value.rotz,0,360, "%.5f")
-                            setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
+                            if imgui.Button("Aumentar##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                 
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.rotx[0] = value.rotx[0] + 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.rotx[0] = value.rotx[0] - 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Rodar X")
+
+                            if imgui.Button("Aumentar##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                 
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.roty[0] = value.roty[0] + 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.roty[0] = value.roty[0] - 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Rodar Y")
+
+                            if imgui.Button("Aumentar##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                 
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.rotz[0] = value.rotz[0] + 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Diminuir##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.rotz[0] = value.rotz[0] - 1
+                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                        end
+                                        break
+                                    end
+                                end
+                            end    
+                            imgui.SameLine()        
+                            imgui.Text("Rodar Z")
+
+                            imgui.Spacing()
+                            
+                            imgui.Spacing()
+                            if imgui.Button("Remover grupo",imgui.ImVec2(fcommon.GetSize(1))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            deleteObject(tonumber(handle))
+                                        end
+                                        module.tgame.object_spawner.placed[lgrp] = nil
+                                        break
+                                    end
+                                end
+                                printHelpString("Groupo removido")
+                            end
                         end)
                     end
                     imgui.EndChild()
