@@ -659,7 +659,7 @@ function SpawnObject(model,obj_name,grp_name,x,y,z)
         setObjectRotation(obj,0,0,0)
         setObjectCollision(obj,false)
         markModelAsNoLongerNeeded(model)
-        printHelpString("Modelo criado")
+        printHelpString("Objeto criado")
         if module.tgame.object_spawner.placed[grp_name] == nil then
             module.tgame.object_spawner.placed[grp_name] = {}
         end
@@ -702,6 +702,7 @@ function module.RemoveAllObjects()
             deleteObject(tonumber(handle))
             module.tgame.object_spawner.placed[grp][key] = nil
         end
+        module.tgame.object_spawner.placed[grp] = nil
     end
 end
 
@@ -1080,7 +1081,37 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                     for grp,data in pairs(module.tgame.object_spawner.placed) do
                         fcommon.DropDownMenu(grp,function()
 
-                            if imgui.Button("Aumentar##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("Adicionar colisões",imgui.ImVec2(fcommon.GetSize(2))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.collision[0] = true
+                                            setObjectCollision(handle,true)
+                                        end
+                                        break
+                                    end
+                                end
+                                printHelpString("Colisoes adicionadas")
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Remover colisões",imgui.ImVec2(fcommon.GetSize(2))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.collision[0] = false
+                                            setObjectCollision(handle,false)
+                                        end
+                                        break
+                                    end
+                                end
+                                printHelpString("Colisoes removidas")
+                            end
+                            imgui.Spacing()
+                            local _,size = fcommon.GetSize(10)
+                            imgui.Columns(2,nil,false)
+                            if imgui.Button("+##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1094,7 +1125,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1108,9 +1139,9 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end    
                             imgui.SameLine()        
-                            imgui.Text("Mover coordenada X ")
+                            imgui.Text("Mover X")
 
-                            if imgui.Button("Aumentar##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##Y",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1124,7 +1155,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##Y",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1138,9 +1169,9 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end    
                             imgui.SameLine()        
-                            imgui.Text("Mover coordenada Y ")
+                            imgui.Text("Mover Y")
                             
-                            if imgui.Button("Aumentar##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##Z",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1154,7 +1185,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##Z",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1168,10 +1199,11 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end    
                             imgui.SameLine()        
-                            imgui.Text("Mover coordenada Z ")
-                            imgui.Spacing()
-                            
-                            if imgui.Button("Aumentar##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                            imgui.Text("Mover Z")
+
+                            imgui.NextColumn()
+                             
+                            if imgui.Button("+##rotX",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1185,7 +1217,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotX",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1200,7 +1232,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                             imgui.SameLine()        
                             imgui.Text("Rodar X")
 
-                            if imgui.Button("Aumentar##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##rotY",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1214,7 +1246,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotY",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1229,7 +1261,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                             imgui.SameLine()        
                             imgui.Text("Rodar Y")
 
-                            if imgui.Button("Aumentar##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##rotZ",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1243,7 +1275,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Diminuir##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotZ",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1257,8 +1289,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                             end    
                             imgui.SameLine()        
                             imgui.Text("Rodar Z")
-
-                            imgui.Spacing()
+                            imgui.Columns(1)
                             
                             imgui.Spacing()
                             if imgui.Button("Remover grupo",imgui.ImVec2(fcommon.GetSize(1))) then
