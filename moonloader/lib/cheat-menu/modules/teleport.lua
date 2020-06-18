@@ -28,7 +28,7 @@ module.tteleport =
 
 -- Teleports player to a specified coordinates
 function module.Teleport(x, y, z,interior_id)
-
+	
 	local target = false
 
 	if x == nil and y == nil then
@@ -40,10 +40,15 @@ function module.Teleport(x, y, z,interior_id)
 		end
 	end
 
+	if math.abs(x) > 99999 or math.abs(y) > 99999 or math.abs(z) > 99999 then
+		printHelpString("Coordenada muito alta")
+		return
+	end
+
 	if interior_id == nil then
 		interior_id = 0
 	end
-
+	
 	lockPlayerControl(true)
 	doFade(false,200)
 	wait(200)

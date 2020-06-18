@@ -99,6 +99,11 @@ function module.RegisterAllCommands()
 	end,"Recarrega todos scripts no moonloader")
 
 	module.RegisterCommand("tp",function(t)
+		if t[2] == nil or t[3] == nil then
+			printHelpString("Coordenada nao inserida!")
+			return
+		end
+
         if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
 		lua_thread.create(fteleport.Teleport,tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
 	end,"Teleporta para a coordenada","{X} {Y} {Z}(opcional)")
@@ -523,7 +528,7 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 				imgui.Spacing()
 				imgui.TextWrapped("O menu funcionará corretamente em outras resoluções, mas a GUI e as fontes poderam ter problemas.")
 				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Agradecimentos especiais para: ")
+				imgui.TextWrapped("Agradecimentos especiais a: ")
 				imgui.Columns(2,nil,false)
 				
 				imgui.TextWrapped("Dowglas_")
@@ -531,20 +536,13 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 				imgui.TextWrapped("guru guru")
 				imgui.TextWrapped("Israel")
 				imgui.TextWrapped("Junior-Djjr")
+				
+				imgui.NextColumn()
 				imgui.TextWrapped("kuba--")
 				imgui.TextWrapped("randazz0")
 				imgui.TextWrapped("Um_Geek")
 				imgui.TextWrapped("Comunidade Modding")
 				imgui.TextWrapped("Rockstar Games")
-				imgui.NextColumn()
-				imgui.TextWrapped("Pela Tradução em português")
-				imgui.TextWrapped("Pelo GSX")
-				imgui.TextWrapped("Pelo Timecyc stuff")
-				imgui.TextWrapped("Pelo api Neon")
-				imgui.TextWrapped("Por sua ajuda")
-				imgui.TextWrapped("Pela C zip library")
-				imgui.TextWrapped("Pelo ImStyleSerializer")
-				imgui.TextWrapped("Por sua ajuda")
 				imgui.EndChild()
 			end
 			imgui.Columns(1)
