@@ -345,7 +345,7 @@ end
 -- Main function
 function module.VisualMain()
     fcommon.Tabs("Visual",{"Caixas de seleção","Menus","Timecyc editor"},{
-        function()
+        function() -- Checkboxes
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxValue('Borda do colete',0x589123)
             fcommon.CheckBoxValue('Porcentagem do colete',0x589125)
@@ -389,7 +389,7 @@ function module.VisualMain()
             end)
             imgui.Columns(1)
         end,
-        function()
+        function() -- Menus
             fcommon.RadioButtonFunc("Cor da saúde",{"Vermelho (Padrão)","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
             fcommon.RadioButtonFunc("Cor do dinheiro",{"Vermelho","Verde (Padrão)","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
             fcommon.RadioButtonFunc("Contorno do dinheiro",{"Sem contornoe","Contorno fino","Contorno padrão"},{0,1,2},0x58F58D)
@@ -403,7 +403,7 @@ function module.VisualMain()
             fcommon.RadioButtonFunc("Cor da estrela de procurado",{"Vermelho","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo (Padrão)","Rosa","Cinzento","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
             fcommon.UpdateAddress({ name = 'Posição Y da estrela de procurado',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
-        function()
+        function() -- Timecyc editor
             if module.tvisual.timecyc.timecyc_24_plugin ~= 0 then
                 HOUR = 24
             else
@@ -446,7 +446,7 @@ function module.VisualMain()
             imgui.Spacing()
 
             fcommon.Tabs("Guias Timecyc",{"Cores","Misc"},{
-            function()
+            function() -- Colors
                 
                 if imgui.ColorEdit3("Ambiente",module.tvisual.timecyc.ambient) then
                     CTimecyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
@@ -521,7 +521,7 @@ function module.VisualMain()
                     CTimecyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
                 end
             end,
-            function()
+            function() -- Misc
 
                 imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
                 if imgui.SliderInt("Alfa da nuvem", module.tvisual.timecyc.cloud_alpha, 0, 255) then

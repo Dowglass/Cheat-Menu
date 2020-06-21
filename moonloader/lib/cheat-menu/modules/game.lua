@@ -846,7 +846,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                 imgui.TextWrapped("Cheats ativados")
                 imgui.Separator()
                 if imgui.BeginChild("Lista de cheats") then  
-                    for i=0,91,1 do   
+                    for i=0,91,1 do   -- Cheat ids 0 -> 911
                         if module.tgame.random_cheats.disabled_cheats[tostring(i)] then
                             selected = false
                         else
