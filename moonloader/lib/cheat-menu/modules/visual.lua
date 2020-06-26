@@ -390,17 +390,22 @@ function module.VisualMain()
             imgui.Columns(1)
         end,
         function() -- Menus
-            fcommon.RadioButtonFunc("Cor da saúde",{"Vermelho (Padrão)","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
-            fcommon.RadioButtonFunc("Cor do dinheiro",{"Vermelho","Verde (Padrão)","Roxo","Luz roxa","Branco","Preto","Amarelo","Rosa","Cinza","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
-            fcommon.RadioButtonFunc("Contorno do dinheiro",{"Sem contornoe","Contorno fino","Contorno padrão"},{0,1,2},0x58F58D)
+  
+            fcommon.CRGBAColorPicker("Cor da barra de saúde",0xBAB22C,{180,25,29})
+            fcommon.CRGBAColorPicker("Cor da borda no menu principal",0xBAB240,{0,0,0})
+            fcommon.CRGBAColorPicker("Cor do dinheiro",0xBAB230,{54,104,44})
+            fcommon.RadioButtonFunc("Contorno do dinheiro",{"Sem contorno","Contorno fino","Contorno padrão"},{0,1,2},0x58F58D)
             fcommon.RadioButtonFunc("Estilo da fonte do dinheiro",{"Estilo 1","Estilo 2","Estilo padrão"},{1,2,3},0x58F57F)
             fcommon.UpdateAddress({ name = 'Altura do radar',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
             fcommon.UpdateAddress({ name = 'Largura do radar',address = 0x866B78,size = 4,min=0,default = 94,max = 999,is_float = true})
             fcommon.UpdateAddress({ name = 'Posição X do radar',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
             fcommon.UpdateAddress({ name = 'Posição Y do radar',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
             fcommon.UpdateAddress({ name = 'Zoom no radar',address = 0xA444A3,size = 1,min=0,default = 0,max = 170})
+            fcommon.CRGBAColorPicker("Cor da estação de rádio",0xBAB24C,{150,150,150})
+            fcommon.CRGBAColorPicker("Cor do texto com estilo",0xBAB258,{226,192,99})
+            fcommon.CRGBAColorPicker("Cor do texto",0xBAB234,{50,60,127})
             fcommon.RadioButtonFunc("Borda da estrela de procurado",{"Sem borda","Padrão","Borda em negrito"},{0,1,2},0x58DD41)
-            fcommon.RadioButtonFunc("Cor da estrela de procurado",{"Vermelho","Verde","Roxo","Luz roxa","Branco","Preto","Amarelo (Padrão)","Rosa","Cinzento","Vermelho escuro"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
+            fcommon.CRGBAColorPicker("Cor da estrela de procurado",0xBAB244,{144,98,16})
             fcommon.UpdateAddress({ name = 'Posição Y da estrela de procurado',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
         function() -- Timecyc editor
