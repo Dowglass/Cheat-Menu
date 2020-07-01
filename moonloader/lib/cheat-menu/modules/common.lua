@@ -182,6 +182,10 @@ function module.Tabs(label,names,func)
         imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.ColorConvertU32ToFloat4(buttonhovered)
         imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.ColorConvertU32ToFloat4(buttonactive)
 
+        if not fmenu.tmenu.show_tooltips[0] then
+            imgui.NewLine()
+        end
+        
         imgui.Separator()
         imgui.EndChild()
         imgui.PopStyleVar(1)
