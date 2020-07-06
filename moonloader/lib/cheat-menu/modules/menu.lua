@@ -29,6 +29,7 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
+	debug_log      		= imgui.new.bool(fconfig.Get('tmenu.debug_log',false)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -148,8 +149,9 @@ function module.RegisterAllCommands()
 	end,"Restaura a câmera padrão")
 
 	module.RegisterCommand("cameramode",function(t)
-        fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
-	end,"Ativa ou desativa o modo câmera")
+		fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
+		fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
+	end,"Ativa ou desativa o modo de câmera")
 	
 	module.RegisterCommand("veh",function(t)
 		if t[2] == nil then 
@@ -270,7 +272,7 @@ function module.CheckUpdates()
 
 	module.httpRequest(link, nil, function(body, code, headers, status)
 		if body then
-			print(link, 'OK', status)
+			log.Write(string.format("%s %s",link,status))
 			if string.find( script.this.version,"beta") then
 				repo_version = body:match("script_version_number%((%d+)%)")
 				this_version = script.this.version_num
@@ -288,15 +290,15 @@ function module.CheckUpdates()
 				end
 			else
 				printHelpString("Nao foi possivel conectar ao github. O restante do menu ainda esta funcional. Voce pode desativar a verificacao de atualizacao automatica em 'Menu'.")
-			end
-		else
-			print(link, 'Erro', code)
+				end
+			else
+				log.Write(string.format("%s %s",link,tostring(code),"WARN"))
 		end
 	end)
 end
 
 function module.DownloadHandler(id, status, p1, p2)
-	print("Status da atualizacao: " .. status)
+	log.Write("Status da atualizacao: " .. status)
 	if status == fconst.UPDATE_STATUS.INSTALL then
 		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
 		printHelpString("Download completo. Clique no botao 'Instalar atualizacao' para finalizar.")
@@ -306,12 +308,10 @@ end
 function DownloadUpdate()
 	if string.find( script.this.version,"beta") then
 		module.httpRequest("https://github.com/Dowglass/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
-			print(link, 'OK', status)
 			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
 	else
-		module.httpRequest("https://api.github.com/repos/Dowglass/Cheat-Menu/tags", nil, function(body, code, headers, status)  
-			print(link, 'OK', status)
+		module.httpRequest("https://api.github.com/repos/Dowglass/Cheat-Menu/tags", nil, function(body, code, headers, status)  	
 			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
 			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
@@ -327,7 +327,7 @@ function module.MenuMain()
 	fcommon.Tabs("Menu",{"Config","Info","Comandos","Teclas de atalho","Estilos","Licença","Sobre"},{
 		function()
 			if imgui.Button("Configurações padrão",imgui.ImVec2(fcommon.GetSize(2))) then
-				module.tmenu.crash_text = "Configuraçoes padrao ~g~definida"
+				module.tmenu.crash_text = "Configuracoes padrao ~g~definida"
 				fconfig.tconfig.reset = true
 				thisScript():reload()
 			end
@@ -350,6 +350,10 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
+			fcommon.CheckBoxVar("Gravar informações de depuração",module.tmenu.debug_log,"Escreve informações extras sobre depuração no .log.\nPode ter um impacto no desempenho.",
+			function()
+				tcheatmenu.window.restart_required = true
+			end)
 			imgui.Columns(1)
 			
 		end,

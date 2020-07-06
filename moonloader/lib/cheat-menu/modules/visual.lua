@@ -165,16 +165,10 @@ local CTimecyc =
 }
 
 function module.LockWeather()
-    while true do
-
-        if module.tvisual.lock_weather[0] then
-            local weather = CTimecyc.curr_weather[0]
-            while module.tvisual.lock_weather[0] do
-                CTimecyc.curr_weather[0] = weather
-                CTimecyc.next_weather[0] = weather
-                wait(0)
-            end
-        end
+    local weather = CTimecyc.curr_weather[0]
+    while module.tvisual.lock_weather[0] do
+        CTimecyc.curr_weather[0] = weather
+        CTimecyc.next_weather[0] = weather
         wait(0)
     end
 end
@@ -378,7 +372,10 @@ function module.VisualMain()
             fcommon.CheckBoxValue('Borda da saúde',0x589353)
             fcommon.CheckBoxValue('Porcentagem da saúde',0x589355)
             fcommon.CheckBoxValue('Ocultar nível de procurado',0x58DD1B,nil,0x90)
-            fcommon.CheckBoxVar('Bloquear tempo',module.tvisual.lock_weather)
+            fcommon.CheckBoxVar('Bloquear tempo',module.tvisual.lock_weather,nil,
+            function()
+                fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
+            end)
             fcommon.CheckBoxVar('Nomes de canais de rádio',module.tvisual.radio_channel_names,nil,
             function()     
                 if module.tvisual.radio_channel_names[0] then

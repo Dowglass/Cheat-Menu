@@ -81,7 +81,7 @@ module.tvehicle =
     hidden_objects = {},
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
-    license_plate_text = imgui.new.char[9](fconfig.Get('tvehicle.license_plate_text',"GTA__SAN")),
+    license_plate_text = imgui.new.char[9](fconfig.Get('tvehicle.license_plate_text',"TM28 4CO")),
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
@@ -107,8 +107,14 @@ module.tvehicle =
     no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
     path = tcheatmenu.dir .. "vehicles\\images",
-    random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
-    random_colors_traffic = imgui.new.bool(fconfig.Get('tvehicle.random_colors_traffic',false)),
+    rainbow_colors = 
+    {
+        bool = imgui.new.bool(fconfig.Get('tvehicle.rainbow_colors.bool',false)),
+        light = imgui.new.float(fconfig.Get('tvehicle.rainbow_colors.light',0.5)),
+        saturation = imgui.new.float(fconfig.Get('tvehicle.rainbow_colors.saturation',1)),
+        traffic = imgui.new.bool(fconfig.Get('tvehicle.rainbow_colors.traffic',false)),
+        wait_time = imgui.new.int(fconfig.Get('tvehicle.rainbow_colors.wait_time',100)),
+    },
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
     stay_on_bike = imgui.new.bool(fconfig.Get('tvehicle.stay_on_bike',false)),
@@ -173,38 +179,35 @@ function InstallNeon(pCar,color,pulsing)
 end
 
 function module.TrafficNeons()
-    
-    while true do
-        if module.tvehicle.neon.checkbox[0] and module.tvehicle.neon["Handle"] ~= 0 then
-            local x,y,z = getCharCoordinates(PLAYER_PED)
+    while module.tvehicle.neon.checkbox[0] and module.tvehicle.neon["Handle"] ~= 0 do
+        local x,y,z = getCharCoordinates(PLAYER_PED)
 
-            local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
-            
-            if result then
-                while result do
-                    local temp = 0
-                    local pCar = getCarPointer(car)
+        local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
+        
+        if result then
+            while result do
+                local temp = 1
+                local pCar = getCarPointer(car)
 
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
-                        temp = math.random(1,20) -- 5%
+                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
+                --     temp = math.random(1,20) -- 5%
+                -- end
+                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                --     temp = math.random(1,5) -- 20%
+                -- end
+                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                --     temp = math.random(1,3) -- 30%
+                -- end
+                if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
+                    if getCarCharIsUsing(PLAYER_PED) ~= car then
+                        InstallNeon(pCar,math.random(0,6),math.random(0,1))
                     end
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
-                        temp = math.random(1,5) -- 20%
-                    end
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
-                        temp = math.random(1,3) -- 30%
-                    end
-                    if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
-                        if getCarCharIsUsing(PLAYER_PED) ~= car then
-                            InstallNeon(pCar,math.random(0,6),math.random(0,1))
-                        end
-                    end
-                    callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
-                    result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
                 end
+                callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
+                result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
             end
         end
-        wait(0)
+        wait(100)
     end
 end
 
@@ -313,7 +316,6 @@ function module.GSXProcessVehicles()
             if not doesVehicleExist(car) then 
                 t[pveh] = nil
                 s[car] = nil
-                print("Removido!")
             end
         end
         
@@ -457,72 +459,57 @@ end
 
 function module.AircraftCamera()
 
-    while true do
-        if (isCharInAnyHeli(PLAYER_PED)
-        or isCharInAnyPlane(PLAYER_PED)) 
-        and module.tvehicle.aircraft.camera[0] then
-            while isCharInAnyHeli(PLAYER_PED)
-            or isCharInAnyPlane(PLAYER_PED) do
-                
-                -- FirstPersonCamera controls the camera if its enabled
-                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end
+    while module.tvehicle.aircraft.camera[0] do
+        while isCharInAnyHeli(PLAYER_PED)
+        or isCharInAnyPlane(PLAYER_PED) do
+            
+            -- FirstPersonCamera controls the camera if its enabled
+            if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
 
-                local vehicle = getCarCharIsUsing(PLAYER_PED)
-                local roll = getCarRoll(vehicle)
+            local vehicle = getCarCharIsUsing(PLAYER_PED)
+            local roll = getCarRoll(vehicle)
 
-                attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
-                if isKeyDown(0x56) then
-                    while isKeyDown(0x56) do
-                        wait(0)
-                    end
-                    module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
-                    if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
-                        module.tvehicle.aircraft.index  = 0
-                    end
+            attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
+            if isKeyDown(0x56) then
+                while isKeyDown(0x56) do
+                    wait(0)
                 end
-                wait(0)
+                module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
+                if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
+                    module.tvehicle.aircraft.index  = 0
+                end
             end
-            restoreCameraJumpcut()
+            wait(0)
         end
-        wait(0)
+        wait(100)
     end
+    restoreCameraJumpcut()
 end
 
 function module.FirstPersonCamera()
-    while true do
-        local total_x = 0
-        local total_y = 0
-        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] then
+    local total_x = 0
+    local total_y = 0
 
-            local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
-            while module.tvehicle.first_person_camera.bool[0] do
+    while module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] do
 
-                local hveh = getCarCharIsUsing(PLAYER_PED)
+        local hveh = getCarCharIsUsing(PLAYER_PED)        
+        
+        x,y = getPcMouseMovement()
+        total_x = total_x + x
+        total_y = total_y + y
 
-                if isCharOnFoot(PLAYER_PED) or getCarModel(hveh) ~= model then
-                    break 
-                end
-                
-
-                x,y = getPcMouseMovement()
-                total_x = total_x + x
-                total_y = total_y + y
-
-                local roll = 0.0
-                if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
-                    roll = getCarRoll(hveh)
-                end
-                
-                if fgame.tgame.camera.bool[0] then
-                    break
-                end
-                attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
-                wait(0)
-            end
-            restoreCameraJumpcut()  
+        local roll = 0.0
+        if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
+            roll = getCarRoll(hveh)
         end
+
+        if fgame.tgame.camera.bool[0] then
+            break
+        end
+        attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
         wait(0)
     end
+    restoreCameraJumpcut()  
 end
 
 --------------------------------------------------
@@ -716,41 +703,78 @@ function ApplyTexture(filename,load_saved_texture,car)
     end,false,car)
 end
 
-function module.RandomColors()
-    while true do
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] and not module.tvehicle.random_colors_traffic[0] then
-            local primary_color = math.random(0,#module.tvehicle.color.col_data_table)
-            local secondary_color = math.random(0,#module.tvehicle.color.col_data_table)
-            local car = getCarCharIsUsing(PLAYER_PED)
-            if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
-                changeCarColour(car,primary_color,secondary_color)
-            else
-                break
-            end
-            wait(1000)
-        end
-        wait(0)
+function hslToRgb(h, s, l)
+    local r, g, b;
+
+    if s == 0 then
+		r = l
+		g = l
+		b = l
+    else
+		function hue2rgb(p, q, t)
+            if(t < 0) then t = t + 1 end
+			if(t > 1) then t = t - 1 end
+			
+            if(t < 1/6) then return p + (q - p) * 6 * t end
+            if(t < 1/2) then return q end
+            if(t < 2/3) then return p + (q - p) * (2/3 - t) * 6 end
+            return p
+		end
+
+		local q = l < 0.5 and l * (1 + s) or l + s - l * s
+        local p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
     end
+
+    return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
 end
 
-function module.RandomTrafficColors()
-    while true do
-        if module.tvehicle.random_colors_traffic[0] then
-            local carX,carY,carZ = getCharCoordinates(PLAYER_PED)
+function ChangeVehicleColorHSL(hveh,hue,saturation,lightness)
+    saturation = saturation or 1
+    lightness = lightness or 0.5
+    module.ForEachCarComponent(function(mat,comp,hveh)
+        local r,g,b = mat:get_color()
+
+        if not module.tvehicle.apply_material_filter[0] 
+        or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+            local r,g,b = hslToRgb(hue,saturation,lightness)
+            mat:set_color(r,g,b,255)
+        end
+    end,false,hveh)
+end
+
+function module.RainbowColors()
+    local hue = 0
+    while module.tvehicle.rainbow_colors.bool[0] do
         
-            local result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,false,true)
+        if module.tvehicle.rainbow_colors.traffic[0] then -- Player + Traffic  
+            local charX,charY,charZ = getCharCoordinates(PLAYER_PED)
+        
+            local result, hveh = findAllRandomVehiclesInSphere(charX,charY,charZ,100.0,false,true)
 
             if result then
                 while result do
-                    local primary_color = math.random(0,#module.tvehicle.color.col_data_table)
-                    local secondary_color = math.random(0,#module.tvehicle.color.col_data_table)
-                    changeCarColour(car,primary_color,secondary_color)
-                    result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,true,true)
+                    ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])
+                    result, hveh = findAllRandomVehiclesInSphere(charX,charY,charZ,100.0,true,true)
                 end
             end
-            wait(1000)
+        else -- Only Player
+            if isCharInAnyCar(PLAYER_PED) then
+                local hveh = getCarCharIsUsing(PLAYER_PED)
+                ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])
+            else -- function not needed at this time
+                break
+            end
         end
-        wait(0)
+
+        if hue >= 1 then
+            hue =  0
+        else
+            hue = hue + 0.01
+        end
+        wait(module.tvehicle.rainbow_colors.wait_time[0])
     end
 end
 
@@ -783,7 +807,7 @@ function module.RemoveComponentFromVehicle(component,car,hide_msg)
     if doesVehicleExist(car) then
         removeVehicleMod(car,component)
         if hide_msg ~= true then
-            printHelpString("Componente ~r~removido")
+            printHelpString("Componente ~g~removido")
         end
     end
 end
@@ -796,16 +820,16 @@ function module.OnEnterVehicle()
     while true do
         
         if isCharInAnyCar(PLAYER_PED) then
-            local car        = getCarCharIsUsing(PLAYER_PED)
-            local pCar       = getCarPointer(car)
-            local model      = getCarModel(car)
+            local hveh        = getCarCharIsUsing(PLAYER_PED)
+            local pVeh       = getCarPointer(hveh)
+            local model      = getCarModel(hveh)
             local model_name = module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(model)] or getGxtText(module.GetNameOfVehicleModel(model))
 
             -- Get vehicle components
             module.tvehicle.hidden_objects = {}
             module.tvehicle.components.names = {"default"}
 
-            module.ForEachCarComponent(function(mat,comp,car)
+            module.ForEachCarComponent(function(mat,comp,hveh)
                 table.insert(module.tvehicle.components.names,comp.name)
             end,true)
             module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
@@ -814,9 +838,9 @@ function module.OnEnterVehicle()
             if module.tvehicle.gsx.handle ~= 0  then
                 ApplyTexture(nil,true)
                 ApplyColor(true)
-                module.tvehicle.neon.rb_value[0] = module.GSXGet(car,"cm_neon_color") or -1
-                module.tvehicle.neon.pulsing[0]  = module.GSXGet(car,"cm_neon_pulsing") or false
-                InstallNeon(pCar)
+                module.tvehicle.neon.rb_value[0] = module.GSXGet(hveh,"cm_neon_color") or -1
+                module.tvehicle.neon.pulsing[0]  = module.GSXGet(hveh,"cm_neon_pulsing") or false
+                InstallNeon(pVeh)
             end
             
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
@@ -834,13 +858,18 @@ function module.OnEnterVehicle()
             module.tvehicle.first_person_camera.offset_y_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["y"]
             module.tvehicle.first_person_camera.offset_z_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["z"]
 
-            while isCharInCar(PLAYER_PED,car) do
+            fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
+            fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")
+            fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+            fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
+
+            while isCharInCar(PLAYER_PED,hveh) do
                 wait(0)
             end
 
             module.tvehicle.first_person_camera.offsets[tostring(model)].x = module.tvehicle.first_person_camera.offset_x_var[0]
             module.tvehicle.first_person_camera.offsets[tostring(model)].y = module.tvehicle.first_person_camera.offset_y_var[0] 
-            module.tvehicle.first_person_camera.offsets[tostring(model)].z = module.tvehicle.first_person_camera.offset_z_var[0]
+            module.tvehicle.first_person_camera.offsets[tostring(model)].z = module.tvehicle.first_person_camera.offset_z_var[0] 
             module.tvehicle.max_velocity_temp[0] = -1
         end
         wait(0)
@@ -873,31 +902,19 @@ function DoorMenu(func)
 end   
 
 function module.UnlimitedNitro()
-    while true do
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
-            local car = getCarCharIsUsing(PLAYER_PED)
-            
-            if isThisModelACar(getCarModel(car)) then  
-                writeMemory(0x969165,1,0,false) -- ALl cars have nitro
-                writeMemory(0x96918B,1,0,false) -- All taxis have nitro
-                while module.tvehicle.unlimited_nitro[0] do
-
-                    if getCarCharIsUsing(PLAYER_PED) ~= car then
-                        break
-                    end
-                    
-                    if isKeyDown(vkeys.VK_LBUTTON) then
-                        module.AddComponentToVehicle(1010,car,true)
-                        while isKeyDown(vkeys.VK_LBUTTON) do
-                            wait(0)
-                        end
-                        module.RemoveComponentFromVehicle(1010,car,true)
-                    end
-
-                    wait(0)
-                end
+    writeMemory(0x969165,1,0,true) -- ALl cars have nitro
+    writeMemory(0x96918B,1,0,true) -- All taxis have nitro
+    local hveh = getCarCharIsUsing(PLAYER_PED)
+    while isCharInCar(PLAYER_PED,hveh) and module.tvehicle.unlimited_nitro[0] and isThisModelACar(getCarModel(hveh)) do
+        
+        if isKeyDown(vkeys.VK_LBUTTON) then
+            module.AddComponentToVehicle(1010,hveh,true)
+            while isKeyDown(vkeys.VK_LBUTTON) do
+                wait(0)
             end
+            module.RemoveComponentFromVehicle(1010,hveh,true)
         end
+
         wait(0)
     end
 end
@@ -942,6 +959,9 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Desligar motor",module.tvehicle.disable_car_engine)
             fcommon.CheckBoxVar("Câmera em primeira pessoa",module.tvehicle.first_person_camera.bool,nil,nil,
             function()
+                fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")
+            end,
+            function()
                 fcommon.InputFloat("Ângulo X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
                 fcommon.InputFloat("Ângulo Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
                 fcommon.InputFloat("Ângulo Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
@@ -956,6 +976,8 @@ function module.VehicleMain()
                     setCarVisible(car,not module.tvehicle.invisible_car[0])
                 end
             end)
+            
+            imgui.NextColumn()
 
             fcommon.CheckBoxVar("Ligar luzes",module.tvehicle.lights,nil,
             function()
@@ -975,8 +997,6 @@ function module.VehicleMain()
                 end
             end,nil,false)
 
-            imgui.NextColumn()
-
             fcommon.CheckBoxVar("Trancar portas",module.tvehicle.lock_doors,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -992,7 +1012,11 @@ function module.VehicleMain()
                     printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
             end,nil,false)
-            fcommon.CheckBoxVar("Nova câmera aérea",module.tvehicle.aircraft.camera)
+
+            fcommon.CheckBoxVar("Nova câmera aérea",module.tvehicle.aircraft.camera,nil,
+            function()
+                fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
+            end)
             fcommon.CheckBoxValue("Nova câmera no trem",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
             fcommon.CheckBoxVar("Sem dano",module.tvehicle.no_damage)
             fcommon.CheckBoxVar("Sem trânsito de veículos",module.tvehicle.no_vehicles,nil,
@@ -1014,11 +1038,15 @@ function module.VehicleMain()
             
             fcommon.CheckBoxVar("Não mostrar dano",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Handling perfeito",0x96914C)
-            fcommon.CheckBoxVar("Cores aleatórias",module.tvehicle.random_colors,"Pinta o carro dos jogadores com cores aleatórias\na cada segundo.")
-            fcommon.CheckBoxVar("Tráfego com cores aleatórias",module.tvehicle.random_colors_traffic,"Pinta carros de tráfego com cores aleatórias a cada segundo.")
             fcommon.CheckBoxValue("Modo tanque",0x969164) 
-            fcommon.CheckBoxVar("Tráfego neon",module.tvehicle.neon.checkbox,"Adiciona luzes de neon aos veículos de trânsito.\nApenas alguns veículos terão.")
-            fcommon.CheckBoxVar("Nitro ilimitado",module.tvehicle.unlimited_nitro,"O Nitro será ativado quando clicado com o botão esquerdo\n\nAtivar isso desativa: \n'Todos os carros e taxis tem nitro'")
+            fcommon.CheckBoxVar("Tráfego neon",module.tvehicle.neon.checkbox,"Adiciona luzes de neon aos veículos de trânsito.\nApenas alguns veículos terão.",
+            function()
+                fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
+            end)
+            fcommon.CheckBoxVar("Nitro ilimitado",module.tvehicle.unlimited_nitro,"O Nitro será ativado ao clicar com o botão esquerdo.\nAtivar isso desativa: \n'Todos os carros e taxis tem nitro'.",
+            function()
+                fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
+            end)
             fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -1274,13 +1302,26 @@ function module.VehicleMain()
                 imgui.Columns(2,nil,false)
                 fcommon.CheckBoxVar("Filtrar material",module.tvehicle.apply_material_filter,"Filtra o material ao aplicar cor/textura.\nDesative se algo não funcionar corretamente.")
                 imgui.NextColumn()
+                fcommon.CheckBoxVar("Cores do arco-íris",module.tvehicle.rainbow_colors.bool,"Efeito arco-íris no veículo do jogador.",function()
+                    fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+                end,
+                function()
+                    fcommon.CheckBoxVar("Aplicar no tráfego",module.tvehicle.rainbow_colors.traffic,"Efeito arco-íris em veículos de trânsito.",
+                    function()
+                        fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+                    end)
+                    imgui.Dummy(imgui.ImVec2(0,20))
+                    imgui.SliderFloat("Luminosidade",module.tvehicle.rainbow_colors.light,0,1)
+                    imgui.SliderFloat("Saturação",module.tvehicle.rainbow_colors.saturation,0,1)
+                    imgui.SliderInt("Tempo",module.tvehicle.rainbow_colors.wait_time,0,1000)
+                end)
                 imgui.Columns(1)
                 imgui.Spacing()
                 
                 if imgui.ColorEdit3("Cor",module.tvehicle.color.rgb) then
                     ApplyColor()
                 end
-                fcommon.ConfigPanel({nil,"Cor"},function()
+                fcommon.ConfigPanel("Cor",function()
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
@@ -1392,7 +1433,7 @@ function module.VehicleMain()
                 end
                 imgui.Spacing()
                 imgui.Text("Info")
-                fcommon.InformationTooltip("Left click to add component\nRight click to remove component")
+                fcommon.InformationTooltip("Clique com o botão esquerdo para adicionar e\ndireito para remover o componente.")
                 imgui.Spacing()
                 if imgui.BeginChild("Tunar") then
                     imgui.Spacing()
@@ -1475,7 +1516,7 @@ function module.VehicleMain()
                     file:close()
                     printHelpString("Dados salvos!")
                 end
-                if imgui.Button("Ler mais sobre handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Sobre handling",imgui.ImVec2(fcommon.GetSize(1))) then
                     os.execute('explorer "https://projectcerbera.com/gta/sa/tutorials/handling"')
                 end
 

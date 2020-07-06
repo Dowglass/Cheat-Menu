@@ -23,7 +23,7 @@ module.tgame                =
         bool                = imgui.new.bool(false),
         fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
         lock_on_player      = imgui.new.bool(false),
-        movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.2)),
+        movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.1)),
         shake               = imgui.new.float(0.0),
     },
     cop = 
@@ -46,7 +46,7 @@ module.tgame                =
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
-    gxt_save_name           = imgui.new.char[22]("Sem titulo"),
+    gxt_save_name           = imgui.new.char[22]("Untitled Save"),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     object_spawner          = 
     {
@@ -90,206 +90,197 @@ module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](
 
 
 function module.SolidWater()
-   
-    while true do
-        if module.tgame.solid_water[0] then
-            while module.tgame.solid_water[0] do
-                wait(0)
-                local x,y,z = getCharCoordinates(PLAYER_PED)
-                local water_height =  getWaterHeightAtCoords(x,y,false)
-
-                if doesObjectExist(module.tgame.solid_water_object) then
-                    deleteObject(module.tgame.solid_water_object)
-                end
-
-                if z > water_height and water_height ~= -1000 and not isCharInAnyBoat(PLAYER_PED) then     -- Don't create the object if player is under water/diving
-                    module.tgame.solid_water_object = createObject(3095,x,y,water_height)
-                    setObjectVisible(module.tgame.solid_water_object,false)
-                end
-            end
-
-            if doesObjectExist(module.tgame.solid_water_object) then
-                deleteObject(module.tgame.solid_water_object)
-            end
-            
-        end
+    while module.tgame.solid_water[0] do
         wait(0)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
+        local water_height =  getWaterHeightAtCoords(x,y,false)
+
+        if doesObjectExist(module.tgame.solid_water_object) then
+            deleteObject(module.tgame.solid_water_object)
+        end
+
+        if z > water_height and water_height ~= -1000 and not isCharInAnyBoat(PLAYER_PED) then     -- Don't create the object if player is under water/diving
+            module.tgame.solid_water_object = createObject(3095,x,y,water_height)
+            setObjectVisible(module.tgame.solid_water_object,false)
+        end
+    end
+
+    if doesObjectExist(module.tgame.solid_water_object) then
+        deleteObject(module.tgame.solid_water_object)
     end
 end
 
 function module.CameraMode()
 
-    while true do
-        if module.tgame.camera.bool[0] then
+    while module.tgame.camera.bool[0] do
 
-            local x,y,z = getCharCoordinates(PLAYER_PED)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
 
-            local ped =  createRandomChar(x,y,z)
+        local ped =  createRandomChar(x,y,z)
 
-            freezeCharPositionAndDontLoadCollision(ped,true)
-            setCharCollision(ped,false)
-            setLoadCollisionForCharFlag(ped,false)
-            setEveryoneIgnorePlayer(0,true)
+        freezeCharPositionAndDontLoadCollision(ped,true)
+        setCharCollision(ped,false)
+        setLoadCollisionForCharFlag(ped,false)
+        setEveryoneIgnorePlayer(0,true)
+        
+        displayRadar(false)
+        displayHud(false)
+        setCharVisible(ped,false)
+
+        local total_mouse_x = getCharHeading(PLAYER_PED)
+        local total_mouse_y = 0
+        local total_mouse_delta = 0
+        
+
+        setCharCoordinates(ped,x,y,z-20) 
+
+        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+        cameraPersistFov(true) 
+
+        while module.tgame.camera.bool[0] do
+            local factor = 1.0
+            x, y, z = getCharCoordinates(ped)  
+            local mouse_x, mouse_y =  getPcMouseMovement()
+
+            total_mouse_x = total_mouse_x - mouse_x/6
+            total_mouse_y = total_mouse_y + mouse_y/3
             
-            displayRadar(false)
-            displayHud(false)
-            setCharVisible(ped,false)
-
-            local total_mouse_x = getCharHeading(PLAYER_PED)
-            local total_mouse_y = 0
-            local total_mouse_delta = 0
+            if total_mouse_y > 170 then total_mouse_y = 170 end
+            if total_mouse_y < -170 then total_mouse_y = -170 end
             
 
-            setCharCoordinates(ped,x,y,z-20) 
-
-            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-            cameraPersistFov(true) 
-
-            while module.tgame.camera.bool[0] do
-                local factor = 1.0
-                x, y, z = getCharCoordinates(ped)  
-                local mouse_x, mouse_y =  getPcMouseMovement()
-
-                total_mouse_x = total_mouse_x - mouse_x/6
-                total_mouse_y = total_mouse_y + mouse_y/3
-                
-                if total_mouse_y > 170 then total_mouse_y = 170 end
-                if total_mouse_y < -170 then total_mouse_y = -170 end
-                
-
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
-                    factor = factor*0.5
-                end
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
-                    factor = factor*2
-                end
-
-
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
-                    local angle = getCharHeading(ped) + 90
-
-                    x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
-                    y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                    z = z + module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
-                end
-        
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
-                    local angle = getCharHeading(ped) + 90
-                    
-                    x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
-                    y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                    z = z - module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
-                end
-
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
-                    local angle = getCharHeading(ped)
-                    
-                    x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
-                    y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                end
-
-                if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
-                    local angle = getCharHeading(ped)
-                    
-                    x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
-                    y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                end
-
-                if module.tgame.camera.lock_on_player[0] then
-
-                    local right = 0
-                    local front = 0
-                    local up = 0
-                    total_mouse_x = 0
-                    total_mouse_y = 0
-                    while module.tgame.camera.lock_on_player[0] and module.tgame.camera.bool[0] do
-                        local mouse_x, mouse_y =  getPcMouseMovement()
-
-                        total_mouse_x = total_mouse_x - mouse_x/6
-                        total_mouse_y = total_mouse_y + mouse_y/6
-                        if total_mouse_x > 300 then total_mouse_x = 300 end
-                        if total_mouse_x < -300 then total_mouse_x = -300 end
-                        if total_mouse_y > 170 then total_mouse_y = 170 end
-                        if total_mouse_y < -170 then total_mouse_y = -170 end
-                        factor = 1
-                        
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
-                            factor = factor*0.5
-                        end
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
-                            factor = factor*2
-                        end
-
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
-                            front = front + factor * module.tgame.camera.movement_speed[0]
-                        end
-        
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
-                            front = front - factor * module.tgame.camera.movement_speed[0]
-                        end
-
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
-                            right = right - factor * module.tgame.camera.movement_speed[0]
-                        end
-        
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
-                            right = right + factor * module.tgame.camera.movement_speed[0]
-                        end
-
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_up[1] and tcheatmenu.hot_keys.camera_mode_up[2]) then 
-                            up = up - factor * module.tgame.camera.movement_speed[0]
-                        end
-        
-                        if isKeyDown(tcheatmenu.hot_keys.camera_mode_down[1] and tcheatmenu.hot_keys.camera_mode_down[2]) then 
-                            up = up + factor * module.tgame.camera.movement_speed[0]
-                        end
-                        attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 90.0, total_mouse_y, 0.0, 2)
-
-                        if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
-                            total_mouse_delta = total_mouse_delta + getMousewheelDelta()
-                            module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
-                            if module.tgame.camera.fov[0] > 120 then
-                                module.tgame.camera.fov[0] = 120
-                            end
-                            if module.tgame.camera.fov[0] < 5 then
-                                module.tgame.camera.fov[0] = 5
-                            end
-                            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
-                            cameraPersistFov(true) 
-                        end
-                        
-                        wait(0)
-                    end
-                else
-                    setCharHeading(ped,total_mouse_x)
-                    attachCameraToChar(ped,0.0, 0.0, 20.0, 0.0, 180, total_mouse_y, 0.0, 2)
-                    setCharCoordinates(ped,x,y,z-1.0)
-                end
-
-                if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
-                    total_mouse_delta = total_mouse_delta + getMousewheelDelta()
-                    module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
-                    if module.tgame.camera.fov[0] > 120 then
-                        module.tgame.camera.fov[0] = 120
-                    end
-                    if module.tgame.camera.fov[0] < 5 then
-                        module.tgame.camera.fov[0] = 5
-                    end
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
-                    cameraPersistFov(true) 
-                end
-                wait(0)
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
+                factor = factor*0.5
             end
-        
-            cameraPersistFov(false) 
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
+                factor = factor*2
+            end
 
-            displayRadar(true)
-            displayHud(true)
 
-            restoreCameraJumpcut()
-            markCharAsNoLongerNeeded(ped)
-            deleteChar(ped)
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
+                local angle = getCharHeading(ped) + 90
+
+                x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
+                y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
+                z = z + module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
+            end
+    
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
+                local angle = getCharHeading(ped) + 90
+                
+                x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
+                y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
+                z = z - module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
+            end
+
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
+                local angle = getCharHeading(ped)
+                
+                x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
+                y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
+            end
+
+            if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
+                local angle = getCharHeading(ped)
+                
+                x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
+                y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
+            end
+
+            if module.tgame.camera.lock_on_player[0] then
+
+                local right = 0
+                local front = 0
+                local up = 0
+                total_mouse_x = 0
+                total_mouse_y = 0
+                while module.tgame.camera.lock_on_player[0] and module.tgame.camera.bool[0] do
+                    local mouse_x, mouse_y =  getPcMouseMovement()
+
+                    total_mouse_x = total_mouse_x - mouse_x/6
+                    total_mouse_y = total_mouse_y + mouse_y/6
+                    if total_mouse_x > 300 then total_mouse_x = 300 end
+                    if total_mouse_x < -300 then total_mouse_x = -300 end
+                    if total_mouse_y > 170 then total_mouse_y = 170 end
+                    if total_mouse_y < -170 then total_mouse_y = -170 end
+                    factor = 1
+                    
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
+                        factor = factor*0.5
+                    end
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
+                        factor = factor*2
+                    end
+
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
+                        front = front + factor * module.tgame.camera.movement_speed[0]
+                    end
+    
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
+                        front = front - factor * module.tgame.camera.movement_speed[0]
+                    end
+
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
+                        right = right - factor * module.tgame.camera.movement_speed[0]
+                    end
+    
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
+                        right = right + factor * module.tgame.camera.movement_speed[0]
+                    end
+
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_up[1] and tcheatmenu.hot_keys.camera_mode_up[2]) then 
+                        up = up - factor * module.tgame.camera.movement_speed[0]
+                    end
+    
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_down[1] and tcheatmenu.hot_keys.camera_mode_down[2]) then 
+                        up = up + factor * module.tgame.camera.movement_speed[0]
+                    end
+                    attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 90.0, total_mouse_y, 0.0, 2)
+
+                    if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
+                        total_mouse_delta = total_mouse_delta + getMousewheelDelta()
+                        module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
+                        if module.tgame.camera.fov[0] > 120 then
+                            module.tgame.camera.fov[0] = 120
+                        end
+                        if module.tgame.camera.fov[0] < 5 then
+                            module.tgame.camera.fov[0] = 5
+                        end
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
+                        cameraPersistFov(true) 
+                    end
+                    
+                    wait(0)
+                end
+            else
+                setCharHeading(ped,total_mouse_x)
+                attachCameraToChar(ped,0.0, 0.0, 20.0, 0.0, 180, total_mouse_y, 0.0, 2)
+                setCharCoordinates(ped,x,y,z-1.0)
+            end
+
+            if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
+                total_mouse_delta = total_mouse_delta + getMousewheelDelta()
+                module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
+                if module.tgame.camera.fov[0] > 120 then
+                    module.tgame.camera.fov[0] = 120
+                end
+                if module.tgame.camera.fov[0] < 5 then
+                    module.tgame.camera.fov[0] = 5
+                end
+                cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
+                cameraPersistFov(true) 
+            end
+            wait(0)
         end
+    
+        cameraPersistFov(false) 
+
+        displayRadar(true)
+        displayHud(true)
+
+        restoreCameraJumpcut()
+        markCharAsNoLongerNeeded(ped)
+        deleteChar(ped)
         wait(0)
     end
 end
@@ -322,43 +313,34 @@ function CheatsEntry(func,status,names)
 end
 
 function module.SyncSystemTime()
-    while true do
-        if module.tgame.sync_system_time[0] then
-            time = os.date("*t")
-            local hour,minute = getTimeOfDay()
-            if hour ~= time.hour or minute ~= time.min then
-                setTimeOfDay(time.hour,time.min)
-            end 
-        end
+    while module.tgame.sync_system_time[0] do
+        time = os.date("*t")
+        local hour,minute = getTimeOfDay()
+        if hour ~= time.hour or minute ~= time.min then
+            setTimeOfDay(time.hour,time.min)
+        end 
         wait(0)
     end
 end
 
 function module.RandomCheatsActivate()
-    while true do
-        if module.tgame.random_cheats.checkbox[0] then
-            wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
-            if module.tgame.random_cheats.checkbox[0] then
-                cheatid = math.random(0,91)
-                callFunction(0x438370,1,1,cheatid)
-                table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
-                printHelpString("~g~" .. module.tgame.random_cheats.cheat_name[tostring(cheatid)][1])
-            end
-        end
-        wait(0)
+    while module.tgame.random_cheats.checkbox[0] do
+        wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
+        cheatid = math.random(0,91)
+        callFunction(0x438370,1,1,cheatid)
+        table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
+        printHelpString("~g~" .. module.tgame.random_cheats.cheat_name[tostring(cheatid)][1])
     end
 end
 
 function module.RandomCheatsDeactivate()
-    while true do
-        if module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats then
-            for _,x in ipairs(module.tgame.random_cheats.activated_cheats) do
-                if module.tgame.random_cheats.cheat_name[tostring(x)][2] == "true" then
-                    wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
-                    if module.tgame.random_cheats.disable_cheat_checkbox[0] then
-                        callFunction(0x438370,1,1,module.tgame.random_cheats.activated_cheats[x])
-                        printHelpString("~r~" .. module.tgame.random_cheats.cheat_name[tostring(x)][1])
-                    end
+    while module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats do
+        for _,x in ipairs(module.tgame.random_cheats.activated_cheats) do
+            if module.tgame.random_cheats.cheat_name[tostring(x)][2] == "true" then
+                wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
+                if module.tgame.random_cheats.disable_cheat_checkbox[0] then
+                    callFunction(0x438370,1,1,module.tgame.random_cheats.activated_cheats[x])
+                    printHelpString("~r~" .. module.tgame.random_cheats.cheat_name[tostring(x)][1])
                 end
             end
         end
@@ -367,18 +349,16 @@ function module.RandomCheatsDeactivate()
 end
 
 function module.FreezeTime()
-    while true do
-        if module.tgame.freeze_time[0] then
+    while module.tgame.freeze_time[0] do
 
-            local status = fvisual.tvisual.lock_weather[0]
-            memory.write(0x969168,1,1)  -- Freeze time
-            while module.tgame.freeze_time[0] do
-                fvisual.tvisual.lock_weather[0] = true
-                wait(0)
-            end
-            fvisual.tvisual.lock_weather[0] = status
-            memory.write(0x969168,0,1)  -- Freeze time
+        local status = fvisual.tvisual.lock_weather[0]
+        memory.write(0x969168,1,1)  -- Freeze time
+        while module.tgame.freeze_time[0] do
+            fvisual.tvisual.lock_weather[0] = true
+            wait(0)
         end
+        fvisual.tvisual.lock_weather[0] = status
+        memory.write(0x969168,0,1)  -- Freeze time
         wait(0)
     end
 end
@@ -545,7 +525,7 @@ function ShowLoadedScript(script,index)
         imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(string.sub(authors,1,-3))
         imgui.Text("Versão: " .. tostring(script.version))
-        imgui.Text("Versão n°: " .. tostring(script.version_num))
+        imgui.Text("versão n°: " .. tostring(script.version_num))
         imgui.NextColumn()
         imgui.Text("Script ID: " .. script.id)
         imgui.Text("Status: Carregado")
@@ -739,12 +719,15 @@ function module.GameMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo câmera",module.tgame.camera.bool,string.format("Atalho: %s\n\nPara frente: %s\tPara trás: %s\
 Esquerda: %s\t\tDireita: %s\n\nMovimento lento: %s\nMovimento rápido: %s\n\nRotação: Mouse\nZoom Cima/Baixo : Roda do mouse \n\
-Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
+Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_right),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_fast),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_up),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),nil,
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),
+            function()
+                fcommon.SingletonThread(module.CameraMode,"CameraMode")
+            end,
             function()
                 fcommon.CheckBoxVar("Travar câmera",module.tgame.camera.lock_on_player,"Trava a câmera no jogador.")
 
@@ -815,7 +798,10 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                 end
             end)
             fcommon.CheckBoxValue("Relógio mais rápido",0x96913B)            
-            fcommon.CheckBoxVar("Parar relógio",module.tgame.freeze_time)
+            fcommon.CheckBoxVar("Parar relógio",module.tgame.freeze_time,nil,
+            function()
+                fcommon.SingletonThread(module.FreezeTime,"FreezeTime")
+            end)
             
             imgui.NextColumn()
 
@@ -833,20 +819,25 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end)
-            fcommon.CheckBoxVar("Cheats aleatórios",module.tgame.random_cheats.checkbox,"Ativa cheats aleatoriamente após um certo tempo.",nil,
+            fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats.checkbox,"Ativa cheats aleatoriamente em um determinado tempo.",function()
+                fcommon.SingletonThread(fgame.RandomCheatsActivate,"RandomCheatsActivate")
+            end,
             function()
-                fcommon.CheckBoxVar('Desativar cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Desativar cheats ativados após um certo tempo.")
+                fcommon.CheckBoxVar('Desativar cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Desativar cheats ativados em um determinado tempo.",
+                function()
+                    fcommon.SingletonThread(fgame.RandomCheatsDeactivate,"RandomCheatsDeactivate")
+                end)
                 imgui.Spacing()
                 imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
-                imgui.SliderInt("Ativar temporizador de cheat", module.tgame.random_cheats.cheat_activate_timer, 10, 100)
+                imgui.SliderInt("Ativar temporizador de cheats", module.tgame.random_cheats.cheat_activate_timer, 10, 100)
                 imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
-                imgui.SliderInt("Desativar temporizador de cheat", module.tgame.random_cheats.cheat_deactivate_timer, 10, 100)
+                imgui.SliderInt("Desativar temporizador de cheats", module.tgame.random_cheats.cheat_deactivate_timer, 10, 100)
                 imgui.Spacing()
 
                 imgui.TextWrapped("Cheats ativados")
                 imgui.Separator()
                 if imgui.BeginChild("Lista de cheats") then  
-                    for i=0,91,1 do   -- Cheat ids 0 -> 911
+                    for i=0,91,1 do   -- Cheat ids 0 -> 91
                         if module.tgame.random_cheats.disabled_cheats[tostring(i)] then
                             selected = false
                         else
@@ -861,8 +852,14 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                 end
             end)
             fcommon.CheckBoxVar('Captura de tela',module.tgame.ss_shortcut,"Tire uma captura de tela usando" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
-            fcommon.CheckBoxVar('Água sólida',module.tgame.solid_water)
-            fcommon.CheckBoxVar('Sincronizar hora do sistema',module.tgame.sync_system_time)
+            fcommon.CheckBoxVar('Água sólida',module.tgame.solid_water,nil,
+            function()
+                fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
+            end)
+            fcommon.CheckBoxVar('Sincronizar horário do sistema',module.tgame.sync_system_time,nil,
+            function()
+                fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
+            end)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
         
@@ -871,7 +868,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
             fcommon.DropDownMenu('Personalizar nome do save',function()
                 imgui.InputText("Nome", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
                 imgui.Spacing()
-                if imgui.Button("Salvar jogo",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Salvar",imgui.ImVec2(fcommon.GetSize(1))) then
                     if isCharOnFoot(PLAYER_PED) then
                         registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
                         activateSaveMenu()
@@ -1074,7 +1071,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
             function()
                 local filter = module.tgame.object_spawner.filter
                 filter:Draw("Filtrar")
-                fcommon.InformationTooltip("As alterações aqui afetam todos os objetos\ndo grupo.")
+                fcommon.InformationTooltip("Alterações feitas aqui afetam todos os objetos\ndo grupo.")
                 imgui.Spacing()
 
                 if imgui.BeginChild("Grupos") then 
@@ -1202,7 +1199,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
                             imgui.Text("Mover Z")
 
                             imgui.NextColumn()
-                             
+                            
                             if imgui.Button("+##rotX",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do

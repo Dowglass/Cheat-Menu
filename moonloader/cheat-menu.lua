@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta (PT-BR)")
-script_version_number(2020070201) -- YYYYMMDDNN
+script_version_number(2020070601) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -43,6 +43,7 @@ glob          = require 'game.globals'
 http          = require 'copas.http'
 imgui         = require 'mimgui'
 lfs           = require 'lfs'
+log           = require 'cheat-menu.libraries.log'
 mad           = require 'MoonAdditions'
 memory        = require 'cheat-menu.libraries.memory'
 os            = require 'os'
@@ -54,6 +55,9 @@ ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory(
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
 fconst        = require 'cheat-menu.modules.const'
+
+WRITE_INFO_TO_LOG = fconfig.Get('tmenu.debug_log',false)
+log.Start()
 
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -77,6 +81,8 @@ ffi.cdef[[
 
 
 resX, resY = getScreenResolution()
+WRITE_INFO_TO_LOG = fmenu.tmenu.debug_log[0]
+
 tcheatmenu       =
 {   
     dir          = tcheatmenu.dir,
@@ -103,6 +109,7 @@ tcheatmenu       =
     },
     read_key_press = false,
     tab_data     = {},
+    thread_locks = {},
     window       =
     {
         coord    = 
@@ -113,6 +120,7 @@ tcheatmenu       =
         fail_loading_json = tcheatmenu.window.fail_loading_json,
         missing_components = tcheatmenu.window.missing_components,
         panel_func = nil,
+        restart_required = false,
         show     = imgui.new.bool(false),
         size     =
         {
@@ -220,6 +228,19 @@ function(self) -- render frame
         imgui.Spacing()
     end
 
+    if tcheatmenu.window.restart_required then
+        imgui.Button("Reinicialização necessária para aplicar algumas alterações",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Reiniciar menu",imgui.ImVec2(fcommon.GetSize(2))) then
+            fmenu.tmenu.crash_text = "Cheat Menu ~g~recarregado!"
+			thisScript():reload()
+        end
+        imgui.SameLine()
+        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(2))) then
+            tcheatmenu.window.restart_required = false
+        end
+        imgui.Spacing()
+    end
+
     --------------------------------------------------
     -- Updater code
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
@@ -240,7 +261,7 @@ function(self) -- render frame
     end
 
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.INSTALL then
-        if imgui.Button("Instalar atualização (Isso pode demorar um pouco).",imgui.ImVec2(fcommon.GetSize(1))) then
+        if imgui.Button("Instalar atualização (Isso pode demorar um pouco)",imgui.ImVec2(fcommon.GetSize(1))) then
             fmenu.tmenu.update_status = fconst.UPDATE_STATUS.HIDE_MSG
             fgame.tgame.script_manager.skip_auto_reload = true
             ziplib.zip_extract(tcheatmenu.dir .. "update.zip",tcheatmenu.dir,nil,nil)
@@ -288,8 +309,8 @@ function(self) -- render frame
             imgui.Dummy(imgui.ImVec2(0,10))
 
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Auto recarregar",fmenu.tmenu.auto_reload,"Recarrega o  cheat menu automaticamente\nem caso de crash.\n\nÁs vezes, pode causar crash no loop.")
-            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações\nonline. Isso requer uma conexão com internet \
+            fcommon.CheckBoxVar("Auto recarregar",fmenu.tmenu.auto_reload,"Recarrega o  cheat menu automaticamente\nem caso de crash.\n\nÁs vezes, pode causar crash em loop.")
+            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check," Cheat Menu irá verificar automaticamente se há atualizações\nonline. Isso requer uma conexão com internet \
 para baixar arquivos do repo do github.")
             imgui.NextColumn()
             fcommon.CheckBoxVar("Carregamento rápido de imagens",fmenu.tmenu.fast_load_images,"Carrega imagens de veículos, armas, peds etc\nna inicialização do menu.\n \
@@ -297,7 +318,7 @@ Isso pode aumentar o tempo de inicialização do jogo ou\ntravar por alguns segu
             fcommon.CheckBoxVar("Mostrar dicas",fmenu.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
             imgui.Columns(1)
             imgui.Spacing()
-            imgui.TextWrapped("Você pode configurar tudo daqui a qualquer momento na seção 'Menu'")
+            imgui.TextWrapped("Você pode configurar tudo daqui a qualquer momento na seção 'Menu'.")
             imgui.Spacing()
             imgui.TextWrapped("Esta modificação está licenciada sob os termos da GPLv3. Para mais detalhes, consulte: <http://www.gnu.org/licenses/>")
             imgui.EndChild()
@@ -566,29 +587,23 @@ function main()
     fvehicle.ParseCarcols()
     fvehicle.ParseVehiclesIDE()
 
-    lua_thread.create(fcommon.ReadKeyPress)
-    lua_thread.create(fplayer.KeepPosition)
-    lua_thread.create(fped.PedHealthDisplay)
-    lua_thread.create(fgame.CameraMode)
-    lua_thread.create(fgame.FreezeTime)
-    lua_thread.create(fgame.LoadScriptsOnKeyPress)
-    lua_thread.create(fgame.RandomCheatsActivate)
-    lua_thread.create(fgame.RandomCheatsDeactivate)
-    lua_thread.create(fgame.SolidWater)
-    lua_thread.create(fgame.SyncSystemTime)
-    lua_thread.create(fvehicle.AircraftCamera)
-    lua_thread.create(fvehicle.FirstPersonCamera)
-    lua_thread.create(fvehicle.OnEnterVehicle)
-    lua_thread.create(fvehicle.GSXProcessVehicles)
-    lua_thread.create(fvehicle.RandomColors)
-    lua_thread.create(fvehicle.RandomTrafficColors)
-    lua_thread.create(fvehicle.TrafficNeons)
-    lua_thread.create(fvehicle.UnlimitedNitro)
-    lua_thread.create(fvisual.LockWeather)
-    lua_thread.create(fweapon.AutoAim)
+    fcommon.SingletonThread(fplayer.KeepPosition,"KeepPosition")
+    fcommon.SingletonThread(fped.PedHealthDisplay,"PedHealthDisplay")
+    fcommon.SingletonThread(fgame.FreezeTime,"FreezeTime")
+    fcommon.SingletonThread(fgame.LoadScriptsOnKeyPress,"LoadScriptsOnKeyPress")
+    fcommon.SingletonThread(fgame.RandomCheatsActivate,"RandomCheatsActivate")
+    fcommon.SingletonThread(fgame.RandomCheatsDeactivate,"RandomCheatsDeactivate")
+    fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
+    fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
+    fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
+    fcommon.SingletonThread(fvehicle.GSXProcessVehicles,"GSXProcessVehicles")
+    fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
+    fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
+    fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
+    fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
 
-    --------------------------------------------------
-    
+    ------------------------------------------------
+
     while true do
         --------------------------------------------------
         -- Functions that neeed to run constantly
@@ -637,6 +652,7 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
+                fcommon.SingletonThread(fgame.CameraMode,"ModoCamera")
                 printHelpString("Modo camera ativado")
             else
                 printHelpString("Modo camera desativado")
@@ -754,8 +770,6 @@ function onScriptTerminate(script, quitGame)
 
         restoreCameraJumpcut()
 
-        fmenu.tmenu.crash_text = ""
-
         if fvehicle.tvehicle.gsx.handle ~= 0 then
             fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
         end
@@ -773,14 +787,14 @@ function onScriptTerminate(script, quitGame)
         fcommon.ReleaseImages(fvehicle.tvehicle.components.images)
         fcommon.ReleaseImages(fped.tped.images)
         fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
-        
+
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu parou de funcionar!"
 
                 if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
                     script:reload()
-                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " mas recarregado"
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " Recarregando script"
                 end
             end
         end
