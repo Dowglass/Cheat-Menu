@@ -29,7 +29,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	debug_log      		= imgui.new.bool(fconfig.Get('tmenu.debug_log',false)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -162,7 +161,7 @@ function module.RegisterAllCommands()
 		local model = tonumber(t[2])
 
         if type(model) == "nil" then
-			model = fvehicle.GetModelInfo(string.upper(t[2])) 
+			model = casts.CModelInfo.GetModelFromName(string.upper(t[2])) 
 
 			if model ~= 0 and isModelAvailable(model) then  
 				if isThisModelABoat(model) 
@@ -272,7 +271,7 @@ function module.CheckUpdates()
 
 	module.httpRequest(link, nil, function(body, code, headers, status)
 		if body then
-			log.Write(string.format("%s %s",link,status))
+			print(string.format("%s %s",link,status))
 			if string.find( script.this.version,"beta") then
 				repo_version = body:match("script_version_number%((%d+)%)")
 				this_version = script.this.version_num
@@ -292,13 +291,13 @@ function module.CheckUpdates()
 				printHelpString("Nao foi possivel conectar ao github. O restante do menu ainda esta funcional. Voce pode desativar a verificacao de atualizacao automatica em 'Menu'.")
 				end
 			else
-				log.Write(string.format("%s %s",link,tostring(code),"WARN"))
+				print(string.format("%s %s",link,tostring(code),"WARN"))
 		end
 	end)
 end
 
 function module.DownloadHandler(id, status, p1, p2)
-	log.Write("Status da atualizacao: " .. status)
+	print("Status da atualizacao: " .. status)
 	if status == fconst.UPDATE_STATUS.INSTALL then
 		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
 		printHelpString("Download completo. Clique no botao 'Instalar atualizacao' para finalizar.")
@@ -350,10 +349,6 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
-			fcommon.CheckBoxVar("Gravar informações de depuração",module.tmenu.debug_log,"Escreve informações extras sobre depuração no .log.\nPode ter um impacto no desempenho.",
-			function()
-				tcheatmenu.window.restart_required = true
-			end)
 			imgui.Columns(1)
 			
 		end,

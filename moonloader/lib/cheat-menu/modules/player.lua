@@ -34,6 +34,11 @@ module.tplayer =
     },
     filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
+    health_regeneration = {
+        bool            = imgui.new.bool(fconfig.Get('tplayer.health_regeneration.bool',false)),
+        increment_value = imgui.new.int(fconfig.Get('tplayer.health_regeneration.increment_value',2)),
+        interval        = imgui.new.int(fconfig.Get('tplayer.health_regeneration.interval',5000)),
+    },
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_position',false)),
     model_val           = nil,
@@ -146,6 +151,20 @@ function WantedLevelMenu()
     end)
 end
 
+
+function module.RegenerateHealth()
+    while module.tplayer.health_regeneration.bool[0] do
+        local max_health = math.floor(mad.get_char_max_health(PLAYER_PED))
+        local health = getCharHealth(PLAYER_PED)
+
+        if max_health > health then
+            setCharHealth(PLAYER_PED,health+module.tplayer.health_regeneration.increment_value[0])
+        end
+
+        wait(module.tplayer.health_regeneration.interval[0])
+    end
+end
+
 --------------------------------------------------
 -- Cloth functions
 
@@ -201,16 +220,17 @@ function module.PlayerMain()
     fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Skins","Roupas"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxValue("Mirar enquanto estiver dirigindo",0x969179)
             fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
             fcommon.CheckBoxValue("Recompensa na cabeça",0x96913F)
+            fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,fcommon.SingletonThread(module.RegenerateHealth,"RegenerateHealth"),
+            function()
+                imgui.SliderInt("Valor para regenerar", module.tplayer.health_regeneration.increment_value, 0, 25)
+                imgui.SliderInt("Intervalo", module.tplayer.health_regeneration.interval, 0, 10000)
+                fcommon.InformationTooltip("Tempo de espera para regenerar\nem milissegundos.")
+            end)
             fcommon.CheckBoxValue("Saltos mais altos do ciclo",0x969161)
-            fcommon.CheckBoxValue("Munição infinita",0x969178)
             fcommon.CheckBoxValue("Oxigênio infinito",0x96916E)
             fcommon.CheckBoxValue("Corrida infinita",0xB7CEE4)
-        
-            imgui.NextColumn()
-
             fcommon.CheckBoxVar("Jogador invisível",module.tplayer.invisible,"O jogador não poderá entrar/sair do veículo.",
             function()
                 if module.tplayer.invisible[0] then
@@ -222,6 +242,7 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end)
+            imgui.NextColumn()
             fcommon.CheckBoxVar("Manter posição",module.tplayer.keep_position,"Teleportar para o local em que você morreu.",
             function()
                 fcommon.SingletonThread(module.KeepPosition,"KeepPosition")

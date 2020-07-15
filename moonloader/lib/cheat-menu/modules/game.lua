@@ -284,33 +284,6 @@ function module.CameraMode()
         wait(0)
     end
 end
-function CheatsEntry(func,status,names)
-    local sizeX = fcommon.GetSize(3)
-    local sizeY = imgui.GetWindowHeight()/10
-
-    fcommon.DropDownMenu(names[1],function()
-        imgui.Spacing()
-
-        for i = 1, #func do
-
-            if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
-                callFunction(func[i],1,1)
-                if status == nil or status[i] == nil then
-                    fcommon.CheatActivated()
-                else
-                    if readMemory(status[i],1,false) == 0 then
-                        fcommon.CheatDeactivated()
-                    else
-                        fcommon.CheatActivated()
-                    end
-                end
-            end
-            if i % 3 ~= 0 then
-                imgui.SameLine()
-            end
-        end
-    end)
-end
 
 function module.SyncSystemTime()
     while module.tgame.sync_system_time[0] do
@@ -525,7 +498,7 @@ function ShowLoadedScript(script,index)
         imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(string.sub(authors,1,-3))
         imgui.Text("Versão: " .. tostring(script.version))
-        imgui.Text("versão n°: " .. tostring(script.version_num))
+        imgui.Text("Versão n°: " .. tostring(script.version_num))
         imgui.NextColumn()
         imgui.Text("Script ID: " .. script.id)
         imgui.Text("Status: Carregado")
@@ -625,6 +598,11 @@ function FollowPed(ped)
 end
 
 function SpawnObject(model,obj_name,grp_name,x,y,z)
+        
+    if isThisModelACar() then
+        printHelpString("Veiculo")
+        return
+    end
     if model < 700 then
         printHelpString("Nao e possivel criar objeto!")
         return
@@ -705,17 +683,9 @@ function module.GameMain()
         printHelpString("Coordenadas copiada")
     end
     
-    fcommon.Tabs("Jogo",{"Caixas de seleção","Menus","Cheats","Gerenciador de Scripts","Criador de Objetos"},{
+    fcommon.Tabs("Jogo",{"Caixas de seleção","Menus","Gerenciador de Scripts","Criador de Objetos"},{
         function()
             
-            local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-            imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Combo("Dia da semana", current_day,module.tgame.day.array,#module.tgame.day.names) then
-                writeMemory(0xB7014E,1,current_day[0]+1,false)
-                fcommon.CheatActivated()
-            end
-            
-            imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo câmera",module.tgame.camera.bool,string.format("Atalho: %s\n\nPara frente: %s\tPara trás: %s\
 Esquerda: %s\t\tDireita: %s\n\nMovimento lento: %s\nMovimento rápido: %s\n\nRotação: Mouse\nZoom Cima/Baixo : Roda do mouse \n\
@@ -777,7 +747,10 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Desativar caixas de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem um novo jogo. (Requer reinicialização)")
+            fcommon.CheckBoxVar("Desativar caixas de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem um novo jogo.",
+            function()
+                tcheatmenu.window.restart_required = true
+            end)
             fcommon.CheckBoxValue('PNS grátis',0x96C009)
             fcommon.CheckBoxVar("Parar tempo em missão",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
@@ -865,7 +838,15 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
         
         end,
         function()
-            fcommon.DropDownMenu('Personalizar nome do save',function()
+            fcommon.DropDownMenu('Dia da semana',function()
+                local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
+                imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
+                if imgui.Combo("Dia da semana", current_day,module.tgame.day.array,#module.tgame.day.names) then
+                    writeMemory(0xB7014E,1,current_day[0]+1,false)
+                    fcommon.CheatActivated()
+                end
+            end)
+            fcommon.DropDownMenu('Persoanlizar nome do save',function()
                 imgui.InputText("Nome", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
                 imgui.Spacing()
                 if imgui.Button("Salvar",imgui.ImVec2(fcommon.GetSize(1))) then
@@ -873,10 +854,11 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                         registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
                         activateSaveMenu()
                     else
-                        printHelpString("O jogador ~r~nao~w~ esta a pe!")
+                        printHelpString("Jogador ~r~nao~w~ esta a pe!")
                     end
                 end
             end)
+
             fcommon.UpdateAddress({name = 'Dias se passaram',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
@@ -929,26 +911,12 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
             fcommon.UpdateAddress({name = 'Gravidade',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
             SetTime()
             fcommon.DropDownMenu('Temas',function()
-                fcommon.RadioButton('Selecionar tema',{'Praia','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+                fcommon.RadioButtonAddress('Selecionar tema',{'Praia','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
             end)
+            fcommon.CallFuncButtons("Clima",  {["Ensolarado"] = 0x438F50,["Nublado"] = 0x438F60,["Chuvoso"] = 0x438F70,
+                                                ["Neblina"] = 0x438F80,["Trovoada"] = 0x439570,["Tempestade de areia"] = 0x439590})
         end,
-        function()
-            CheatsEntry({0x439110,0x439150,0x439190},nil,{'Corpo','Gordo','Musculoso','Magro'})
-            CheatsEntry({0x438E40,0x438FF0},nil,{'Jogador','Saúde, Armadura\n$2500K','Suicídio'})
-            CheatsEntry({0x438F90,0x438FC0},nil,{'Jogabilidade','Rápido','Devagar'})
-            CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangues','Gangues em \ntodos lugares','Área de gangue'})
-            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Ímã de prostituta','Tumulto','Ataque de peds','Todos armados','Caos'})
-            CheatsEntry({0x439930,0x439940,0x4399D0},nil,{'Habilidades','Stamina','Armas','Veículos'})
-            CheatsEntry({0x4395B0,0x439600},nil,{'Criar','Paraquedas','Jetpack'})
-            CheatsEntry({0x439230,0x439720,0x439E50},{0x969159,0x969176,0x96915C},{'Temas','Praia','Fun house','Ninja'})
-            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{0x969150,0x969151,0x96915E,0x96915F},{'Tráfego','Rosa','Preto','Cheap','Rápido'})
-            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},nil,{'Clima','Ensolarado','Céu nublado','Chuvoso','Nebuloso','Tempestade','Tempestade de areia'})
-            CheatsEntry({0x439D80,0x4398D0},{nil,0x969179},{'Veículos','Explodir','Mirar enquanto dirige'})
-            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Parar relógio','Elvis em todos os lugares','Campo de invasão','Predator','Adrenalina'})
-            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Nível procurado','+2 estrelas','Limpar estrelas','6 estrelas','Nunca ser procurado'})
-            CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Pack de armas','1','2','3'})
-        end,
-        function()
+            function()
             if imgui.Button("Recarregar todos scripts",imgui.ImVec2(fcommon.GetSize(1))) then
                 fgame.tgame.script_manager.skip_auto_reload = true
                 reloadScripts()

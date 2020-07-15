@@ -129,10 +129,6 @@ module.tvehicle =
     watertight_car  = imgui.new.bool(fconfig.Get('tvehicle.watertight_car',false)),
 }
 
-module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
-IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
-CVehicleModelInfo = ffi.cast("uintptr_t*", 0x00A9B0C8)
-
 --------------------------------------------------
 -- Neon
 
@@ -166,7 +162,7 @@ function InstallNeon(pCar,color,pulsing)
         if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
             callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
             
-            local data = module.tvehicle.neon.data[module.GetNameOfVehicleModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
+            local data = module.tvehicle.neon.data[casts.CModelInfo.GetNameFromModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
   
             callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
             callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
@@ -186,18 +182,18 @@ function module.TrafficNeons()
         
         if result then
             while result do
-                local temp = 1
+                local temp = 0
                 local pCar = getCarPointer(car)
 
-                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
-                --     temp = math.random(1,20) -- 5%
-                -- end
-                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
-                --     temp = math.random(1,5) -- 20%
-                -- end
-                -- if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
-                --     temp = math.random(1,3) -- 30%
-                -- end
+                if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
+                    temp = math.random(1,20) -- 5%
+                end
+                if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                    temp = math.random(1,5) -- 20%
+                end
+                if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                    temp = math.random(1,3) -- 30%
+                end
                 if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
                     if getCarCharIsUsing(PLAYER_PED) ~= car then
                         InstallNeon(pCar,math.random(0,6),math.random(0,1))
@@ -240,27 +236,14 @@ else
         uint8_t angleZ;
         uint8_t field_3F;
     } CStoredCar;
-    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; size_t when; } journalNews;
-    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; } apiCarNotify;
     typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; CStoredCar *gameStoredData; } externalCallbackStructure;
     typedef void(__cdecl externalCbFun_t)(const externalCallbackStructure*);
     int __cdecl addNotifyCallback(externalCbFun_t fun);
-    int __cdecl addNotifyTempCallback(externalCbFun_t fun);
     void __cdecl removeNotifyCallback(int cbRef);
-    void __cdecl removeNotifyTempCallback(int cbRef);
-    int __cdecl getNewCarGrgForeach(size_t *i, apiCarNotify *out);
-    void __cdecl setDataToSaveLaterVehPtr(GSXCVehicle veh, const char *name, int size, void *ptr, bool forceCopyNow);
     void __cdecl pushDirectlyToSavedData(GSXCVehicle veh, const char *name, int size, void *ptr);
-    int __cdecl dataToSaveLaterExists(GSXCVehicle veh, const char *name);
-    void __cdecl removeToLoadDataVehPtr(GSXCVehicle veh, const char *name);
-    void __cdecl removeToSaveLaterVehPtr(GSXCVehicle veh, const char *name);
     int __cdecl dataToLoadExists(GSXCVehicle veh, const char *name);
     void*  __cdecl getLoadDataByVehPtr(GSXCVehicle veh, const char *name);
-    const char*  __cdecl GSX_getCompileTime();
-    const char*  __cdecl GSX_getVersionString();
-    float __cdecl GSX_getVersionNum();
     int __cdecl getDataToLoadSize(GSXCVehicle veh, const char *name);
-    int __cdecl getDataToSaveSize(GSXCVehicle veh, const char *name);
     ]]
 
     local gsx = ffi.load("gsx.asi")
@@ -348,24 +331,6 @@ function module.GSXGet(car,str)
 end
 
 --------------------------------------------------
--- Model/ info
-
-function module.GetNameOfVehicleModel(model)
-    return ffi.string(ffi.cast("char*", CVehicleModelInfo[tonumber(model)] + 0x32)) or ""
-end
-
-function module.GetModelInfo(name)
-    local pInfo = allocateMemory(16)
-    
-    callFunction(0x4C5940,2,2,name,pInfo)
-    local model = readMemory(pInfo,4,false)
-    freeMemory(pInfo)
-    if model > 0 and model < 1000000 and module.GetNameOfVehicleModel(model) ~= "" then
-        return model
-    else
-        return 0
-    end
-end
 
 function module.GiveVehicleToPlayer(model)
     model = tonumber(model)
@@ -383,7 +348,7 @@ function module.GiveVehicleToPlayer(model)
 
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
 
-            if IsThisModelATrain(previous_model) then
+            if casts.CModelInfo.IsTrainModel(model) then
                 deleteMissionTrain(hveh)
             else
                 deleteCar(hveh)
@@ -394,7 +359,7 @@ function module.GiveVehicleToPlayer(model)
             z = 400
         end
 
-        if IsThisModelATrain(model) then
+        if casts.CModelInfo.IsTrainModel(model) then
 
             local train_id_table = module.tvehicle.trains[tostring(model)]
             local train_id = train_id_table[math.random(1,#train_id_table)]
@@ -703,7 +668,17 @@ function ApplyTexture(filename,load_saved_texture,car)
     end,false,car)
 end
 
-function hslToRgb(h, s, l)
+function HUEtoRGB(p, q, t)
+    if(t < 0) then t = t + 1 end
+    if(t > 1) then t = t - 1 end
+    
+    if(t < 1/6) then return p + (q - p) * 6 * t end
+    if(t < 1/2) then return q end
+    if(t < 2/3) then return p + (q - p) * (2/3 - t) * 6 end
+    return p
+end
+
+function HSLtoRGB(h, s, l)
     local r, g, b;
 
     if s == 0 then
@@ -711,21 +686,11 @@ function hslToRgb(h, s, l)
 		g = l
 		b = l
     else
-		function hue2rgb(p, q, t)
-            if(t < 0) then t = t + 1 end
-			if(t > 1) then t = t - 1 end
-			
-            if(t < 1/6) then return p + (q - p) * 6 * t end
-            if(t < 1/2) then return q end
-            if(t < 2/3) then return p + (q - p) * (2/3 - t) * 6 end
-            return p
-		end
-
 		local q = l < 0.5 and l * (1 + s) or l + s - l * s
         local p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
+        r = HUEtoRGB(p, q, h + 1/3);
+        g = HUEtoRGB(p, q, h);
+        b = HUEtoRGB(p, q, h - 1/3);
     end
 
     return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
@@ -739,7 +704,7 @@ function ChangeVehicleColorHSL(hveh,hue,saturation,lightness)
 
         if not module.tvehicle.apply_material_filter[0] 
         or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-            local r,g,b = hslToRgb(hue,saturation,lightness)
+            local r,g,b = HSLtoRGB(hue,saturation,lightness)
             mat:set_color(r,g,b,255)
         end
     end,false,hveh)
@@ -823,7 +788,8 @@ function module.OnEnterVehicle()
             local hveh        = getCarCharIsUsing(PLAYER_PED)
             local pVeh       = getCarPointer(hveh)
             local model      = getCarModel(hveh)
-            local model_name = module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(model)] or getGxtText(module.GetNameOfVehicleModel(model))
+            
+            local model_name = module.tvehicle.gxt_name_table[casts.CModelInfo.GetNameFromModel(model)] or getGxtText(casts.CModelInfo.GetNameFromModel(model))
 
             -- Get vehicle components
             module.tvehicle.hidden_objects = {}
@@ -923,17 +889,22 @@ end
 -- Main
 
 function module.VehicleMain()
-    imgui.Spacing()
-    
-    if imgui.Button("Reparar veículo",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Explodir carros",imgui.ImVec2(fcommon.GetSize(3))) then
+        callFunction(0x439D80,0,0)
+        fcommon.CheatActivated()
+    end
+    imgui.SameLine()
+    if imgui.Button("Reparar veículo",imgui.ImVec2(fcommon.GetSize(3))) then
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
             fixCar(car)
             fcommon.CheatActivated()
+        else
+            printHelpString("Jogador nao esta no veiculo!")
         end
     end
     imgui.SameLine()
-    if imgui.Button("Girar veículo",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Girar veículo",imgui.ImVec2(fcommon.GetSize(3))) then
         
         if isCharInAnyCar(PLAYER_PED) then
             local car   = getCarCharIsUsing(PLAYER_PED)
@@ -941,13 +912,17 @@ function module.VehicleMain()
             setCarRoll(car,getCarRoll(car) + 180)
             setCarRoll(car,getCarRoll(car)) -- rotation fix
             fcommon.CheatActivated()
+        else
+            printHelpString("Jogador nao esta no veiculo!")
         end
     end
+
     fcommon.Tabs("Veículos",{"Caixas de seleção","Menus","Criar","Pintura","Tunar","Handling"},{
         function()
             imgui.Columns(2,nil,false)
                 
             fcommon.CheckBoxValue("Motoristas agressivos",0x96914F)
+            fcommon.CheckBoxValue("Mirar enquanto estiver dirigindo (driveby)",0x969179)
             fcommon.CheckBoxValue("Todos carros com nitro",0x969165)
             fcommon.CheckBoxValue("Todos taxis com nitro",0x96918B)
             fcommon.CheckBoxValue("Barcos voam",0x969153)
@@ -966,6 +941,13 @@ function module.VehicleMain()
                 fcommon.InputFloat("Ângulo Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
                 fcommon.InputFloat("Ângulo Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
             end)
+            fcommon.CheckBoxVar("Fixar câmera em aeronaves",module.tvehicle.aircraft.camera,nil,
+            function()
+                fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
+            end)
+            fcommon.CheckBoxValue("Fixar câmera em trens",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF)
+            
+            imgui.NextColumn()
 
             fcommon.CheckBoxValue("Carros flutuam ao ser atingidos",0x969166)
             fcommon.CheckBoxValue("Semáforos verde",0x96914E)
@@ -976,9 +958,6 @@ function module.VehicleMain()
                     setCarVisible(car,not module.tvehicle.invisible_car[0])
                 end
             end)
-            
-            imgui.NextColumn()
-
             fcommon.CheckBoxVar("Ligar luzes",module.tvehicle.lights,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -1012,12 +991,7 @@ function module.VehicleMain()
                     printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
             end,nil,false)
-
-            fcommon.CheckBoxVar("Nova câmera aérea",module.tvehicle.aircraft.camera,nil,
-            function()
-                fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
-            end)
-            fcommon.CheckBoxValue("Nova câmera no trem",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
+ 
             fcommon.CheckBoxVar("Sem dano",module.tvehicle.no_damage)
             fcommon.CheckBoxVar("Sem trânsito de veículos",module.tvehicle.no_vehicles,nil,
             function()
@@ -1065,7 +1039,7 @@ function module.VehicleMain()
                     local seats = getMaximumNumberOfPassengers(vehicle)
                     imgui.Spacing()
                     imgui.Columns(2,nil,false)
-                    imgui.Text(module.GetNameOfVehicleModel(getCarModel(vehicle)))
+                    imgui.Text(casts.CModelInfo.GetNameFromModel(getCarModel(vehicle)))
                     imgui.NextColumn()
                     imgui.Text(string.format("Total de bancos: %d",seats+1))
                     imgui.Columns(1)
@@ -1092,9 +1066,9 @@ function module.VehicleMain()
             end)
 
             fcommon.DropDownMenu("Opções de tráfego",function()
-                fcommon.RadioButton("Cor",{"Preto","Rosa"},{0x969151,0x969150})
+                fcommon.RadioButtonAddress("Cor",{"Preto","Rosa"},{0x969151,0x969150})
                 imgui.Spacing()
-                fcommon.RadioButton("Tipo",{"'Cheap'","Country","Rápido"},{0x96915E,0x96917B,0x96915F})
+                fcommon.RadioButtonAddress("Tipo",{"'Cheap'","Country","Rápido"},{0x96915E,0x96917B,0x96915F})
             end)
 
             if isCharInAnyCar(PLAYER_PED) then
@@ -1199,18 +1173,18 @@ function module.VehicleMain()
                 fcommon.UpdateAddress({name = 'Quantidade de nitro',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
                 fcommon.DropDownMenu("Definir nome",function()
 
-                    imgui.Text(string.format( "Nome do carro = %s",module.GetNameOfVehicleModel(getCarModel(car))))
+                    imgui.Text(string.format( "Nome do carro = %s",casts.CModelInfo.GetNameFromModel(getCarModel(car))))
                     imgui.Spacing()
                     imgui.InputText("Nome", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
 
                     imgui.Spacing()
                     if imgui.Button("Definir",imgui.ImVec2(fcommon.GetSize(3))) then
-                        setGxtEntry(module.GetNameOfVehicleModel(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
+                        setGxtEntry(casts.CModelInfo.GetNameFromModel(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
                         fcommon.CheatActivated()
                     end
                     imgui.SameLine()
                     if imgui.Button("Salvar",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
+                        mmodule.tvehicle.gxt_name_table[casts.CModelInfo.GetNameFromModel(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
                     end
                     imgui.SameLine()
                     if imgui.Button("Limpar tudo",imgui.ImVec2(fcommon.GetSize(3))) then
@@ -1260,10 +1234,10 @@ function module.VehicleMain()
             imgui.Spacing()
             fcommon.Tabs("Lista de veículos",{"Lista","Procura"},{
                 function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetNameOfVehicleModel,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,casts.CModelInfo.GetNameFromModel,module.tvehicle.filter)
                 end,
                 function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetNameOfVehicleModel,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,casts.CModelInfo.GetNameFromModel,module.tvehicle.filter)
                 end
             })
         end,
@@ -1328,7 +1302,7 @@ function module.VehicleMain()
                     fcommon.CheckBoxVar("Mostrar tudo", module.tvehicle.color.show_all,"Mostrar todas as cores do 'carcols.dat'.")
                     imgui.Spacing()
                     
-                    local name = module.GetNameOfVehicleModel(getCarModel(car))
+                    local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
                     
                     local shown_colors = {}
                     imgui.Text("Cores:")
@@ -1450,7 +1424,7 @@ function module.VehicleMain()
                 local model = getCarModel(car)
 
                 -------------------------------------------------------
-                local phandling = readMemory((CVehicleModelInfo[model] + 0x4A),2,false) --m_nHandlingId
+                local phandling = readMemory((casts.CModelInfo.ms_modelInfoPtrs[model] + 0x4A),2,false) --m_nHandlingId
                 phandling = phandling * 0xE0
                 phandling = phandling + 0xC2B9DC
 
@@ -1460,13 +1434,13 @@ function module.VehicleMain()
                     module.tvehicle.max_velocity_temp[0] = velocity
                 end
 
-                if imgui.Button("Resetar handling do jogo",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Resetar handling",imgui.ImVec2(fcommon.GetSize(3))) then
                     local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
                     printHelpString("Handling resetado!")
                 end
                 imgui.SameLine()
-                if imgui.Button("Salvar dados no arquivo",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Salvar arquivo",imgui.ImVec2(fcommon.GetSize(3))) then
                     local name = module.tvehicle.handling_name[model]
                     local fMass =  memory.getfloat(phandling + 0x4)
                     local fTurnMass = memory.getfloat(phandling + 0xC)
@@ -1516,13 +1490,14 @@ function module.VehicleMain()
                     file:close()
                     printHelpString("Dados salvos!")
                 end
-                if imgui.Button("Sobre handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                imgui.SameLine()
+                if imgui.Button("Sobre handling",imgui.ImVec2(fcommon.GetSize(3))) then
                     os.execute('explorer "https://projectcerbera.com/gta/sa/tutorials/handling"')
                 end
 
                 imgui.Spacing()
                 if imgui.BeginChild("Handling") then
-                    fcommon.RadioButtonFunc("ABS",{"Ligado","Desligado"},{1.0,0.0},phandling + 0x9C,false)
+                    fcommon.RadioButtonAddressEx("ABS",{"Ligado","Desligado"},{1.0,0.0},phandling + 0x9C,false)
                     fcommon.UpdateAddress({name = 'Multiplicador anti-mergulho',address = phandling + 0xC4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Viés de freio',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Desaceleração do freio',address = phandling + 0x94 ,size = 4,min = 0.1,max = 20,is_float = true,mul = 2500,cvalue = 0.1, save = false})
@@ -1532,11 +1507,11 @@ function module.VehicleMain()
                     fcommon.UpdateAddress({name = 'Multiplicador de danos por colisão',address = phandling + 0xC8,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01,mul = 0.3381, save = false})                    
                     fcommon.UpdateAddress({name = 'Nível de amortecimento',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 0,max = 30.0,is_float = true, save = false})
-                    fcommon.RadioButtonFunc("Tipo de direção",{"Tração dianteira","Tração Traseira","Tração nas quatro rodas"},{70,82,52},phandling + 0x74,false)
+                    fcommon.RadioButtonAddressEx("Tipo de direção",{"Tração dianteira","Tração Traseira","Tração nas quatro rodas"},{70,82,52},phandling + 0x74,false)
                     fcommon.UpdateAddress({name = 'Aceleração do motor',address = phandling + 0x7C ,size = 4,min = 0,max = 49,is_float = true,mul = 12500, save = false})
                     fcommon.UpdateAddress({name = 'Inércia do motor',address = phandling + 0x80 ,size = 4,min = 0,max = 400,is_float = true, save = false})
-                    fcommon.RadioButtonFunc("Tipo de motor",{"Gasolina","Diesel","Elétrico"},{80,68,69},phandling + 0x75,false)
-                    fcommon.RadioButtonFunc("Luzes dianteiras",{"Longa","Pequena","Grande"},{0,1,2,3},phandling + 0xDC,false)
+                    fcommon.RadioButtonAddressEx("Tipo de motor",{"Gasolina","Diesel","Elétrico"},{80,68,69},phandling + 0x75,false)
+                    fcommon.RadioButtonAddressEx("Luzes dianteiras",{"Longa","Pequena","Grande"},{0,1,2,3},phandling + 0xDC,false)
                     fcommon.UpdateAddress({name = 'Nível de força',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1, save = false})
                     fcommon.UpdateBits("Manipulação de sinalizadores",module.tvehicle.handling_flags,phandling + 0xD0,4)
                     fcommon.UpdateAddress({name = 'Amortecimento em alta velocidade',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
@@ -1586,7 +1561,7 @@ arquivo de dados com esses valores alterados aqui.")
                     fcommon.UpdateAddress({name = 'Valor monetário',address = phandling + 0xD8 ,size = 4, save = false})
                     fcommon.UpdateAddress({name = 'Número de engrenagens',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
                     fcommon.UpdateAddress({name = 'Porcentagem submersa',address = phandling + 0x20 ,size = 1,min = 10,max = 120, save = false})
-                    fcommon.RadioButtonFunc("Luzes traseiras",{"Longa","Pequena","Grande","Alta"},{0,1,2,3},phandling + 0xDD,false)
+                    fcommon.RadioButtonAddressEx("Luzes traseiras",{"Longa","Pequena","Grande","Alta"},{0,1,2,3},phandling + 0xDD,false)
                     fcommon.UpdateAddress({name = 'Distância do deslocamento do assento',address = phandling + 0xD4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Trava de direção',address = phandling + 0xA0 ,size = 4,min = 10,max = 50,is_float = true, save = false})
                     fcommon.UpdateAddress({name = 'Viés de suspensão',address = phandling + 0xC0 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})

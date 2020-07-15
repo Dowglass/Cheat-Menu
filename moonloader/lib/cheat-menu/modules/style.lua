@@ -30,7 +30,7 @@ module.tstyle =
     name           = imgui.new.char[256]("Untitled"),
     preparetoapply = false,
     selected       = imgui.new.int(0),
-    selected_name  = fconfig.Get('tstyle.selected_name',"Padrão"),
+    selected_name  = fconfig.Get('tstyle.selected_name',"Default"),
     status         = nil,
     styles_table   = {},
 }

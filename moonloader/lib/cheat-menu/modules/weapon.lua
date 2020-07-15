@@ -30,7 +30,6 @@ module.tweapon =
     long_target_range   = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
     long_weapon_range   = imgui.new.bool(fconfig.Get('tweapon.long_weapon_range',false)),
     names               = fcommon.LoadJson("weapon"),
-    no_reload           = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
     path                = tcheatmenu.dir .. "weapons",
     ped                 = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
     gang                =
@@ -104,6 +103,8 @@ module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang
 -- Returns weapon name
 function module.GetModelName(id)
 
+    if id == "jetpack" then return id end
+
     if module.tweapon.names[id] ~= nil then
         return module.tweapon.names[id]
     else
@@ -124,24 +125,28 @@ end
 
 -- Gives weapon to player or ped
 function module.GiveWeapon(weapon)
-    weapon = tonumber(weapon)
-    model = getWeapontypeModel(weapon)
-    if isModelAvailable(model) then
-        requestModel(model)
-        loadAllModelsNow()
+    if weapon == "jetpack" then -- exception
+        callFunction(0x439600,0,0)
+    else
+        weapon = tonumber(weapon)
+        model = getWeapontypeModel(weapon)
+        if isModelAvailable(model) then
+            requestModel(model)
+            loadAllModelsNow()
 
-        if module.tweapon.ped[0] == true then
-            if doesCharExist(fped.tped.selected) then
-                giveWeaponToChar(fped.tped.selected,weapon,module.tweapon.ammo_count[0])
-                fcommon.CheatActivated()
+            if module.tweapon.ped[0] == true then
+                if doesCharExist(fped.tped.selected) then
+                    giveWeaponToChar(fped.tped.selected,weapon,module.tweapon.ammo_count[0])
+                    fcommon.CheatActivated()
+                else
+                    printHelpString("~r~Nenum~w~ ped selecionado!")
+                end
             else
-                printHelpString("~r~Nenhum~w~ ped selecionado!")
-            end
-        else
-            giveWeaponToChar(PLAYER_PED,weapon,module.tweapon.ammo_count[0])
-            fcommon.CheatActivated()
-        end          
-        markModelAsNoLongerNeeded(model)
+                giveWeaponToChar(PLAYER_PED,weapon,module.tweapon.ammo_count[0])
+                fcommon.CheatActivated()
+            end          
+            markModelAsNoLongerNeeded(model)
+        end
     end
 end
 
@@ -176,37 +181,7 @@ end
 -- Main function
 function module.WeaponMain()
     
-    imgui.Spacing()
-    if imgui.Button("Remover arma atual",imgui.ImVec2(fcommon.GetSize(2))) then
-        
-        if module.tweapon.ped[0] == true then
-            if fped.tped.selected ~=  nil then
-                removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
-                printHelpString("Arma atual removida")
-            else
-                printHelpString("~r~Nenhum~w~ ped selecionado!")
-            end
-        else
-            removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
-            printHelpString("Arma atual removida")
-        end
-    end
-
-    imgui.SameLine()
-    if imgui.Button("Remover todas armas",imgui.ImVec2(fcommon.GetSize(2))) then         
-        if module.tweapon.ped[0] == true then
-            if fped.tped.selected ~=  nil then
-                removeAllCharWeapons(fped.tped.selected)
-                printHelpString("Armas removidas")
-            else
-                printHelpString("~r~Nenhum~w~ ped selecionado!")
-            end
-        else
-            removeAllCharWeapons(PLAYER_PED)
-            printHelpString("Armas removidas")
-        end
-    end
-    if imgui.Button("Dropar arma",imgui.ImVec2(fcommon.GetSize(1))) then   
+    if imgui.Button("Dropar arma",imgui.ImVec2(fcommon.GetSize(3))) then   
         local ped = PLAYER_PED
 
         if module.tweapon.ped[0] == true then
@@ -232,7 +207,37 @@ function module.WeaponMain()
             end
         end
     end
-    fcommon.Tabs("Armas",{"Caixas de seleção","Criar","Editor de armas de gangue"},{
+    imgui.SameLine()
+    if imgui.Button("Remover todas armas",imgui.ImVec2(fcommon.GetSize(3))) then         
+        if module.tweapon.ped[0] == true then
+            if fped.tped.selected ~=  nil then
+                removeAllCharWeapons(fped.tped.selected)
+                printHelpString("Armas removidas")
+            else
+                printHelpString("~r~Nenhum~w~ ped selecionado!")
+            end
+        else
+            removeAllCharWeapons(PLAYER_PED)
+            printHelpString("Armas removidas")
+        end
+    end
+    imgui.SameLine()
+    if imgui.Button("Remover arma atual",imgui.ImVec2(fcommon.GetSize(3))) then
+        
+        if module.tweapon.ped[0] == true then
+            if fped.tped.selected ~=  nil then
+                removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
+                printHelpString("Arma atual removida")
+            else
+                printHelpString("~r~Nenhum~w~ ped selecionado!")
+            end
+        else
+            removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
+            printHelpString("Arma atual removida")
+        end
+    end
+    
+    fcommon.Tabs("Armas",{"Caixas de seleção","Menus","Criar","Editor de armas de gangue"},{
         function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComandos:\nQ = esquerda \nE = direita",
@@ -249,21 +254,22 @@ function module.WeaponMain()
                     callFunction(0x5BE670,0,0)
                 end
             end)
+            fcommon.CheckBoxValue("Infinite ammo",0x969178)
             fcommon.CheckBoxVar("Longo alcance alvo",module.tweapon.long_target_range,nil,
             function()
                 if not module.tweapon.long_target_range[0] then
                     callFunction(0x5BE670,0,0)
                 end
             end)
+                    
+            imgui.NextColumn()
+
             fcommon.CheckBoxVar("Longo alcance de armas",module.tweapon.long_weapon_range,nil,
             function()
                 if not module.tweapon.long_weapon_range[0] then
                     callFunction(0x5BE670,0,0)
                 end
             end)
-        
-            imgui.NextColumn()
-            
             fcommon.CheckBoxVar("Precisão máxima",module.tweapon.max_accuracy,nil,
             function()
                 if not module.tweapon.max_accuracy[0] then
@@ -282,36 +288,22 @@ function module.WeaponMain()
                     callFunction(0x5BE670,0,0)
                 end
             end)
-            fcommon.CheckBoxVar("Não recarregar + Munição Infinita",module.tweapon.no_reload,nil,
-            function()
-                if module.tweapon.no_reload[0] then
-                    writeMemory( 0x73FA85,1,0x90,1)
-                    writeMemory( 0x73FAAF,1,0x90,1)
-                    writeMemory( 0x73FAB0,2,0x9090,1)
-                    writeMemory( 0x7428AF,1,0x90,1)
-                    writeMemory( 0x7428E6,1,0x90,1)
-                    writeMemory( 0x7428E7,2,0x9090,1)
-                else
-                    writeMemory( 0x73FA85,1,72,1)
-                    writeMemory( 0x73FAAF,1,255,1)
-                    writeMemory( 0x73FAB0,2,3150,1)
-                    writeMemory( 0x7428AF,1,72,1)
-                    writeMemory( 0x7428E6,1,255,1)
-                    writeMemory( 0x7428E7,2,3150,1)
-                end
-            end)
             imgui.Columns(1)
         end,
         function()
-            imgui.Columns(2,nil,false)
+            fcommon.CallFuncButtons("Pack de armas", {["Set1"] = 0x4385B0,["Set2"] = 0x438890,["Set3"] = 0x438B30})
+        end,
+        function()
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Dê a arma para ped. Mire para selecionar.")
-            imgui.NextColumn()
-            imgui.Columns(1)
+            imgui.SameLine()
             imgui.Spacing()
+            imgui.SameLine()
+            imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
             if imgui.InputInt('Munição', module.tweapon.ammo_count) then
               module.tweapon.ammo_count[0]  =  (module.tweapon.ammo_count[0] < 0) and 0 or  module.tweapon.ammo_count[0]
               module.tweapon.ammo_count[0]  =  (module.tweapon.ammo_count[0] > 99999) and 99999 or  module.tweapon.ammo_count[0]
             end
+            
             imgui.Spacing()
             fcommon.Tabs("Criar",{"Lista","Procurar"},{
                 function()
