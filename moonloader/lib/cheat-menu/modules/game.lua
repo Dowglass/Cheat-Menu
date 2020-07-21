@@ -669,20 +669,14 @@ end
 
 -- Main function
 function module.GameMain()
-    if imgui.Button("Salvar jogo",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Salvar jogo",imgui.ImVec2(fcommon.GetSize(1))) then
         if isCharOnFoot(PLAYER_PED) then
             activateSaveMenu()
         else
             printHelpString("O jogador ~r~nao~w~ esta a pe!")
         end
     end
-    imgui.SameLine()
-    if imgui.Button("Copiar coordenadas",imgui.ImVec2(fcommon.GetSize(2))) then
-        local x,y,z = getCharCoordinates(PLAYER_PED)
-        setClipboardText(string.format( "%d,%d,%d",x,y,z))
-        printHelpString("Coordenadas copiada")
-    end
-    
+   
     fcommon.Tabs("Jogo",{"Caixas de seleção","Menus","Gerenciador de Scripts","Criador de Objetos"},{
         function()
             
@@ -841,12 +835,12 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
             fcommon.DropDownMenu('Dia da semana',function()
                 local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
                 imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-                if imgui.Combo("Dia da semana", current_day,module.tgame.day.array,#module.tgame.day.names) then
+                if imgui.Combo("Dia", current_day,module.tgame.day.array,#module.tgame.day.names) then
                     writeMemory(0xB7014E,1,current_day[0]+1,false)
                     fcommon.CheatActivated()
                 end
             end)
-            fcommon.DropDownMenu('Persoanlizar nome do save',function()
+            fcommon.DropDownMenu('Personalizar nome do save',function()
                 imgui.InputText("Nome", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
                 imgui.Spacing()
                 if imgui.Button("Salvar",imgui.ImVec2(fcommon.GetSize(1))) then

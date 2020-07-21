@@ -29,7 +29,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
@@ -339,9 +338,7 @@ function module.MenuMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
 			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
-a internet para baixar arquivos do github.")
-			fcommon.CheckBoxVar("Apenas texto",module.tmenu.draw_text_only,"Substitua as imagens do menu por nomes de texto.\
-Isso pode melhorar o desempenho do menu.")	
+a internet para baixar arquivos do github.")	
 			fcommon.CheckBoxVar("Carregamento rápido de imagens",module.tmenu.fast_load_images,"Carregamento rápido de imagens de veículos, armas, peds e etc.\n \
 Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segundos, mas melhora o desempenho do menu.")
 				
@@ -451,6 +448,11 @@ Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segu
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+
+					if fstyle.tstyle.font_size ~= fstyle.tstyle.font_size_var[0] then
+						tcheatmenu.window.restart_required = true
+						fstyle.tstyle.font_size = fstyle.tstyle.font_size_var[0]
+					end
 					printHelpString("Estilo salvo")
 				end
 			end

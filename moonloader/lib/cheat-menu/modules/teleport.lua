@@ -95,19 +95,6 @@ function module.Teleport(x, y, z,interior_id)
 	lockPlayerControl(false)
 end
 
--- Displays the teleport location name
-function ShowTeleportEntry(label, x, y, z,interior_id)
-	if imgui.MenuItemBool(label) then
-		lua_thread.create(module.Teleport,x, y, z,interior_id)
-	end
-	if imgui.IsItemClicked(1) then
-		module.tteleport.coordinates[label] = nil
-		fcommon.SaveJson("coordinate",module.tteleport.coordinates)
-		module.tteleport.coordinates = fcommon.LoadJson("coordinate")
-		printHelpString("Coordenada ~r~removida!")
-	end
-end
-
 -- Main function
 function module.TeleportMain()
 
@@ -148,26 +135,31 @@ function module.TeleportMain()
             end
 		end,
 		function()
-			module.tteleport.filter:Draw("Filtrar")
-			fcommon.InformationTooltip("Clique com o botão direito do mouse em qualquer uma dessas entradas para removê-las.")
-			imgui.Spacing()
-
-			if imgui.BeginChild("Teleport entries") then
-				for name, coord in pairs(module.tteleport.coordinates) do
-					local interior_id, x, y, z = coord:match("([^, ]+), ([^, ]+), ([^, ]+), ([^, ]+)")
-
-					if module.tteleport.filter:PassFilter(name) then
-						ShowTeleportEntry(name, tonumber(x), tonumber(y), tonumber(z),interior_id)
+			fcommon.DrawEntries(fconst.IDENTIFIER.TELEPORT,fconst.DRAW_TYPE.TEXT,function(text)
+				local interior_id, x, y, z = text:match("([^, ]+), ([^, ]+), ([^, ]+), ([^, ]+)")
+				lua_thread.create(module.Teleport,x, y, z,interior_id)
+			end,
+			function(text)
+				for category,table in pairs(module.tteleport.coordinates) do
+					for key,val in pairs(table) do
+						if key == text then
+							module.tteleport.coordinates[category][key] = nil
+							goto end_loop
+						end
 					end
 				end
-				imgui.EndChild()
-			end
+				::end_loop::
+
+				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
+				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
+				printHelpString("Coordenada ~r~removida!")
+			end,function(a) return a end,module.tteleport.coordinates)
 		end,
 		function()
 			imgui.Columns(1)
 			imgui.InputText("Nome do Local",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords))
 			imgui.InputText("Coordenadas",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
-			fcommon.InformationTooltip("Insira coordenadas XYZ.\nFormato : X,Y,Z")
+			fcommon.InformationTooltip("Insira coordenadas XYZ.\nFormato : X, Y, Z")
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
 
@@ -176,10 +168,9 @@ function module.TeleportMain()
 			imgui.Spacing()
 			if imgui.Button("Salvar local",imgui.ImVec2(fcommon.GetSize(1))) then
 				if ffi.string(module.tteleport.coord_name) == "" then
-					imgui.StrCopy(module.tteleport.coord_name,"Sem título")
+					imgui.StrCopy(module.tteleport.coord_name,"Untitled")
 				end
-
-				module.tteleport.coordinates[ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getCharActiveInterior(PLAYER_PED), ffi.string(module.tteleport.coords))
+				module.tteleport.coordinates["Custom"][ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getCharActiveInterior(PLAYER_PED), ffi.string(module.tteleport.coords))
 				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
 				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
 				printHelpString("Local ~g~adicionado!")
