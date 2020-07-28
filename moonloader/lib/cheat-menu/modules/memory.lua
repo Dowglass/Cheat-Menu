@@ -209,19 +209,19 @@ function module.MemoryMain()
                     printHelpString("Endereco definido!")
                 end,
                 function(text)
-                    for category,table in pairs(module.tmemory.list) do
-                        for key,val in pairs(table) do
-                            if key == text then
-                                module.tmemory.list[category][key] = nil
-                                goto end_loop
+                    if imgui.MenuItemBool("Remover endereço") then
+                        for category,table in pairs(module.tmemory.list) do
+                            for key,val in pairs(table) do
+                                if key == text then
+                                    module.tmemory.list[category][key] = nil
+                                    goto end_loop
+                                end
                             end
                         end
-                    end
-                    ::end_loop::
+                        ::end_loop::
 
-                    fcommon.SaveJson("memory",module.tmemory.list)
-                    module.tmemory.list = fcommon.LoadJson("memory")
-                    printHelpString("Memoria ~r~removida")
+                        printHelpString("Endereco ~r~removido")
+                    end
                 end,
                 function(a) return a end,module.tmemory.list)
         end,

@@ -208,25 +208,36 @@ function module.ChangePlayerCloth(name)
 end
 
 function module.RemoveThisCloth(name)
-    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
-    givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
-    buildPlayerModel(PLAYER_HANDLE)
+    if imgui.MenuItemBool("Remover item") then 
+        local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+        givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
+        buildPlayerModel(PLAYER_HANDLE)
+        printHelpString("Item removido!")
+    end
 end
 --------------------------------------------------
 
 -- Main function
 function module.PlayerMain()
+
+    local x,y = fcommon.GetSize(2)
+    x = x -  imgui.CalcTextSize("?").x
     
-    if imgui.Button("Copiar coordenadas",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Copiar coordenadas",imgui.ImVec2(x,y)) then
         local x,y,z = getCharCoordinates(PLAYER_PED)
-        setClipboardText(string.format( "%d,%d,%d",x,y,z))
+        setClipboardText(string.format( "%d, %d, %d",x,y,z))
         printHelpString("Coordenadas copiadas!")
     end
     imgui.SameLine()
-    if imgui.Button("Suicídio",imgui.ImVec2(fcommon.GetSize(2))) then
-        setCharHealth(PLAYER_PED,0)
+
+    if imgui.Button("Suicídio",imgui.ImVec2(x,y)) then
+        lua_thread.create(function()
+             --printHelpString("")
+             --wait(500)
+            setCharHealth(PLAYER_PED,0)
+        end)
     end
-    imgui.Spacing()
+    fcommon.InformationTooltip("|C.V.V (Centro de Valorização da Vida)|\n|Fone: 188\n|Site: https://www.cvv.org.br/")
 
     fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Skins","Roupas"},{
         function()

@@ -22,7 +22,7 @@ module.tanimation =
     fighting      =
     {
         selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',0)),
-        names     = {"default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
+        names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
         array     = {},
     }, 
     filter = imgui.ImGuiTextFilter(),
@@ -56,6 +56,11 @@ function module.PlayAnimation(file,animation)
         char = PLAYER_PED
     end
 
+    if file ~= "PED" then   -- don't remove if animation is from ped.ifp
+        requestAnimation(file)  
+        loadAllModelsNow()
+    end
+
     if module.tanimation.secondary[0] == true then
         taskPlayAnimSecondary(char,animation,file,4.0,module.tanimation.loop[0],0,0,0,-1)  
     else
@@ -63,7 +68,7 @@ function module.PlayAnimation(file,animation)
     end
     fcommon.CheatActivated()
     if file ~= "PED" then   -- don't remove if animation is from ped.ifp
-        removeAnimation(animation)  
+        removeAnimation(file)  
     end
 end
 
@@ -93,7 +98,7 @@ function module.AnimationMain()
     imgui.NextColumn()
     fcommon.CheckBoxVar("Ped##Animação",module.tanimation.ped,"Animação no ped:Mire no ped para selecionar.")
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Secundária##Animação",module.tanimation.secondary)
+    fcommon.CheckBoxVar("Secundári##Animação",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 
@@ -101,23 +106,25 @@ function module.AnimationMain()
         function()
 
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
+                print(file)
+                print(anim)
 				module.PlayAnimation(file,anim)
 			end,
-			function(text,category)
-                module.tanimation.list[category][text] = nil
-                
-                local bool = false
-                for k,v in pairs(module.tanimation.list[ffi.string(module.tanimation.ifp_name)]) do
-                    bool = true
-                end
-                
-                if not bool then
-                    module.tanimation.list[category] = nil
-                end
+            function(text,category)
+                if imgui.MenuItemBool("Remover animação") then 
+                    module.tanimation.list[category][text] = nil
+                    
+                    local bool = false
+                    for k,v in pairs(module.tanimation.list[ffi.string(module.tanimation.ifp_name)]) do
+                        bool = true
+                    end
+                    
+                    if not bool then
+                        module.tanimation.list[category] = nil
+                    end
 
-				fcommon.SaveJson("animation",module.tanimation.list)
-				module.tanimation.list = fcommon.LoadJson("animation")
-				printHelpString("Animacao ~r~removida")
+                    printHelpString("Animacao ~r~removida")
+                end
             end,function(a) return a end,module.tanimation.list)
 
         end,
@@ -153,8 +160,7 @@ function module.AnimationMain()
                     module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
                 end
                 module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
-                fcommon.SaveJson("animation",module.tanimation.list)
-                module.tanimation.list = fcommon.LoadJson("animation")
+
                 printHelpString("Animacao ~g~adicionada")
             end
         end
