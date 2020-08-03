@@ -25,10 +25,10 @@ module.tstyle =
     array          = nil,
     current_font   = "",
     fonts          = {},
-    font_size      = fconfig.Get('tstyle.font_size',14),
-    font_size_var  = imgui.new.int(fconfig.Get('tstyle.font_size',14)),
+    font_size      = fconfig.Get('tstyle.font_size',math.floor(resY*0.0182291666666667)),
+    font_size_var  = imgui.new.int(fconfig.Get('tstyle.font_size',math.floor(resY*0.0182291666666667))),
     list           = nil,
-    name           = imgui.new.char[256]("Untitled"),
+    name           = imgui.new.char[256]("Personalizado"),
     preparetoapply = false,
     selected       = imgui.new.int(0),
     selected_name  = fconfig.Get('tstyle.selected_name',"Default"),
@@ -190,7 +190,7 @@ function module.LoadFonts()
     local handle, name = findFirstFile(mask)
     
     while handle and name do
-        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), module.tstyle.font_size)
+        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 8)
         name = findNextFile(handle)
     end
 end
@@ -297,9 +297,9 @@ function module.StyleEditor()
         function()
             imgui.BeginChild("##Tamanhos");
             imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50);
-
-            imgui.SliderInt("Tamanho da fonte", module.tstyle.font_size_var, 12, 48)
-                
+            imgui.Text(tostring(fstyle.tstyle.font_size))
+            imgui.SliderInt("Tamanho da fonte", module.tstyle.font_size_var, 8, 48)
+            fcommon.InformationTooltip("Salve o estilo para visualizar as alterações.")
             style.GrabMinSize = StylerSliderFloat("Tamanho mínimo da barra",style.GrabMinSize,0.0,20.0)
             style.IndentSpacing = StylerSliderFloat("Espaçamento entre os recursos",style.IndentSpacing,0.0,30.0)
             style.ItemInnerSpacing = StylerSliderFloat2("Espaçamento interno dos itens",style.ItemInnerSpacing,0.0,20.0)

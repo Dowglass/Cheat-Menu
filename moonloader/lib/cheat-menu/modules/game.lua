@@ -46,7 +46,7 @@ module.tgame                =
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
-    gxt_save_name           = imgui.new.char[22]("Untitled Save"),
+    gxt_save_name           = imgui.new.char[22](""),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     object_spawner          = 
     {
@@ -58,7 +58,7 @@ module.tgame                =
         },
         filter              = imgui.ImGuiTextFilter(),
         group_name          = imgui.new.char[32]("Groupo 1"),
-        obj_name            = imgui.new.char[32]("Novo objeto"),
+        obj_name            = imgui.new.char[32]("Objeto"),
         model               = imgui.new.int(1427),
         placed              = {},
         set_player_coord    = imgui.new.bool(fconfig.Get('tgame.object_spawner.set_player_coord',false)),

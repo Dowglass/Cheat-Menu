@@ -98,7 +98,7 @@ function module.AnimationMain()
     imgui.NextColumn()
     fcommon.CheckBoxVar("Ped##Animação",module.tanimation.ped,"Animação no ped:Mire no ped para selecionar.")
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Secundári##Animação",module.tanimation.secondary)
+    fcommon.CheckBoxVar("Secundária##Animação",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 

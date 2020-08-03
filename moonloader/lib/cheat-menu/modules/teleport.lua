@@ -34,13 +34,13 @@ function module.Teleport(x, y, z,interior_id)
 		target, x,y,z = getTargetBlipCoordinates()
 
 		if not target then
-			printHelpString("Nenhum marcador encontrado")
+			printHelpString("Nenhum marcador encontrado!")
 			return
 		end
 	end
 
 	if math.abs(x) > 99999 or math.abs(y) > 99999 or math.abs(z) > 99999 then
-		printHelpString("Coordenada muito alta")
+		printHelpString("Coordenada muito alta!")
 		return
 	end
 
