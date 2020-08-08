@@ -23,10 +23,6 @@ local module = {}
 module.tstyle = 
 {
     array          = nil,
-    current_font   = "",
-    fonts          = {},
-    font_size      = fconfig.Get('tstyle.font_size',math.floor(resY*0.0182291666666667)),
-    font_size_var  = imgui.new.int(fconfig.Get('tstyle.font_size',math.floor(resY*0.0182291666666667))),
     list           = nil,
     name           = imgui.new.char[256]("Personalizado"),
     preparetoapply = false,
@@ -156,9 +152,6 @@ function module.applyStyle(style, stylename)
                 end
                 break
             end
-            if v == 'Font' then
-                break
-            end
             if tostring(module.tstyle.styles_table[stylename][v]):find("(%d+) (%d+)") then
                 local n = split(module.tstyle.styles_table[stylename][v], " ")
                 style[v] = imgui.ImVec2(tonumber(n[1]), tonumber(n[2]))
@@ -166,8 +159,6 @@ function module.applyStyle(style, stylename)
                 style[v] = tonumber(module.tstyle.styles_table[stylename][v])
             end
         end
-        imgui.GetIO().FontDefault = fstyle.tstyle.fonts[module.tstyle.styles_table[stylename]["Font"]] or fstyle.tstyle.fonts["trebucbd.ttf"]
-        fstyle.tstyle.current_font = module.tstyle.styles_table[stylename]["Font"]
         return true
     end
     return false
@@ -182,17 +173,6 @@ function module.loadStyles()
     end
 
     return module.tstyle.preparetoapply
-end
-
-function module.LoadFonts()
-    local mask = tcheatmenu.dir .. "fonts//*.ttf"
-
-    local handle, name = findFirstFile(mask)
-    
-    while handle and name do
-        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 8)
-        name = findNextFile(handle)
-    end
 end
 
 function StylerCheckbox(label,style)
@@ -260,12 +240,6 @@ function module.StyleEditor()
 
     local style = imgui.GetStyle();
 
-    fcommon.DropDownList("Selecionar fonte",fstyle.tstyle.fonts,fstyle.tstyle.current_font,
-    function(key,val)
-        imgui.GetIO().FontDefault = val
-        fstyle.tstyle.current_font = key
-    end)
-
     imgui.Spacing()
 
     fcommon.Tabs("Estilos",{"Bordas","Cores","Tamanhos"},{
@@ -296,16 +270,13 @@ function module.StyleEditor()
         end,
         function()
             imgui.BeginChild("##Tamanhos");
-            imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50);
-            imgui.Text(tostring(fstyle.tstyle.font_size))
-            imgui.SliderInt("Tamanho da fonte", module.tstyle.font_size_var, 8, 48)
-            fcommon.InformationTooltip("Salve o estilo para visualizar as alterações.")
-            style.GrabMinSize = StylerSliderFloat("Tamanho mínimo da barra",style.GrabMinSize,0.0,20.0)
-            style.IndentSpacing = StylerSliderFloat("Espaçamento entre os recursos",style.IndentSpacing,0.0,30.0)
-            style.ItemInnerSpacing = StylerSliderFloat2("Espaçamento interno dos itens",style.ItemInnerSpacing,0.0,20.0)
-            style.ItemSpacing = StylerSliderFloat2("Espaçamento entre itens",style.ItemSpacing,0.0,20.0)
+            imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50)
+            style.GrabMinSize = StylerSliderFloat("Grab min size",style.GrabMinSize,0.0,20.0)
+            style.IndentSpacing = StylerSliderFloat("Indent spacing",style.IndentSpacing,0.0,30.0)
+            style.ItemInnerSpacing = StylerSliderFloat2("Espaçamento interno do item",style.ItemInnerSpacing,0.0,20.0)
+            style.ItemSpacing = StylerSliderFloat2("Espaçamento de item",style.ItemSpacing,0.0,20.0)
             style.ScrollbarSize = StylerSliderFloat("Tamanho da barra de rolagem",style.ScrollbarSize,1.0,20.0)
-            style.WindowPadding = StylerSliderFloat2("Preenchimento da janela",style.WindowPadding,0.0,20.0)
+            style.WindowPadding = StylerSliderFloat2("Preenchimento de janela",style.WindowPadding,0.0,20.0)
             
             imgui.Dummy(imgui.ImVec2(0,10))
 
@@ -334,9 +305,7 @@ function module.saveStyles( style, stylename )
             break
         end
         module.tstyle.styles_table[stylename][v] = type(style[v]) == 'cdata' and (style[v].x.." "..style[v].y) or style[v]
-    end
-    module.tstyle.styles_table[stylename]["Font"] = (memory.tostring(imgui.GetFont():GetDebugName()):sub(1,-7))
-    
+    end    
     return fcommon.SaveJson("styles",module.tstyle.styles_table) and true or false
 end
 
