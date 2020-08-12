@@ -107,7 +107,8 @@ function module.TeleportMain()
 			
 			imgui.Spacing()
 
-            imgui.InputText("Coordenada",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
+			fcommon.InputText("Coordenadas",module.tteleport.coords,"Exemplo: x, y, z")
+
 
             if module.tteleport.insert_coords[0] then
                 local x,y,z = getCharCoordinates(PLAYER_PED)
@@ -117,7 +118,6 @@ function module.TeleportMain()
 			if (isKeyDown(vkeys.VK_LCONTROL) or isKeyDown(vkeys.VK_RCONTROL)) and isKeyDown(vkeys.VK_V) then
 				imgui.StrCopy(module.tteleport.coords,getClipboardText())
 			end
-            fcommon.InformationTooltip("Insira as coordenadas XYZ.\nFormato : X,Y,Z")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             if imgui.Button("Teleportar para coordenada",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -130,8 +130,9 @@ function module.TeleportMain()
             end
             imgui.SameLine()
             if imgui.Button("Teleportar para marcação",imgui.ImVec2(fcommon.GetSize(2))) then
-                lua_thread.create(module.Teleport)
-            end
+				lua_thread.create(module.Teleport)
+			end
+
 		end,
 		function()
 			fcommon.DrawEntries(fconst.IDENTIFIER.TELEPORT,fconst.DRAW_TYPE.TEXT,function(text)
@@ -160,8 +161,8 @@ function module.TeleportMain()
 		function()
 			imgui.Columns(1)
 			imgui.InputText("Nome do Local",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords))
-			imgui.InputText("Coordenadas",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
-			fcommon.InformationTooltip("Insira coordenadas XYZ.\nFormato : X, Y, Z")
+			fcommon.InputText("Coordenadas",module.tteleport.coords,"Exemplo: x, y, z")
+
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
 

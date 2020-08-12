@@ -73,10 +73,8 @@ function module.MemoryMain()
             imgui.Spacing()
 
             imgui.InputText("Endereço", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " para colar")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
-            fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
@@ -143,9 +141,7 @@ function module.MemoryMain()
             
             imgui.InputInt("Valor", module.tmemory.value)
             imgui.InputText("Endereço", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " para colar")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
-            fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then

@@ -208,11 +208,11 @@ function module.ChangePlayerCloth(name)
 end
 
 function module.RemoveThisCloth(name)
-    if imgui.MenuItemBool("Remover item") then 
+    if imgui.MenuItemBool("Remover roupa") then 
         local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
         givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
         buildPlayerModel(PLAYER_HANDLE)
-        printHelpString("Item removido!")
+        printHelpString("Roupa ~r~removida!")
     end
 end
 --------------------------------------------------
@@ -239,7 +239,7 @@ function module.PlayerMain()
     end
     fcommon.InformationTooltip("|C.V.V (Centro de Valorização da Vida)|\n|Fone: 188\n|Site: https://www.cvv.org.br/")
 
-    fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Skins","Roupas"},{
+    fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Aparência"},{
         function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
@@ -326,17 +326,47 @@ function module.PlayerMain()
             WantedLevelMenu()
         end,
         function()
-            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Comandos: Mire no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
+            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Ative usando: Mirando no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
-            fcommon.Tabs("Skins",{"Peds","Skins personalizadas"},{
+            fcommon.Tabs("Aparência",{"Roupas","Peds","Skins personalizadas"},{
+                function()
+                    if getCharModel(PLAYER_PED) == 0 then
+                        if imgui.Button("Remover roupas",imgui.ImVec2(fcommon.GetSize(1))) then
+                            for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
+                            buildPlayerModel(PLAYER_HANDLE)
+                            printHelpString("Roupas ~r~removidas")
+                        end
+                        
+                        imgui.Dummy(imgui.ImVec2(0,10))        
+                        fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)    
+                    else
+                        imgui.TextWrapped("Você precisa estar com a skin do CJ para trocar de roupa.")
+                        imgui.Spacing()
+                        if imgui.Button("Mudar para a skin do CJ",imgui.ImVec2(fcommon.GetSize(1))) then
+                            setPlayerModel(PLAYER_HANDLE,0)
+
+                            local veh = nil
+                            local speed = 0
+                            if isCharInAnyCar(PLAYER_PED) then
+                                veh = getCarCharIsUsing(PLAYER_PED)
+                                speed = getCarSpeed(veh)
+                            end
+                            clearCharTasksImmediately(PLAYER_PED)
+                            if veh ~= nil then
+                                taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
+                                setCarForwardSpeed(veh,speed)
+                            end
+                        end
+                    end
+                end,
                 function()
                     fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerModel,nil,fped.GetModelName,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
                 end,
                 function()
                     if module.tplayer.custom_skins.is_modloader_installed then
-                        module.tplayer.custom_skins.filter:Draw("Filtrar")
-                        fcommon.InformationTooltip(string.format("Coloque os arquivos dff & txd dentro,\n'%s'\n\
-Nota:\nOs nomes dos arquivos não podem exceder 8 caracteres.\nNão mude os nomes enquanto o jogo estiver em execução.",fplayer.tplayer.custom_skins.path))
+                        module.tplayer.custom_skins.filter:Draw("Procurar")
+                        fcommon.InformationTooltip(string.format("Coloque os arquivos dff & txd em,\n'%s'\n\
+Nota:\nOs nomes dos arquivos não podem exceder de 8 caracteres.\nNão mude os nomes enquanto o jogo estiver aberto.",fplayer.tplayer.custom_skins.path))
                         imgui.Spacing()
 
                         if imgui.BeginChild("Skins personalizadas") then
@@ -359,17 +389,6 @@ Nota:\nOs nomes dos arquivos não podem exceder 8 caracteres.\nNão mude os nome
                     end
                 end
             })
-        end,
-        function()
-            if imgui.Button("Remover roupas",imgui.ImVec2(fcommon.GetSize(1))) then
-                for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
-                buildPlayerModel(PLAYER_HANDLE)
-                printHelpString("Roupas ~r~removidas")
-            end
-             
-            imgui.Dummy(imgui.ImVec2(0,10))        
-            fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)
-
         end
     })
 end

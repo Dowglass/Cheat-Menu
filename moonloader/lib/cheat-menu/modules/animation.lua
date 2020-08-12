@@ -22,7 +22,7 @@ module.tanimation =
     fighting      =
     {
         selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',0)),
-        names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
+        names     = {"Padrão","Boxing","Kung fu","Kick Boxing","Punch Kick"},
         array     = {},
     }, 
     filter = imgui.ImGuiTextFilter(),
@@ -94,15 +94,15 @@ function module.AnimationMain()
 
     -- Checkboxes
     imgui.Columns(3,nil,false)
-    fcommon.CheckBoxVar("Loop##Animação",module.tanimation.loop)
+    fcommon.CheckBoxVar("Loop##Animation",module.tanimation.loop)
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Ped##Animação",module.tanimation.ped,"Animação no ped:Mire no ped para selecionar.")
+    fcommon.CheckBoxVar("Ped##Animation",module.tanimation.ped,"Faça alguma animação no ped.\nMire com uma arma para selecionar.")
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Secundária##Animação",module.tanimation.secondary)
+    fcommon.CheckBoxVar("Secundária##Animation",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 
-    fcommon.Tabs("Animação",{"Animações","Pesquisa","Misc","Personalizado"},{
+    fcommon.Tabs("Animação",{"Procurar","Misc","Personalizar"},{
         function()
 
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
@@ -121,7 +121,7 @@ function module.AnimationMain()
                         module.tanimation.list[category] = nil
                     end
 
-                    printHelpString("Animacao ~r~removida")
+                    printHelpString("Animacao ~r~removida!")
                 end
             end,function(a) return a end,module.tanimation.list)
 
@@ -151,7 +151,7 @@ function module.AnimationMain()
         end,
         function()
             imgui.InputText("Nome do IFP",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
-            imgui.InputText("Nome da animação",module.tanimation.name,ffi.sizeof(module.tanimation.name))
+            imgui.InputText("Nome da Animação",module.tanimation.name,ffi.sizeof(module.tanimation.name))
             imgui.Spacing()
             if imgui.Button("Adicionar animação",imgui.ImVec2(fcommon.GetSize(1))) then
                 if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then

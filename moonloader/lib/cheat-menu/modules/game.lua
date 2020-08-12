@@ -923,7 +923,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
 
                 local filter = module.tgame.script_manager.filter
 
-                filter:Draw("Filtrar")
+                filter:Draw("Procurar")
                 imgui.Spacing()
                 
                 for index, script in ipairs(script.list()) do
@@ -976,7 +976,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                 imgui.Spacing()
                 local filter = module.tgame.object_spawner.filter
 
-                filter:Draw("Filtrar")
+                filter:Draw("Procurar")
                 fcommon.InformationTooltip("Todos os objetos serão removidos ao \nencerrar o Cheat Menu.")
                 imgui.Spacing()
 
@@ -1032,10 +1032,10 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
             end,
             function()
                 local filter = module.tgame.object_spawner.filter
-                filter:Draw("Filtrar")
+                filter:Draw("Procurar")
                 fcommon.InformationTooltip("Alterações feitas aqui afetam todos os objetos\ndo grupo.")
                 imgui.Spacing()
-
+                local size = imgui.GetFrameHeight()
                 if imgui.BeginChild("Grupos") then 
                     for grp,data in pairs(module.tgame.object_spawner.placed) do
                         fcommon.DropDownMenu(grp,function()
@@ -1068,7 +1068,6 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                                 printHelpString("Colisoes removidas")
                             end
                             imgui.Spacing()
-                            local _,size = fcommon.GetSize(10)
                             imgui.Columns(2,nil,false)
                             if imgui.Button("+##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
