@@ -26,8 +26,7 @@ module.tweapon =
     max_move_speed      = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
     huge_damage         = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
     images              = {},
-    long_target_range   = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
-    long_weapon_range   = imgui.new.bool(fconfig.Get('tweapon.long_weapon_range',false)),
+    long_range   = imgui.new.bool(fconfig.Get('tweapon.long_range',false)),
     names               = fcommon.LoadJson("weapon"),
     path                = tcheatmenu.dir .. "weapons",
     ped                 = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
@@ -240,7 +239,7 @@ function module.WeaponMain()
     fcommon.Tabs("Armas",{"Caixas de seleção","Menus","Criar"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComandos:\nQ = esquerda \nE = direita",
+            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComando: \nQ = esquerda | E = direita",
             function()
                 fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
             end)
@@ -248,25 +247,19 @@ function module.WeaponMain()
             function()
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
             end)
-            fcommon.CheckBoxVar("Aumentar dano",module.tweapon.huge_damage,"Aumenta o dano total da arma.",
+            fcommon.CheckBoxVar("Aumentar dano",module.tweapon.huge_damage,nil,
             function()
                 if not module.tweapon.huge_damage[0] then
                     callFunction(0x5BE670,0,0)
                 end
             end)
             fcommon.CheckBoxValue("Munição infinita",0x969178)
-            fcommon.CheckBoxVar("Longo alcance alvo",module.tweapon.long_target_range,nil,
-            function()
-                if not module.tweapon.long_target_range[0] then
-                    callFunction(0x5BE670,0,0)
-                end
-            end)
-                    
+
             imgui.NextColumn()
 
-            fcommon.CheckBoxVar("Longo alcance de armas",module.tweapon.long_weapon_range,nil,
+            fcommon.CheckBoxVar("Longo alcance de tiro",module.tweapon.long_range,nil,
             function()
-                if not module.tweapon.long_weapon_range[0] then
+                if not module.tweapon.long_range[0] then
                     callFunction(0x5BE670,0,0)
                 end
             end)

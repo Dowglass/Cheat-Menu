@@ -113,7 +113,7 @@ function module.AnimationMain()
                     module.tanimation.list[category][text] = nil
                     
                     local bool = false
-                    for k,v in pairs(module.tanimation.list[ffi.string(module.tanimation.ifp_name)]) do
+                    for k,v in pairs(module.tanimation.list[category]) do
                         bool = true
                     end
                     
@@ -150,16 +150,25 @@ function module.AnimationMain()
             end
         end,
         function()
-            imgui.InputText("Nome do IFP",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
-            imgui.InputText("Nome da Animação",module.tanimation.name,ffi.sizeof(module.tanimation.name))
+            fcommon.InputText("Nome do IFP",module.tanimation.ifp_name,"ifp")
+            fcommon.InputText("Animação",module.tanimation.name,"anim")
             imgui.Spacing()
             if imgui.Button("Adicionar animação",imgui.ImVec2(fcommon.GetSize(1))) then
-                if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
-                    module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
+                if ffi.string(module.tanimation.ifp_name) == "" then
+                    printHelpString("Nenhum ifp encontrado!")
+                else
+                    if ffi.string(module.tanimation.name) == "" then
+                        printHelpString("Nome da animacao nao encontrado!")
+                    else
+                        if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
+                            module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
+                        end
+                        module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
+        
+                        printHelpString("Animacao ~g~adicionada")
+                    end
                 end
-                module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
-
-                printHelpString("Animacao ~g~adicionada")
+               
             end
         end
     })

@@ -598,26 +598,15 @@ function FollowPed(ped)
 end
 
 function SpawnObject(model,obj_name,grp_name,x,y,z)
-        
-    if isThisModelACar() then
-        printHelpString("Veiculo")
-        return
-    end
-    if model < 700 then
-        printHelpString("Nao e possivel criar objeto!")
-        return
-    end
-    requestModel(model)
-    while not hasModelLoaded(model) do
-        wait(0)
-    end
+    
+    if isModelAvailable(model) and casts.CBaseModelInfo.GetModelType(model) == fconst.MODEL_TYPE.ATOMIC then
+        requestModel(model)
+        loadAllModelsNow()
 
-    if isModelAvailable(model) then
         local obj = createObject(model,x,y,z)
         setObjectRotation(obj,0,0,0)
         setObjectCollision(obj,false)
-        markModelAsNoLongerNeeded(model)
-        printHelpString("Objeto criado")
+
         if module.tgame.object_spawner.placed[grp_name] == nil then
             module.tgame.object_spawner.placed[grp_name] = {}
         end
@@ -629,6 +618,11 @@ function SpawnObject(model,obj_name,grp_name,x,y,z)
             roty = imgui.new.float(0),
             rotz = imgui.new.float(0),
         }
+
+        markModelAsNoLongerNeeded(model)
+        printHelpString("Objeto criado")
+    else
+        printHelpString("Modelo invalido")
     end
 end
 
@@ -965,7 +959,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                 imgui.InputFloat("Coordenada Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
                 imgui.Dummy(imgui.ImVec2(0,10))
                 if imgui.Button("Criar objeto",imgui.ImVec2(fcommon.GetSize(1))) then
-                    lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],ffi.string(module.tgame.object_spawner.obj_name),ffi.string(module.tgame.object_spawner.group_name),module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                    SpawnObject(module.tgame.object_spawner.model[0],ffi.string(module.tgame.object_spawner.obj_name),ffi.string(module.tgame.object_spawner.group_name),module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
                 end
             end,
             function()

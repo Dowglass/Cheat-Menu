@@ -351,11 +351,10 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
 			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
 a internet para baixar arquivos do github.")	
-			fcommon.CheckBoxVar("Carregamento rápido de imagens",module.tmenu.fast_load_images,"Carregamento rápido de imagens de veículos, armas, peds e etc.\n \
-Isso pode aumentar o tempo de inicialização do jogo ou travar\npor alguns segundos, mas melhora o desempenho do menu.")
+			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
 				
 			imgui.NextColumn()
-			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
+
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
 			imgui.Columns(1)

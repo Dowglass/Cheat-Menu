@@ -100,14 +100,14 @@ function module.TeleportMain()
 	fcommon.Tabs("Teleporte",{"Teleporte","Procurar","Personalizar"},{
 		function()
 			imgui.Columns(2,nil,false)
-			fcommon.CheckBoxVar("Inserir coordenadas",module.tteleport.insert_coords,"Mostra suas coordenadas atuais.")
+			fcommon.CheckBoxVar("Inserir coordenadas",module.tteleport.insert_coords)
 			imgui.NextColumn()
 			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleporta para a marcação usando" ..  fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_teleport))
 			imgui.Columns(1)
 			
 			imgui.Spacing()
 
-			fcommon.InputText("Coordenadas",module.tteleport.coords,"Exemplo: x, y, z")
+			fcommon.InputText("Coordenadas",module.tteleport.coords,"x, y, z")
 
 
             if module.tteleport.insert_coords[0] then
@@ -159,9 +159,8 @@ function module.TeleportMain()
 			end,function(a) return a end,module.tteleport.coordinates)
 		end,
 		function()
-			imgui.Columns(1)
-			imgui.InputText("Nome do Local",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords))
-			fcommon.InputText("Coordenadas",module.tteleport.coords,"Exemplo: x, y, z")
+			fcommon.InputText("Nome",module.tteleport.coord_name,"Nome do Local")
+			fcommon.InputText("Coordenadas",module.tteleport.coords,"x, y, z")
 
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
@@ -171,13 +170,19 @@ function module.TeleportMain()
 			imgui.Spacing()
 			if imgui.Button("Salvar local",imgui.ImVec2(fcommon.GetSize(1))) then
 				if ffi.string(module.tteleport.coord_name) == "" then
-					imgui.StrCopy(module.tteleport.coord_name,"Untitled")
+					printHelpString("Nenhum nome encontrado!")
+				else
+					local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
+					if tonumber(x) ~= nil and tonumber(y) ~= nil and tonumber(z) ~= nil then
+						module.tteleport.coordinates["Custom"][ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getCharActiveInterior(PLAYER_PED), ffi.string(module.tteleport.coords))
+						fcommon.SaveJson("coordinate",module.tteleport.coordinates)
+						module.tteleport.coordinates = fcommon.LoadJson("coordinate")
+						printHelpString("Local ~g~adicionado")
+					else
+						printHelpString("Nenhuma coordenadas encontrada!")
+					end
 				end
-				module.tteleport.coordinates["Custom"][ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getCharActiveInterior(PLAYER_PED), ffi.string(module.tteleport.coords))
-				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
-				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
-				printHelpString("Local ~g~adicionado!")
-            end
+			end
 		end
 	})
 end
