@@ -1147,7 +1147,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                         imgui.Columns(1)
 
                         imgui.Dummy(imgui.ImVec2(0,20))
-                        fcommon.CheckBoxVar("Pulsante",module.tvehicle.neon.pulsing,"Neons piscarão continuamente.")
+                        fcommon.CheckBoxVar("Pulsante",module.tvehicle.neon.pulsing)
                         imgui.Spacing()
 
                         if imgui.Button("Instalar Neon",imgui.ImVec2(fcommon.GetSize(1))) then
