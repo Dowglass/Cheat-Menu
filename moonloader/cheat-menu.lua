@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta (PT-BR)")
-script_version_number(2020082702) -- YYYYMMDDNN
+script_version_number(2020090203) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -107,7 +107,7 @@ tcheatmenu       =
     },
     read_key_press = false,
     temp_data    = tcheatmenu.temp_data,
-    tab_data     = {},
+    tab_data     = fconfig.Get('tcheatmenu.tab_data',{}),
     thread_locks = {},
     window       =
     {
@@ -237,16 +237,24 @@ function(self) -- render frame
         imgui.Spacing()
     end
 
-    --------------------------------------------------
+     --------------------------------------------------
     -- Updater code
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
-        imgui.Button("Nova atualização disponível!",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Baixar",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("Uma versao atualizada esta disponivel!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Baixar",imgui.ImVec2(fcommon.GetSize(3))) then
             DownloadUpdate()
         end
         imgui.SameLine()
-        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(3))) then
             fmenu.tmenu.update_status =fconst.UPDATE_STATUS.HIDE_MSG
+        end
+        imgui.SameLine()
+        if imgui.Button("Ver changelog",imgui.ImVec2(fcommon.GetSize(3))) then
+            if string.find( script.this.version,"beta") then
+                os.execute('explorer "https://github.com/Dowglass/Cheat-Menu/commits/master"')
+            else
+                os.execute('explorer "https://github.com/Dowglass/Cheat-Menu/releases/tag/' .. fmenu.tmenu.repo_version ..'"')
+            end
         end
         imgui.Spacing()
     end
@@ -479,7 +487,7 @@ function main()
     -- Functions that need to lunch only once at startup
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
-        print("SAMP detectado, desativando script.")
+        print("SAMP detected, unloading script.")
         thisScript():unload()
     end
 
@@ -519,10 +527,16 @@ function main()
         removePickup(glob.Pickup_Info_Police)
     end
 
+    setGameGlobal(glob.STAT_Unlocked_Cities_Number,4)
+
     if fgame.tgame.disable_cheats[0] == true then
         writeMemory(0x4384D0,1,0xE9,false)
         writeMemory(0x4384D1,4,0xD0,false)
         writeMemory(0x4384D5,4,0x90909090,false)
+    end
+
+    if not fgame.tgame.forbidden_area_wanted_level[0] then
+        writeMemory(0x441770,1,0xC3,false)
     end
 
     switchArrestPenalties(not(fgame.tgame.keep_stuff[0]))
@@ -533,7 +547,7 @@ function main()
     end
     
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
-    
+
     if  fgame.tgame.ghost_cop_cars[0] then
         for key,value in pairs(fgame.tgame.cop) do
             writeMemory(tonumber(key),4,math.random(400,611),false)
@@ -576,7 +590,6 @@ function main()
     fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
     fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
     fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
-    fcommon.SingletonThread(fvehicle.GSXProcessVehicles,"GSXProcessVehicles")
     fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
     fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
     fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
@@ -631,10 +644,10 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
-                fcommon.SingletonThread(fgame.CameraMode,"ModoCamera")
-                printHelpString("Modo camera ativado")
+                fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
+                printHelpString("Camera mode enabled")
             else
-                printHelpString("Modo camera desativado")
+                printHelpString("Camera mode disabled")
             end
         end)
 
@@ -642,7 +655,7 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
             if fgame.tgame.ss_shortcut[0] then
                 takePhoto(true)
-                printHelpString("Tela ~g~capturada!")
+                printHelpString("Screenshot ~g~taken")
             end
         end)
 
@@ -686,11 +699,6 @@ function main()
                 if fvehicle.tvehicle.color.default ~= getCarColours(car) then
                     fvehicle.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
-                        if fvehicle.tvehicle.gsx.handle ~= 0  then
-                            fvehicle.GSXSet(car,"cm_color_red_" .. comp.name,fvehicle.tvehicle.color.rgb[0])
-                            fvehicle.GSXSet(car,"cm_color_green_" .. comp.name,fvehicle.tvehicle.color.rgb[1])
-                            fvehicle.GSXSet(car,"cm_color_blue_" .. comp.name,fvehicle.tvehicle.color.rgb[2])
-                        end
                     end)
                 end
             end
@@ -757,10 +765,6 @@ function onScriptTerminate(script, quitGame)
         end
 
         restoreCameraJumpcut()
-
-        if fvehicle.tvehicle.gsx.handle ~= 0 then
-            fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
-        end
 
         if doesObjectExist(fgame.tgame.solid_water_object) then
             deleteObject(fgame.tgame.solid_water_object)

@@ -43,6 +43,7 @@ module.tgame                =
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
     disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
     fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',60)),
+    forbidden_area_wanted_level = imgui.new.bool(fconfig.Get('tgame.forbidden_area_wanted_level',true)),
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
@@ -758,13 +759,23 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada))",fcommon.GetHotKeyName
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxValue("Relógio mais rápido",0x96913B)            
+            fcommon.CheckBoxValue("Relógio mais rápido",0x96913B)        
+            fcommon.CheckBoxVar("Área Proibida",module.tgame.forbidden_area_wanted_level,"Níveis deprocurado que aparecem\
+            fora de LS sem completar missões (ou relacionado).",
+            function()
+                if module.tgame.forbidden_area_wanted_level[0] then
+                    writeMemory(0x441770,1,0x83,false)
+                else
+                    writeMemory(0x441770,1,0xC3,false)
+                end
+            end)    
+
+            imgui.NextColumn()
+
             fcommon.CheckBoxVar("Parar relógio",module.tgame.freeze_time,nil,
             function()
                 fcommon.SingletonThread(module.FreezeTime,"FreezeTime")
             end)
-            
-            imgui.NextColumn()
 
             fcommon.CheckBoxVar("Ghost cop vehicles",module.tgame.ghost_cop_cars,nil,function()        
                 for key,value in pairs(module.tgame.cop) do

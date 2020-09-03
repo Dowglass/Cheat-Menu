@@ -252,6 +252,7 @@ function module.CheckUpdates()
 			if  repo_version ~= nil then
 				if tostring(repo_version) > tostring(this_version) then
 					module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
+					module.tmenu.repo_version = tostring(repo_version)
 					printHelpString("Nova atualizacao disponivel!")
 				else
 					printHelpString("Nenhuma atualizacao disponivel")
@@ -476,8 +477,12 @@ a internet para baixar arquivos do github.")
 				Copyright (C) 2019-2020 Grinch_ \n")
 		end,
 		function()
-			if imgui.Button("Verificar se há atualizações",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Verificar se há atualizações",imgui.ImVec2(fcommon.GetSize(3))) then
 				module.CheckUpdates()
+			end
+			imgui.SameLine()
+			if imgui.Button("Servidor no Discord",imgui.ImVec2(fcommon.GetSize(3))) then
+				os.execute('explorer "https://discord.gg/ZzW7kmf"')
 			end
 			imgui.SameLine()
 			if imgui.Button("Ir para repo oficial no Github",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -504,13 +509,11 @@ a internet para baixar arquivos do github.")
 				imgui.Columns(2,nil,false)
 				
 				imgui.TextWrapped("Dowglas_")
-				imgui.TextWrapped("Fabio")
 				imgui.TextWrapped("guru guru")
 				imgui.TextWrapped("Israel")
 				imgui.TextWrapped("Junior-Djjr")
 				
 				imgui.NextColumn()
-				imgui.TextWrapped("kuba--")
 				imgui.TextWrapped("randazz0")
 				imgui.TextWrapped("Um_Geek")
 				imgui.TextWrapped("Comunidade Modding")
