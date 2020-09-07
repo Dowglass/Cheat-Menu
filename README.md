@@ -12,10 +12,11 @@
 [![GTAF](https://img.shields.io/badge/Topic-GTA%20Forums-%23244052?style=for-the-badge)](https://gtaforums.com/topic/930023-mooncheat-menu/)
 ## Introdução
 
-O Cheat Menu permite que um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
-
+Cheat Menu é um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
 
 É baseado no [Moonloader](https://gtaforums.com/topic/890987-moonloader/) e usa [mimgui](https://github.com/THE-FYP/mimgui) como interface.
+
+Pressione <kbd>Ctrl</kbd> + <kbd>M</kbd> para abrir. <b>Não funciona no SAMP</b>.
 
 ## Versões oficiais
 
@@ -23,11 +24,7 @@ O Cheat Menu permite que um grande conjunto de modificações/truques, permitind
 [Releases](https://github.com/inanahammad/Cheat-Menu/releases) são as versões atualizadas e estáveis. Se você deseja uma experiência tranquila com o mínimo de erros possível, esse e o recomendado.
 
 ### Master Branch
-[Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu e é traduzida [aqui](https://github.com/Dowglass/Cheat-Menu). Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
-
-### Cheat menu
-[Cheat menu](https://github.com/user-grinch/Cheat-Menu) versão oficial.
-
+[Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu. Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
 
 ## Instalação:
 
@@ -55,11 +52,6 @@ Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lu
 ![Image](https://i.imgur.com/DnsXweQ.jpg)
 ![Image](https://i.imgur.com/MwmZqjM.jpg)
 (Em breve a versão em PT-BR).
-
-## Vídeo (EN)
-
-[![Youtube Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
-
 
 ## Documentos 
 
