@@ -36,6 +36,7 @@ module.tmenu =
 		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
 		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
+	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',string.find(script.this.version,"beta"))),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -232,65 +233,69 @@ function module.httpRequest(request, body, handler) -- copas.http
 end
 
 function module.CheckUpdates()
-	if string.find( script.this.version,"beta") then
+	
+	if fmenu.tmenu.get_beta_updates[0] then
 		link = "https://raw.githubusercontent.com/Dowglass/Cheat-Menu/master/moonloader/cheat-menu.lua"
 	else
 		link = "https://api.github.com/repos/Dowglass/Cheat-Menu/tags"
 	end
 
-	module.httpRequest(link, nil, function(body, code, headers, status)
-		if body then
-			print(string.format("%s %s",link,status))
-			if string.find( script.this.version,"beta") then
-				repo_version = body:match("script_version_number%((%d+)%)")
-				this_version = script.this.version_num
-			else
-				repo_version = decodeJson(body)[1].name
-				this_version = script.this.version
-			end
+	downloadUrlToFile(link,string.format("%s/version.txt",tcheatmenu.dir),
+	function(id, status, p1, p2)
+		if status == fconst.UPDATE_STATUS.DOWNLOADED then
+			local file_path = string.format("%s\\version.txt",tcheatmenu.dir)
+			if doesFileExist(file_path) then
+				local file = io.open(file_path,"rb")
+				local content = file:read("*all")
 
-			if  repo_version ~= nil then
-				if tostring(repo_version) > tostring(this_version) then
-					module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
-					module.tmenu.repo_version = tostring(repo_version)
-					printHelpString("Nova atualizacao disponivel!")
+				if fmenu.tmenu.get_beta_updates[0] then
+					repo_version = content:match("script_version_number%((%d+)%)")
+					this_version = script.this.version_num
 				else
-					printHelpString("Nenhuma atualizacao disponivel")
+					repo_version = decodeJson(content)[1].name
+					this_version = script.this.version
 				end
-			else
-				printHelpString("Nao foi possivel conectar ao github. O restante do menu ainda esta funcional. Voce pode desativar a verificacao de atualizacao automatica em 'Menu'.")
+	
+				if repo_version ~= nil then
+					if tostring(repo_version) > tostring(this_version) then
+						module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
+						module.tmenu.repo_version = tostring(repo_version)
+						printHelpString("Nova atualizacao disponivel!")
+					else
+						printHelpString("Nenhuma atualizacao disponivel")
+					end
+				else
+					printHelpString("Nao foi possivel conectar ao github. O restante do menu ainda esta funcional. Voce pode desativar a verificacao de atualizacao automatica em 'Menu'.")
 				end
+				io.close(file)
+				os.remove(file_path)
 			else
-				print(string.format("%s %s",link,tostring(code),"WARN"))
+				print("Version.txt nao existe")
+			end
 		end
 	end)
 end
 
-function module.DownloadHandler(id, status, p1, p2)
-	print("Status da atualizacao: " .. status)
-	if status == fconst.UPDATE_STATUS.INSTALL then
-		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
-		printHelpString("Download completo. Clique no botao 'Instalar atualizacao' para finalizar.")
-	end
-end
-
-function DownloadUpdate()
-	if string.find( script.this.version,"beta") then
-		module.httpRequest("https://github.com/Dowglass/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
-			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
-		end)
+function module.DownloadUpdate()
+	if fmenu.tmenu.get_beta_updates[0] then
+		link = "https://github.com/Dowglass/Cheat-Menu/archive/master.zip"
 	else
-		module.httpRequest("https://api.github.com/repos/Dowglass/Cheat-Menu/tags", nil, function(body, code, headers, status)  	
-			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
-			downloadUrlToFile("https://github.com/Dowglass/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
-		end)
+		link = "https://github.com/Dowglass/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip"
 	end
 	
+	downloadUrlToFile(link,string.format("%supdate.zip",tcheatmenu.dir),
+	function(id, status, p1, p2)
+		if status == fconst.UPDATE_STATUS.DOWNLOADED then
+			fmenu.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADED
+			printHelpString("Download completo. Clique no botao 'Instalar atualizacao' para finalizar.")
+		end
+	end)
+
 	printHelpString("O download foi iniciado. Voce sera notificado quando o download for concluido.")
 	module.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
 end
 
--- Main function
+
 function module.MenuMain()
 
 	fcommon.Tabs("Menu",{"Config","Info","Comandos","Teclas de atalho","Estilos","Licença","Sobre"},{
@@ -322,10 +327,11 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
 			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
 a internet para baixar arquivos do github.")	
-			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
+			fcommon.CheckBoxVar("Obter atualizações beta",module.tmenu.get_beta_updates,"Receber atualizações beta frequentemente.\
+(Essas atualizações podem ser instáveis)")
 				
 			imgui.NextColumn()
-
+			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
 			imgui.Columns(1)
@@ -501,8 +507,6 @@ a internet para baixar arquivos do github.")
 				imgui.Text(string.format("Imgui: v%s",imgui._VERSION))
 				imgui.Columns(1)
 
-				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Precisa de ajuda?/Enfrentando problemas?/Tem sugestões?\nEntre em contato comigo no discord: Grinch_#3311 ou no fórum.")
 				imgui.TextWrapped("Por favor, em caso de crash's forneça o 'moonloader.log'.")
 				imgui.Dummy(imgui.ImVec2(0,10))
 				imgui.TextWrapped("Agradecimentos especiais a: ")
