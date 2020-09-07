@@ -53,11 +53,6 @@ Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lu
 ![Image](https://i.imgur.com/MwmZqjM.jpg)
 (Em breve a versão em PT-BR).
 
-## Vídeo (EN)
-
-[![Youtube Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
-
-
 ## Documentos 
 
 ### Adicionando imagens personalizadas de peds/skin - jpg
