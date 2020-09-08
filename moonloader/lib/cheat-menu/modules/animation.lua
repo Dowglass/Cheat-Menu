@@ -150,8 +150,9 @@ function module.AnimationMain()
             end
         end,
         function()
-            fcommon.InputText("Nome do IFP",module.tanimation.ifp_name,"ifp")
-            fcommon.InputText("Animação",module.tanimation.name,"anim")
+
+            imgui.InputTextWithHint("Nome do IFP","ifp",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
+            imgui.InputTextWithHint("Animação","anim",module.tanimation.name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.Spacing()
             if imgui.Button("Adicionar animação",imgui.ImVec2(fcommon.GetSize(1))) then
                 if ffi.string(module.tanimation.ifp_name) == "" then

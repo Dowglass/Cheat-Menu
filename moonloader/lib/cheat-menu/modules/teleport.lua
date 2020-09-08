@@ -107,8 +107,7 @@ function module.TeleportMain()
 			imgui.Columns(1)
 			
 			imgui.Spacing()
-
-			fcommon.InputText("Coordenadas",module.tteleport.coords,"x, y, z")
+			imgui.InputTextWithHint("Coordenadas","x, y, z",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
 
 
             if module.tteleport.insert_coords[0] then
@@ -171,8 +170,8 @@ function module.TeleportMain()
 			end,function(a) return a end,module.tteleport.coordinates)
 		end,
 		function()
-			fcommon.InputText("Nome",module.tteleport.coord_name,"Nome do Local")
-			fcommon.InputText("Coordenadas",module.tteleport.coords,"x, y, z")
+			imgui.InputTextWithHint("Nome","Nome do local",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coord_name))
+			imgui.InputTextWithHint("Coordenadas","x, y, z",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
 
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
