@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta (PT-BR)")
-script_version_number(2020090801) -- YYYYMMDDNN
+script_version_number(2020090802) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -225,7 +225,7 @@ function(self) -- render frame
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
         imgui.Button("Uma versao atualizada esta disponivel!",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Baixar",imgui.ImVec2(fcommon.GetSize(3))) then
-            DownloadUpdate()
+            fmenu.DownloadUpdate()
         end
         imgui.SameLine()
         if imgui.Button("Ocultar mensagem",imgui.ImVec2(fcommon.GetSize(3))) then
