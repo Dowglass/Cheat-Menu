@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta (PT-BR)")
-script_version_number(2020090802) -- YYYYMMDDNN
+script_version_number(2020091403) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -84,7 +84,7 @@ tcheatmenu       =
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
     hot_keys     =
     {
-        asc_key               = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
+        asc_key               = fconfig.Get('tcheatmenu.hot_keys.asc_key',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
         camera_mode           = fconfig.Get('tcheatmenu.hot_keys.camera_mode',{vkeys.VK_LMENU,vkeys.VK_C}),
         camera_mode_forward   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_I,vkeys.VK_I}),
         camera_mode_backward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_K,vkeys.VK_K}),
@@ -95,16 +95,12 @@ tcheatmenu       =
         camera_mode_up        = fconfig.Get('tcheatmenu.hot_keys.camera_mode_up',{vkeys.VK_O,vkeys.VK_O}),
         camera_mode_down      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_down',{vkeys.VK_P,vkeys.VK_P}),
         command_window        = fconfig.Get('tcheatmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
-        currently_active      = nil,
-        mc_paste              = fconfig.Get('tcheatmenu.hot_keys.mc_paste',{vkeys.VK_LCONTROL,vkeys.VK_V}),
         menu_open             = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
         quick_screenshot      = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
         quick_teleport        = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
         script_manager_temp   = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
-    read_key_press = false,
     temp_data    = tcheatmenu.temp_data,
-    tab_data     = fconfig.Get('tcheatmenu.tab_data',{}),
     thread_locks = {},
     window       =
     {
@@ -197,7 +193,7 @@ function(self) -- render frame
     if tcheatmenu.window.fail_loading_json then
         imgui.Button("Falha ao carregar alguns arquivos .json!",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Reinstalar",imgui.ImVec2(fcommon.GetSize(2))) then
-            DownloadUpdate()
+            fmenu.DownloadUpdate()
             tcheatmenu.window.fail_loading_json = false
         end
         imgui.SameLine()
@@ -291,7 +287,7 @@ function(self) -- render frame
                 end
             end
             imgui.Spacing()
-            fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Tecla para abrir/fechar o Cheat Menu")
+            fcommon.HotKey("Tecla para abrir/fechar o Cheat Menu",tcheatmenu.hot_keys.menu_open)
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
@@ -574,6 +570,7 @@ function main()
     fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
     fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
     fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
+    fcommon.SingletonThread(fvehicle.RainbowNeons,"RainbowNeons")
     fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
     fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
     fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
@@ -628,9 +625,9 @@ function main()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
                 fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
-                printHelpString("Camera mode enabled")
+                printHelpString("Modo camera ativado")
             else
-                printHelpString("Camera mode disabled")
+                printHelpString("Modo camera desativado")
             end
         end)
 

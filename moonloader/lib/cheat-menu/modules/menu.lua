@@ -36,7 +36,7 @@ module.tmenu =
 		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
 		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
-	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',string.find(script.this.version,"beta"))),
+	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',true)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -298,8 +298,8 @@ end
 
 function module.MenuMain()
 
-	fcommon.Tabs("Menu",{"Config","Info","Comandos","Teclas de atalho","Estilos","Licença","Sobre"},{
-		function()
+	if fcommon.BeginTabBar('MenuBar') then
+		if fcommon.BeginTabItem('Config') then
 			if imgui.Button("Configurações padrão",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.tmenu.crash_text = "Configuracoes padrao ~g~definida"
 				fconfig.tconfig.reset = true
@@ -311,7 +311,7 @@ function module.MenuMain()
 				thisScript():reload()
 			end
 			imgui.Spacing()
-			imgui.PushItemWidth((imgui.GetWindowWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
+			imgui.PushItemWidth((imgui.GetWindowContentRegionWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
 			fcommon.DropDownList("##Selectfont",fmenu.tmenu.font.list,"Fonte - " ..fmenu.tmenu.font.selected,
 			function(key,val)
 				imgui.GetIO().FontDefault = val
@@ -335,9 +335,8 @@ a internet para baixar arquivos do github.")
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
 			imgui.Columns(1)
-			
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('Info') then
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Mostrar coordenadas",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Mostrar FPS",module.tmenu.overlay.fps)	
@@ -351,8 +350,8 @@ a internet para baixar arquivos do github.")
 			imgui.Spacing()
 			imgui.Combo("Posição", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
 			fcommon.InformationTooltip("Você também pode clicar com o botão direito do mouse na\nsobreposição para acessar essas opções.")
-		end,
-		function()
+			end
+			if fcommon.BeginTabItem('Comandos') then
 			module.tmenu.command.filter:Draw("Procurar")
 			fcommon.InformationTooltip(string.format("Abra a janela de comando usando %s\n e feche usando Enter.",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
 			imgui.Spacing()
@@ -373,34 +372,36 @@ a internet para baixar arquivos do github.")
 				end
 				imgui.EndChild()
 			end
-		end,
-		function()
-			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Abre/Fecha o cheat menu")
-			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Abre a janela de comandos")
-
-			imgui.Dummy(imgui.ImVec2(0,10))
-
-			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Ativa o 'aim skin changer'")
-			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Colar endereço de memória")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Captura de tela")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Teleportar com 'Quick teleport'")
-
-			imgui.Dummy(imgui.ImVec2(0,10))
+		end
+		if fcommon.BeginTabItem('Teclas de atalho') then
+			local x,y = fcommon.GetSize(3)
+			y = y/1.2
 			
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode,"Ativa/Desativa o modo câmera")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Câmera para frente")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Câmera para trás")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Câmera para esquerda")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Câmera para direita")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Movimento da câmera mais lento")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Movimento da câmera mais rápido")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Modo de câmera pra cima (Câmera travada)")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Modo de câmera para baixo (Câmera travada)")
+			fcommon.HotKey("Abre/Fecha o cheat menu",tcheatmenu.hot_keys.menu_open)
+			fcommon.HotKey("Abre a janela de comandos",tcheatmenu.hot_keys.command_window)
+
+			imgui.Dummy(imgui.ImVec2(0,10))
+
+			fcommon.HotKey("Ativa o 'aim skin changer'",tcheatmenu.hot_keys.asc_key)
+			fcommon.HotKey("Captura de tela",tcheatmenu.hot_keys.quick_screenshot)
+			fcommon.HotKey("Teleportar com 'Quick teleport'",tcheatmenu.hot_keys.quick_teleport)
+
+			imgui.Dummy(imgui.ImVec2(0,10))
+
+			fcommon.HotKey("Ativa/Desativa o modo câmera",tcheatmenu.hot_keys.camera_mode)
+			fcommon.HotKey("Câmera para frente",tcheatmenu.hot_keys.camera_mode_forward)
+			fcommon.HotKey("Câmera para trás",tcheatmenu.hot_keys.camera_mode_backward)
+			fcommon.HotKey("Câmera para esquerda",tcheatmenu.hot_keys.camera_mode_left)
+			fcommon.HotKey("Câmera para direita",tcheatmenu.hot_keys.camera_mode_right)
+			fcommon.HotKey("Movimento da câmera mais lento",tcheatmenu.hot_keys.camera_mode_slow)
+			fcommon.HotKey("Movimento da câmera mais rápido",tcheatmenu.hot_keys.camera_mode_fast)
+			fcommon.HotKey("Modo de câmera pra cima (Câmera travada)",tcheatmenu.hot_keys.camera_mode_up)
+			fcommon.HotKey("Modo de câmera pra baixo (Câmera travada)",tcheatmenu.hot_keys.camera_mode_down)
 			imgui.Dummy(imgui.ImVec2(0,10))
 
 			imgui.TextWrapped("Você pode redefinir essas configurações para o padrão no botão 'Configurações padrão' na guia 'Config'.")
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('Estilos') then
 			if fstyle.tstyle.status then
 				if imgui.Button("Excluir estilo",imgui.ImVec2(fcommon.GetSize(2))) then
 					if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == nil then
@@ -446,8 +447,9 @@ a internet para baixar arquivos do github.")
 			imgui.InputText('##Nomedoestilo', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
 			imgui.SameLine()
 			local vec_size = imgui.GetItemRectSize()
-			vec_size.x = fcommon.GetSize(3)
-			if imgui.Button("Adicionar novo estilo",vec_size) then
+			local text = "Adicionar novo estilo"
+			vec_size.x = imgui.CalcTextSize(text).x+10
+			if imgui.Button(text,vec_size) then
 				fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
 				fstyle.tstyle.list = fstyle.getStyles()
 				fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
@@ -457,20 +459,20 @@ a internet para baixar arquivos do github.")
 					end
 				end
 				fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
-				printHelpString("Estilo adicionado!")
+				printHelpString("Estilo adicionado")
 			end
 
 			if fstyle.tstyle.status then
 				
-				if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
+				if imgui.Combo('Selecionar estilo', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
 					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
 				end
 				
 				fstyle.StyleEditor()
-			end
-		end,
-		function()
+		   end
+	   end
+	   if fcommon.BeginTabItem('Licensa') then
 			imgui.TextWrapped("Este programa é um software gratuito. Você pode modificá-lo e/ou redistribuí-lo ao seu critério sob os termos da \z
 				GNU General Public License conforme publicado pela Free Software Foundation na 3° versão da licença. \z
 				 \n\n\z
@@ -481,8 +483,8 @@ a internet para baixar arquivos do github.")
 				Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este programa. Caso contrário, consulte: <http://www.gnu.org/licenses/>.\n\n\n\z
 	
 				Copyright (C) 2019-2020 Grinch_ \n")
-		end,
-		function()
+			end
+			if fcommon.BeginTabItem('Sobre') then
 			if imgui.Button("Verificar se há atualizações",imgui.ImVec2(fcommon.GetSize(3))) then
 				module.CheckUpdates()
 			end
@@ -496,7 +498,7 @@ a internet para baixar arquivos do github.")
 			end
 			imgui.Spacing()
 
-			if imgui.BeginChild("Sobre") then
+			if imgui.BeginChild("AboutChild") then
 
 				imgui.Columns(2,nil,false)
 				imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
@@ -526,7 +528,7 @@ a internet para baixar arquivos do github.")
 			end
 			imgui.Columns(1)
 		end
-	})
+	end
 end
 
 return module

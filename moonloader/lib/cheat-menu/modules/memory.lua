@@ -33,12 +33,12 @@ module.tmemory    =
 -- Main function
 function module.MemoryMain()
  
-    fcommon.OnHotKeyPress(tcheatmenu.hot_keys.mc_paste,function()
-        imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
-    end)
+    -- if isKeyDown(vkeys.VK_LCONTROL) and is isKeyDown(int keyId)
+    --     imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
+    -- end)
 
-    fcommon.Tabs("Memória",{"Ler","Escrever","Procurar","Personalizar"},{
-        function()
+    if fcommon.BeginTabBar("MemoryBar") then
+        if fcommon.BeginTabItem("Ler") then
             imgui.Text("Ponto")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
@@ -112,8 +112,8 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entradas limpas")
             end
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Escrever") then
             imgui.Text("Ponto")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
@@ -183,9 +183,8 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entradas limpas")
             end
-        end,
-        function()
-
+        end
+        if fcommon.BeginTabItem("Procurar") then
             fcommon.DrawEntries(fconst.IDENTIFIER.MEMORY,fconst.DRAW_TYPE.TEXT,
                 function(address,size)
                     imgui.StrCopy(module.tmemory.address,address)
@@ -224,8 +223,8 @@ function module.MemoryMain()
                     end
                 end,
                 function(a) return a end,module.tmemory.list)
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Personalizar") then
             imgui.InputTextWithHint("Nome","Novo endereço",module.tmemory.name,ffi.sizeof(module.tmemory.name))
             imgui.InputTextWithHint("Endereço","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
@@ -262,7 +261,8 @@ function module.MemoryMain()
                 end
                 
             end
-        end})
+        end
+    end
 end
 
 return module

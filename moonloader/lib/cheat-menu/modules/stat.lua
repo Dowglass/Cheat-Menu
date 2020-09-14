@@ -27,8 +27,8 @@ module.tstat      =
 -- Main function
 function module.StatMain()
     
-    fcommon.Tabs("Estatísticas",{"Veículo","Arma","Namorada","Procurar"},{
-        function()
+    if fcommon.BeginTabBar('Estatísticas') then
+        if fcommon.BeginTabItem('Veículo') then
             if imgui.Button("Estatísticas máximas em veículos",imgui.ImVec2(fcommon.GetSize(1))) then
                 callFunction(0x4399D0,1,1)
                 fcommon.CheatActivated()
@@ -38,8 +38,8 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Ciclismo",stat = 230})
             fcommon.UpdateStat({ name = "Direção",stat = 160})
             fcommon.UpdateStat({ name = "Vôo",stat = 223})  
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Armas') then
             if imgui.Button("Estatísticas máximas em armas",imgui.ImVec2(fcommon.GetSize(1))) then
                 callFunction(0x439940,1,1)
                 fcommon.CheatActivated()
@@ -57,8 +57,8 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Silenced pistol",stat = 70})
             fcommon.UpdateStat({ name = "SMG",stat = 76})
             fcommon.UpdateStat({ name = "Rifle",stat = 79})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Namoradas') then
             if imgui.Button("Estatísticas máximas nas namoradas",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=252,257,1 do
                     setFloatStat(i,100)
@@ -73,8 +73,8 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
             fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
             fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Procurar') then
             module.tstat.filter:Draw("Procurar")
             imgui.Spacing()
 
@@ -90,7 +90,7 @@ function module.StatMain()
                 imgui.EndChild()
             end
         end
-    })
+    end
 end
 
 return module

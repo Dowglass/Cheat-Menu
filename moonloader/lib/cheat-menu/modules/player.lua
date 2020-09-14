@@ -222,7 +222,6 @@ function module.PlayerMain()
         printHelpString("Coordenadas copiadas!")
     end
     imgui.SameLine()
-
     if imgui.Button("Suicídio",imgui.ImVec2(x,y)) then
         lua_thread.create(function()
              --printHelpString("")
@@ -232,8 +231,8 @@ function module.PlayerMain()
     end
     fcommon.InformationTooltip("|C.V.V (Centro de Valorização da Vida)|\n|Fone: 188\n|Site: https://www.cvv.org.br/")
 
-    fcommon.Tabs("Jogador",{"Caixas de seleção","Menus","Aparência"},{
-        function()
+    if fcommon.BeginTabBar("PlayerBar") then
+        if fcommon.BeginTabItem("Caixas de seleção") then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
             fcommon.CheckBoxValue("Recompensa na cabeça",0x96913F)
@@ -280,8 +279,8 @@ function module.PlayerMain()
             end)
            
             imgui.Columns(1)
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Menus") then
             fcommon.UpdateAddress({name = "Colete",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
             fcommon.DropDownMenu("Corpo",function()
                 if imgui.RadioButtonIntPtr("Gordo",module.tplayer.cjBody,1) then
@@ -317,12 +316,12 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
             
             WantedLevelMenu()
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Aparência") then
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Ative usando: Mirando no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
-            fcommon.Tabs("Aparência",{"Roupas","Peds","Skins personalizadas"},{
-                function()
+            if fcommon.BeginTabBar('Aparência') then
+                if fcommon.BeginTabItem('Roupas') then
                     if getCharModel(PLAYER_PED) == 0 then
                         if imgui.Button("Remover roupas",imgui.ImVec2(fcommon.GetSize(1))) then
                             for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
@@ -351,11 +350,11 @@ function module.PlayerMain()
                             end
                         end
                     end
-                end,
-                function()
+                end
+                if fcommon.BeginTabItem('Peds') then
                     fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerModel,nil,fped.GetModelName,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
-                end,
-                function()
+                end
+                if fcommon.BeginTabItem('Skins personalizadas') then
                     if module.tplayer.custom_skins.is_modloader_installed then
                         module.tplayer.custom_skins.filter:Draw("Procurar")
                         if module.tplayer.custom_skins.filter:PassFilter('') then
@@ -386,9 +385,9 @@ Nota:\nOs nomes dos arquivos não podem exceder de 8 caracteres.\nNão mude os n
                         imgui.TextWrapped("O Modloader não está instalado. Por favor, instale o modloader.")
                     end
                 end
-            })
+            end
         end
-    })
+    end
 end
 
 return module

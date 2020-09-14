@@ -257,8 +257,8 @@ end
 
 -- Main function
 function module.VisualMain()
-    fcommon.Tabs("Visual",{"Caixas de seleção","Menus","Timecyc editor"},{
-        function() -- Checkboxes
+    if fcommon.BeginTabBar('VisualBar') then
+        if fcommon.BeginTabItem('Caixas de seleção') then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxValue('Borda do colete',0x589123)
             fcommon.CheckBoxValue('Porcentagem do colete',0x589125)
@@ -304,9 +304,8 @@ function module.VisualMain()
                 end
             end)
             imgui.Columns(1)
-        end,
-        function() -- Menus
-  
+        end
+        if fcommon.BeginTabItem('Menus') then
             fcommon.CRGBAColorPicker("Cor da barra de saúde",0xBAB22C,{180,25,29})
             fcommon.CRGBAColorPicker("Cor da borda no menu principal",0xBAB240,{0,0,0})
             fcommon.CRGBAColorPicker("Cor do dinheiro",0xBAB230,{54,104,44})
@@ -323,8 +322,8 @@ function module.VisualMain()
             fcommon.RadioButtonAddressEx("Borda da estrela de procurado",{"Sem borda","Padrão","Borda em negrito"},{0,1,2},0x58DD41)
             fcommon.CRGBAColorPicker("Cor da estrela de procurado",0xBAB244,{144,98,16})
             fcommon.UpdateAddress({ name = 'Posição Y da estrela de procurado',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
-        end,
-        function() -- Timecyc editor
+        end
+        if fcommon.BeginTabItem('Timecyc editor') then
             if module.tvisual.timecyc.timecyc_24_plugin ~= 0 then
                 HOUR = 24
             else
@@ -366,86 +365,84 @@ function module.VisualMain()
             end
             imgui.Spacing()
 
-            fcommon.Tabs("Guias Timecyc",{"Cores","Misc"},{
-            function() -- Colors
-                
-                if imgui.ColorEdit3("Ambiente",module.tvisual.timecyc.ambient) then
-                    casts.CTimeCyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
-                    casts.CTimeCyc.ambient_green[val] = module.tvisual.timecyc.ambient[1]*255
-                    casts.CTimeCyc.ambient_blue[val]  = module.tvisual.timecyc.ambient[2]*255
+            if fcommon.BeginTabBar('Timecyc') then
+                if fcommon.BeginTabItem('Cores') then
+                    if imgui.ColorEdit3("Ambiente",module.tvisual.timecyc.ambient) then
+                        casts.CTimeCyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
+                        casts.CTimeCyc.ambient_green[val] = module.tvisual.timecyc.ambient[1]*255
+                        casts.CTimeCyc.ambient_blue[val]  = module.tvisual.timecyc.ambient[2]*255
+                    end
+                    fcommon.InformationTooltip("Cor ambiente em objetos estáticos do mapa")
+    
+                    if imgui.ColorEdit3("Objeto",module.tvisual.timecyc.ambient_obj) then
+                        casts.CTimeCyc.ambient_obj_red[val]   = module.tvisual.timecyc.ambient_obj[0]*255
+                        casts.CTimeCyc.ambient_obj_green[val] = module.tvisual.timecyc.ambient_obj[1]*255
+                        casts.CTimeCyc.ambient_obj_blue[val]  = module.tvisual.timecyc.ambient_obj[2]*255
+                    end
+                    fcommon.InformationTooltip("Cor ambiente em objetos dinâmicos do mapas")
+    
+                    if imgui.ColorEdit3("Nuvens",module.tvisual.timecyc.fluffy_clouds) then
+                        casts.CTimeCyc.fluffy_clouds_red[val]   = module.tvisual.timecyc.fluffy_clouds[0]*255
+                        casts.CTimeCyc.fluffy_clouds_green[val] = module.tvisual.timecyc.fluffy_clouds[1]*255
+                        casts.CTimeCyc.fluffy_clouds_blue[val]  = module.tvisual.timecyc.fluffy_clouds[2]*255
+                    end
+    
+                    if imgui.ColorEdit3("Nuvens baixas",module.tvisual.timecyc.low_clouds) then
+                        casts.CTimeCyc.low_clouds_red[val]   = module.tvisual.timecyc.low_clouds[0]*255
+                        casts.CTimeCyc.low_clouds_green[val] = module.tvisual.timecyc.low_clouds[1]*255
+                        casts.CTimeCyc.low_clouds_blue[val]  = module.tvisual.timecyc.low_clouds[2]*255
+                    end
+    
+                    if imgui.ColorEdit4("Postfx 1",module.tvisual.timecyc.postfx1) then
+                        casts.CTimeCyc.postfx1_red[val]   = module.tvisual.timecyc.postfx1[0]*255
+                        casts.CTimeCyc.postfx1_green[val] = module.tvisual.timecyc.postfx1[1]*255
+                        casts.CTimeCyc.postfx1_blue[val]  = module.tvisual.timecyc.postfx1[2]*255
+                        casts.CTimeCyc.postfx1_alpha[val] = module.tvisual.timecyc.postfx1[3]*255
+                    end
+                    fcommon.InformationTooltip("Correção de cor 1")
+    
+                    if imgui.ColorEdit4("Postfx 2",module.tvisual.timecyc.postfx2) then
+                        casts.CTimeCyc.postfx2_red[val]   = module.tvisual.timecyc.postfx2[0]*255
+                        casts.CTimeCyc.postfx2_green[val] = module.tvisual.timecyc.postfx2[1]*255
+                        casts.CTimeCyc.postfx2_blue[val]  = module.tvisual.timecyc.postfx2[2]*255
+                        casts.CTimeCyc.postfx2_alpha[val] = module.tvisual.timecyc.postfx2[3]*255
+                    end
+                    fcommon.InformationTooltip("Correção de cor 2")
+    
+                    if imgui.ColorEdit3("Céu",module.tvisual.timecyc.sky_bottom) then
+                        casts.CTimeCyc.sky_bottom_red[val]   = module.tvisual.timecyc.sky_bottom[0]*255
+                        casts.CTimeCyc.sky_bottom_green[val] = module.tvisual.timecyc.sky_bottom[1]*255
+                        casts.CTimeCyc.sky_bottom_blue[val]  = module.tvisual.timecyc.sky_bottom[2]*255
+                    end
+                    
+                    if imgui.ColorEdit3("Núcleo do sol",module.tvisual.timecyc.sun_core) then
+                        casts.CTimeCyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
+                        casts.CTimeCyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
+                        casts.CTimeCyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
+                    end
+    
+                    if imgui.ColorEdit3("Sun corona",module.tvisual.timecyc.sun_corona) then
+                        casts.CTimeCyc.sun_corona_red[val]   = module.tvisual.timecyc.sun_corona[0]*255
+                        casts.CTimeCyc.sun_corona_green[val] = module.tvisual.timecyc.sun_corona[1]*255
+                        casts.CTimeCyc.sun_corona_blue[val]  = module.tvisual.timecyc.sun_corona[2]*255
+                    end
+    
+                    if imgui.ColorEdit3("Sky top",module.tvisual.timecyc.sky_top) then
+                        casts.CTimeCyc.sky_top_red[val]   = module.tvisual.timecyc.sky_top[0]*255
+                        casts.CTimeCyc.sky_top_green[val] = module.tvisual.timecyc.sky_top[1]*255
+                        casts.CTimeCyc.sky_top_blue[val]  = module.tvisual.timecyc.sky_top[2]*255
+                    end
+    
+                    if imgui.ColorEdit4("Água",module.tvisual.timecyc.water) then
+                        casts.CTimeCyc.water_red[val]   = module.tvisual.timecyc.water[0]*255
+                        casts.CTimeCyc.water_green[val] = module.tvisual.timecyc.water[1]*255
+                        casts.CTimeCyc.water_blue[val]  = module.tvisual.timecyc.water[2]*255
+                        casts.CTimeCyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
+                    end
                 end
-                fcommon.InformationTooltip("Cor ambiente em objetos estático do mapa")
-
-                if imgui.ColorEdit3("Objeto Ambiente",module.tvisual.timecyc.ambient_obj) then
-                    casts.CTimeCyc.ambient_obj_red[val]   = module.tvisual.timecyc.ambient_obj[0]*255
-                    casts.CTimeCyc.ambient_obj_green[val] = module.tvisual.timecyc.ambient_obj[1]*255
-                    casts.CTimeCyc.ambient_obj_blue[val]  = module.tvisual.timecyc.ambient_obj[2]*255
-                end
-                fcommon.InformationTooltip("Cor ambiente em objetos dinâmicos do mapas")
-
-                if imgui.ColorEdit3("Nuvens fofas",module.tvisual.timecyc.fluffy_clouds) then
-                    casts.CTimeCyc.fluffy_clouds_red[val]   = module.tvisual.timecyc.fluffy_clouds[0]*255
-                    casts.CTimeCyc.fluffy_clouds_green[val] = module.tvisual.timecyc.fluffy_clouds[1]*255
-                    casts.CTimeCyc.fluffy_clouds_blue[val]  = module.tvisual.timecyc.fluffy_clouds[2]*255
-                end
-
-                if imgui.ColorEdit3("Nuvens baixas",module.tvisual.timecyc.low_clouds) then
-                    casts.CTimeCyc.low_clouds_red[val]   = module.tvisual.timecyc.low_clouds[0]*255
-                    casts.CTimeCyc.low_clouds_green[val] = module.tvisual.timecyc.low_clouds[1]*255
-                    casts.CTimeCyc.low_clouds_blue[val]  = module.tvisual.timecyc.low_clouds[2]*255
-                end
-
-                if imgui.ColorEdit4("Postfx 1",module.tvisual.timecyc.postfx1) then
-                    casts.CTimeCyc.postfx1_red[val]   = module.tvisual.timecyc.postfx1[0]*255
-                    casts.CTimeCyc.postfx1_green[val] = module.tvisual.timecyc.postfx1[1]*255
-                    casts.CTimeCyc.postfx1_blue[val]  = module.tvisual.timecyc.postfx1[2]*255
-                    casts.CTimeCyc.postfx1_alpha[val] = module.tvisual.timecyc.postfx1[3]*255
-                end
-                fcommon.InformationTooltip("Correção de cor 1")
-
-                if imgui.ColorEdit4("Postfx 2",module.tvisual.timecyc.postfx2) then
-                    casts.CTimeCyc.postfx2_red[val]   = module.tvisual.timecyc.postfx2[0]*255
-                    casts.CTimeCyc.postfx2_green[val] = module.tvisual.timecyc.postfx2[1]*255
-                    casts.CTimeCyc.postfx2_blue[val]  = module.tvisual.timecyc.postfx2[2]*255
-                    casts.CTimeCyc.postfx2_alpha[val] = module.tvisual.timecyc.postfx2[3]*255
-                end
-                fcommon.InformationTooltip("Correção de cor 2")
-
-                if imgui.ColorEdit3("Fundo do céu",module.tvisual.timecyc.sky_bottom) then
-                    casts.CTimeCyc.sky_bottom_red[val]   = module.tvisual.timecyc.sky_bottom[0]*255
-                    casts.CTimeCyc.sky_bottom_green[val] = module.tvisual.timecyc.sky_bottom[1]*255
-                    casts.CTimeCyc.sky_bottom_blue[val]  = module.tvisual.timecyc.sky_bottom[2]*255
-                end
-                
-                if imgui.ColorEdit3("Núcleo do sol",module.tvisual.timecyc.sun_core) then
-                    casts.CTimeCyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
-                    casts.CTimeCyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
-                    casts.CTimeCyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
-                end
-
-                if imgui.ColorEdit3("Sun corona",module.tvisual.timecyc.sun_corona) then
-                    casts.CTimeCyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
-                    casts.CTimeCyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
-                    casts.CTimeCyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
-                end
-
-                if imgui.ColorEdit3("Sky top",module.tvisual.timecyc.sky_top) then
-                    casts.CTimeCyc.sky_top_red[val]   = module.tvisual.timecyc.sky_top[0]*255
-                    casts.CTimeCyc.sky_top_green[val] = module.tvisual.timecyc.sky_top[1]*255
-                    casts.CTimeCyc.sky_top_blue[val]  = module.tvisual.timecyc.sky_top[2]*255
-                end
-
-                if imgui.ColorEdit4("Água",module.tvisual.timecyc.water) then
-                    casts.CTimeCyc.water_red[val]   = module.tvisual.timecyc.water[0]*255
-                    casts.CTimeCyc.water_green[val] = module.tvisual.timecyc.water[1]*255
-                    casts.CTimeCyc.water_blue[val]  = module.tvisual.timecyc.water[2]*255
-                    casts.CTimeCyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
-                end
-            end,
-            function() -- Misc
-
-                imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
-                if imgui.SliderInt("Alfa da nuvem", module.tvisual.timecyc.cloud_alpha, 0, 255) then
+                if fcommon.BeginTabItem('Misc') then
+                    imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
+                if imgui.SliderInt("Nuvem Alfa", module.tvisual.timecyc.cloud_alpha, 0, 255) then
                     casts.CTimeCyc.cloud_alpha[val]   = module.tvisual.timecyc.cloud_alpha[0]
                 end
 
@@ -468,11 +465,11 @@ function module.VisualMain()
                     casts.CTimeCyc.fog_start[val]   = module.tvisual.timecyc.fog_start[0]
                 end
 
-                if imgui.SliderInt("Luz no brilho do solo", module.tvisual.timecyc.lights_on_ground_brightness, 0, 255) then
+                if imgui.SliderInt("Luz no brilho do sol", module.tvisual.timecyc.lights_on_ground_brightness, 0, 255) then
                     casts.CTimeCyc.lights_on_ground_brightness[val]   = module.tvisual.timecyc.lights_on_ground_brightness[0]
                 end
 
-                if imgui.SliderInt("Força da sombra clara", module.tvisual.timecyc.light_shadow_strength, 0, 255) then
+                if imgui.SliderInt("Intensidade da sombra clara", module.tvisual.timecyc.light_shadow_strength, 0, 255) then
                     casts.CTimeCyc.light_shadow_strength[val]   = module.tvisual.timecyc.light_shadow_strength[0]
                 end
 
@@ -484,7 +481,7 @@ function module.VisualMain()
                     casts.CTimeCyc.shadow_strength[val]   = module.tvisual.timecyc.shadow_strength[0]
                 end
 
-                if imgui.SliderInt("Brilho de Sprite", module.tvisual.timecyc.sprite_brightness, 0, 127) then
+                if imgui.SliderInt("Brilho do sprite", module.tvisual.timecyc.sprite_brightness, 0, 127) then
                     casts.CTimeCyc.sprite_brightness[val]   = module.tvisual.timecyc.sprite_brightness[0]
                 end
 
@@ -496,13 +493,13 @@ function module.VisualMain()
                     casts.CTimeCyc.sun_size[val]   = module.tvisual.timecyc.sun_size[0]
                 end
 
-                if imgui.SliderInt("Alfa de névoa de água", module.tvisual.timecyc.waterfog_alpha, 0, 255) then
+                if imgui.SliderInt("Neblina na água", module.tvisual.timecyc.waterfog_alpha, 0, 255) then
                     casts.CTimeCyc.waterfog_alpha[val]   = module.tvisual.timecyc.waterfog_alpha[0]
                 end
-            end})
-
+                end
+            end
         end
-    })
+    end
 end
 
 return module

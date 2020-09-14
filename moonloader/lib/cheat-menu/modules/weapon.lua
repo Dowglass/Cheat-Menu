@@ -236,8 +236,8 @@ function module.WeaponMain()
         end
     end
     
-    fcommon.Tabs("Armas",{"Caixas de seleção","Menus","Criar"},{
-        function()
+    if fcommon.BeginTabBar('Weapons') then
+        if fcommon.BeginTabItem('Checkboxes') then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComando: \nQ = esquerda | E = direita",
             function()
@@ -282,9 +282,8 @@ function module.WeaponMain()
                 end
             end)
             imgui.Columns(1)
-        end,
-        function()
-                
+        end
+        if fcommon.BeginTabItem('Menus') then
             fcommon.DropDownMenu("Editor de armas de gangue",function()
                 if imgui.Combo("Gangue", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
                     module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
@@ -321,8 +320,8 @@ function module.WeaponMain()
                 end
             end)
             fcommon.CallFuncButtons("Pack de armas", {["1"] = 0x4385B0,["2"] = 0x438890,["3"] = 0x438B30})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Criar') then
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Dê a arma para ped. Mire para selecionar.")
             imgui.SameLine()
             imgui.Spacing()
@@ -337,6 +336,6 @@ function module.WeaponMain()
             fcommon.DrawEntries(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.IMAGE,module.GiveWeapon,nil,module.GetModelName,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH)
 
         end
-    })  
+    end
 end
 return module

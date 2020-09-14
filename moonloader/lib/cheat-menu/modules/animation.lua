@@ -101,10 +101,8 @@ function module.AnimationMain()
     fcommon.CheckBoxVar("Secundária##Animation",module.tanimation.secondary)
     imgui.Columns(1)
 
-    imgui.Spacing() 
-    fcommon.Tabs("Animação",{"Procurar","Misc","Personalizar"},{
-        function()
-
+    if fcommon.BeginTabBar('Animações') then
+        if fcommon.BeginTabItem('Procurar') then
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
 				module.PlayAnimation(file,anim)
 			end,
@@ -124,9 +122,8 @@ function module.AnimationMain()
                     printHelpString("Animacao ~r~removida!")
                 end
             end,function(a) return a end,module.tanimation.list)
-
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Misc') then
             if imgui.Combo("Luta", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
                 giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
@@ -148,9 +145,8 @@ function module.AnimationMain()
                 end
                 fcommon.CheatActivated()
             end
-        end,
-        function()
-
+        end
+            if fcommon.BeginTabItem('Personalizar') then
             imgui.InputTextWithHint("Nome do IFP","ifp",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.InputTextWithHint("Animação","anim",module.tanimation.name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.Spacing()
@@ -172,7 +168,7 @@ function module.AnimationMain()
                
             end
         end
-    })
+    end
 end
 
 return module

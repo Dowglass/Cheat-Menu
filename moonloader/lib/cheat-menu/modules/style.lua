@@ -241,9 +241,8 @@ function module.StyleEditor()
     local style = imgui.GetStyle();
 
     imgui.Spacing()
-
-    fcommon.Tabs("Estilos",{"Bordas","Cores","Tamanhos"},{
-        function()
+    if fcommon.BeginTabBar('StyleBar') then
+        if fcommon.BeginTabItem('Bordas') then
             imgui.Columns(2,nil,false)
 
             style.ChildBorderSize = StylerCheckbox("Child border",style.ChildBorderSize)
@@ -255,9 +254,8 @@ function module.StyleEditor()
             style.WindowBorderSize = StylerCheckbox("Borda da janela",style.WindowBorderSize)
 
             imgui.Columns(1)
-        end,
-        function()
-
+        end
+        if fcommon.BeginTabItem('Cores') then
             imgui.BeginChild("##Cores")
             imgui.PushItemWidth(-160)
 
@@ -267,8 +265,8 @@ function module.StyleEditor()
             StylerColorPicker(style,42)
             imgui.PopItemWidth();
             imgui.EndChild();
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Tamanhos') then
             imgui.BeginChild("##Tamanhos");
             imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50)
             style.GrabMinSize = StylerSliderFloat("Grab min size",style.GrabMinSize,0.0,20.0)
@@ -290,7 +288,8 @@ function module.StyleEditor()
             imgui.PopItemWidth()
             imgui.EndChild()
         end
-    })
+        fcommon.EndTabBar()
+    end
 end
 
 

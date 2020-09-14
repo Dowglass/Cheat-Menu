@@ -98,8 +98,9 @@ end
 -- Main function
 function module.TeleportMain()
 
-	fcommon.Tabs("Teleporte",{"Teleporte","Procurar","Personalizar"},{
-		function()
+	if fcommon.BeginTabBar("TeleportBar") then
+		if fcommon.BeginTabItem("Teleporte") then
+
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Inserir coordenadas",module.tteleport.insert_coords)
 			imgui.NextColumn()
@@ -133,8 +134,9 @@ function module.TeleportMain()
 				lua_thread.create(module.Teleport)
 			end
 
-		end,
-		function()
+			fcommon.EndTabItem()
+		end
+		if fcommon.BeginTabItem("Procurar") then
 
 			-- Get sprite data, isn't saved in coordinte.json
 			module.tteleport.coordinates["Radar"] = {}
@@ -168,8 +170,11 @@ function module.TeleportMain()
 				end
 					
 			end,function(a) return a end,module.tteleport.coordinates)
-		end,
-		function()
+
+			fcommon.EndTabItem()
+		end
+		if fcommon.BeginTabItem("Personalizar") then
+
 			imgui.InputTextWithHint("Nome","Nome do local",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coord_name))
 			imgui.InputTextWithHint("Coordenadas","x, y, z",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
 
@@ -195,7 +200,7 @@ function module.TeleportMain()
 				end
 			end
 		end
-	})
+	end
 end
 
 return module
