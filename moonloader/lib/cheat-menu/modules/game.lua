@@ -540,7 +540,7 @@ function ShowLoadedScript(script,index)
 
         tcheatmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  tcheatmenu.hot_keys.script_manager_temp
 
-        fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Tecla para carregar",fcommon.GetSize(3))
+        fcommon.HotKey("Tecla para carregar",tcheatmenu.hot_keys.script_manager_temp,fcommon.GetSize(3))
         imgui.Spacing()
         
         if imgui.Button("Nunca carregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then

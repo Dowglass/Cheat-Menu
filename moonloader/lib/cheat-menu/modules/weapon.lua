@@ -34,7 +34,7 @@ module.tweapon =
     {
         weapon_array = {},
         used_weapons = fconfig.Get('tweapon.gang_weapons',fconst.DEFAULT_GANG_WEAPONS),
-        
+        enable_weapon_editor = imgui.new.bool(fconfig.Get('tweapon.gang.enable_weapon_editor',false)),
         weapons_names =
         {
             "Unarmed",
@@ -285,38 +285,47 @@ function module.WeaponMain()
         end
         if fcommon.BeginTabItem('Menus') then
             fcommon.DropDownMenu("Editor de armas de gangue",function()
-                if imgui.Combo("Gangue", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
-                    module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
-                    module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
-                    module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
-                end
-                imgui.Spacing()
-    
-                imgui.Combo("Arma 1", module.tweapon.gang.weapon1,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
-                imgui.Combo("Arma 2", module.tweapon.gang.weapon2,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
-                imgui.Combo("Arma 3", module.tweapon.gang.weapon3,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
-    
-    
-                imgui.Spacing()
-                if imgui.Button("Aplicar mudanças",imgui.ImVec2(fcommon.GetSize(2))) then
-                    setGangWeapons(fped.tped.gang.index[0],module.tweapon.gang.weapon1[0],module.tweapon.gang.weapon2[0],module.tweapon.gang.weapon3[0])
-                    module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1] = module.tweapon.gang.weapon1[0]
-                    module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2] = module.tweapon.gang.weapon2[0]
-                    module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3] = module.tweapon.gang.weapon3[0]
-                    fcommon.CheatActivated()
-                end
-                imgui.SameLine()
-                if imgui.Button("Restaurar padrão",imgui.ImVec2(fcommon.GetSize(2))) then
-    
-                    module.tweapon.gang.used_weapons = fconst.DEFAULT_GANG_WEAPONS
-    
-                    for x=1,10,1 do
-                        setGangWeapons(x,module.tweapon.gang.used_weapons[x][1],module.tweapon.gang.used_weapons[x][2],module.tweapon.gang.used_weapons[x][3])
+                fcommon.CheckBoxVar("Ativar editor de armas de gangues",module.tweapon.gang.enable_weapon_editor,"As alterações serão aplicadas ai iniciar o jogo.")
+                if module.tweapon.gang.enable_weapon_editor[0] then
+                    imgui.Spacing()
+                    if imgui.Combo("Gangue", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
+                        module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
+                        module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
+                        module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
                     end
-                    module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
-                    module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
-                    module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
-                    printHelpString("Armas de Gangue restauradas")
+                    imgui.Spacing()
+        
+                    if imgui.Combo("Arma 1", module.tweapon.gang.weapon1,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names) then
+                        setGangWeapons(fped.tped.gang.index[0],module.tweapon.gang.weapon1[0],module.tweapon.gang.weapon2[0],module.tweapon.gang.weapon3[0])
+                        module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1] = module.tweapon.gang.weapon1[0]
+                        fcommon.CheatActivated()
+                    end
+                    
+                    if imgui.Combo("Arma 2", module.tweapon.gang.weapon2,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names) then
+                        setGangWeapons(fped.tped.gang.index[0],module.tweapon.gang.weapon1[0],module.tweapon.gang.weapon2[0],module.tweapon.gang.weapon3[0])
+                        module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2] = module.tweapon.gang.weapon2[0]
+                        fcommon.CheatActivated()
+                    end
+
+                    if imgui.Combo("Arma 3", module.tweapon.gang.weapon3,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names) then
+                        setGangWeapons(fped.tped.gang.index[0],module.tweapon.gang.weapon1[0],module.tweapon.gang.weapon2[0],module.tweapon.gang.weapon3[0])
+                        module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3] = module.tweapon.gang.weapon3[0]
+                        fcommon.CheatActivated()
+                    end
+
+                    imgui.Spacing()
+                    if imgui.Button("Restaurar padrão",imgui.ImVec2(fcommon.GetSize(1))) then
+        
+                        module.tweapon.gang.used_weapons = fconst.DEFAULT_GANG_WEAPONS
+        
+                        for x=1,10,1 do
+                            setGangWeapons(x,module.tweapon.gang.used_weapons[x][1],module.tweapon.gang.used_weapons[x][2],module.tweapon.gang.used_weapons[x][3])
+                        end
+                        module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
+                        module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
+                        module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
+                        printHelpString("Armas de gangues resetadas")
+                    end
                 end
             end)
             fcommon.CallFuncButtons("Pack de armas", {["1"] = 0x4385B0,["2"] = 0x438890,["3"] = 0x438B30})

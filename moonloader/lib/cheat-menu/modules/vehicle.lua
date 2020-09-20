@@ -106,18 +106,14 @@ module.tvehicle =
     rainbow_colors = 
     {
         bool = imgui.new.bool(fconfig.Get('tvehicle.rainbow_colors.bool',false)),
-        light = imgui.new.float(fconfig.Get('tvehicle.rainbow_colors.light',0.5)),
-        saturation = imgui.new.float(fconfig.Get('tvehicle.rainbow_colors.saturation',1)),
         traffic = imgui.new.bool(fconfig.Get('tvehicle.rainbow_colors.traffic',false)),
-        wait_time = imgui.new.int(fconfig.Get('tvehicle.rainbow_colors.wait_time',100)),
+        speed = imgui.new.float(fconfig.Get('tvehicle.rainbow_colors.speed',0.5)),
     },
     rainbow_neons = 
     {
         bool = imgui.new.bool(fconfig.Get('tvehicle.rainbow_neons.bool',false)),
-        light = imgui.new.float(fconfig.Get('tvehicle.rainbow_neons.light',0.5)),
-        saturation = imgui.new.float(fconfig.Get('tvehicle.rainbow_neons.saturation',1)),
         traffic = imgui.new.bool(fconfig.Get('tvehicle.rainbow_neons.traffic',false)),
-        wait_time = imgui.new.int(fconfig.Get('tvehicle.rainbow_neons.wait_time',100)),
+        speed = imgui.new.float(fconfig.Get('tvehicle.rainbow_neons.speed',0.5)),
     },
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
@@ -555,101 +551,66 @@ function ApplyTexture(filename,load_saved_texture,car)
     end,false,car)
 end
 
-function HUEtoRGB(p, q, t)
-    if(t < 0) then t = t + 1 end
-    if(t > 1) then t = t - 1 end
-    
-    if(t < 1/6) then return p + (q - p) * 6 * t end
-    if(t < 1/2) then return q end
-    if(t < 2/3) then return p + (q - p) * (2/3 - t) * 6 end
-    return p
+function Rainbow(speed)
+    local r = math.floor(math.sin(os.clock() * speed) * 127 + 128)
+    local g = math.floor(math.sin(os.clock() * speed + 2) * 127 + 128)
+    local b = math.floor(math.sin(os.clock() * speed + 4) * 127 + 128)
+    return r,g,b
 end
 
-function HSLtoRGB(h, s, l)
-    local r, g, b;
-
-    if s == 0 then
-		r = l
-		g = l
-		b = l
-    else
-		local q = l < 0.5 and l * (1 + s) or l + s - l * s
-        local p = 2 * l - q;
-        r = HUEtoRGB(p, q, h + 1/3);
-        g = HUEtoRGB(p, q, h);
-        b = HUEtoRGB(p, q, h - 1/3);
-    end
-
-    return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
-end
-
-function ChangeVehicleColorHSL(hveh,hue,saturation,lightness)
-    saturation = saturation or 1
-    lightness = lightness or 0.5
+function RainbowVehicleColor(hveh)
     module.ForEachCarComponent(function(mat,comp,hveh)
         local r,g,b = mat:get_color()
 
         if not module.tvehicle.apply_material_filter[0] 
         or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-            local r,g,b = HSLtoRGB(hue,saturation,lightness)
+            r,g,b = Rainbow(module.tvehicle.rainbow_colors.speed[0])
             mat:set_color(r,g,b,255)
         end
     end,false,hveh)
 end
 
 function module.RainbowColors()
-    local hue = 0
     while module.tvehicle.rainbow_colors.bool[0] do
         
         if module.tvehicle.rainbow_colors.traffic[0] then -- Player + Traffic  
         
             for hveh in fcommon.pool("veh") do
-                ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])    
+                RainbowVehicleColor(hveh)    
             end        
             
         else -- Only Player
             if isCharInAnyCar(PLAYER_PED) then
                 local hveh = getCarCharIsUsing(PLAYER_PED)
-                ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])
+                RainbowVehicleColor(hveh)
             else -- function not needed at this time
                 break
             end
         end
-
-        if hue >= 1 then
-            hue =  0
-        else
-            hue = hue + 0.01
-        end
-        wait(module.tvehicle.rainbow_colors.wait_time[0])
+        wait(0)
     end
 end
 
 function module.RainbowNeons()
-    local hue = 0
+    
     while module.tvehicle.rainbow_neons.bool[0] do
         
         if module.tvehicle.rainbow_neons.traffic[0] then -- Player + Traffic  
         
             for hveh in fcommon.pool("veh") do
-                InstallNeon(hveh,{HSLtoRGB(hue,module.tvehicle.rainbow_neons.saturation[0],module.tvehicle.rainbow_neons.light[0])})   
+                InstallNeon(hveh,{Rainbow(module.tvehicle.rainbow_neons.speed[0])})    
             end        
             
         else -- Only Player
             if isCharInAnyCar(PLAYER_PED) then
                 local hveh = getCarCharIsUsing(PLAYER_PED)
-                InstallNeon(hveh,{HSLtoRGB(hue,module.tvehicle.rainbow_neons.saturation[0],module.tvehicle.rainbow_neons.light[0])})   
+                InstallNeon(hveh,{Rainbow(module.tvehicle.rainbow_neons.speed[0])})   
             else -- function not needed at this time
                 break
             end
         end
-
-        if hue >= 1 then
-            hue =  0
-        else
-            hue = hue + 0.01
-        end
-        wait(module.tvehicle.rainbow_neons.wait_time[0])
+        
+        wait(0)
     end
 end
 
@@ -1188,9 +1149,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                         fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
                     end)
                     imgui.Dummy(imgui.ImVec2(0,20))
-                    imgui.SliderFloat("Luminosidade",module.tvehicle.rainbow_colors.light,0,1)
-                    imgui.SliderFloat("Saturação",module.tvehicle.rainbow_colors.saturation,0,1)
-                    imgui.SliderInt("Tempo",module.tvehicle.rainbow_colors.wait_time,0,1000)
+                    imgui.SliderFloat("Velocidade",module.tvehicle.rainbow_colors.speed,0,2)
                 end)
                 fcommon.CheckBoxVar("Neons aleatórios",module.tvehicle.rainbow_neons.bool,"Neons aleatórios no veículo do jogador.",function()
                     fcommon.SingletonThread(module.RainbowNeons,"RainbowNeons")
@@ -1201,17 +1160,15 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                         fcommon.SingletonThread(module.RainbowNeons,"RainbowNeons")
                     end)
                     imgui.Dummy(imgui.ImVec2(0,20))
-                    imgui.SliderFloat("Luminosidade",module.tvehicle.rainbow_neons.light,0,1)
-                    imgui.SliderFloat("Saturação",module.tvehicle.rainbow_neons.saturation,0,1)
-                    imgui.SliderInt("Tempo",module.tvehicle.rainbow_neons.wait_time,0,1000)
+                    imgui.SliderFloat("Velocidade",module.tvehicle.rainbow_neons.speed,0,2)
                 end)
                 imgui.Columns(1)
                 imgui.Spacing()
                 
-                if imgui.ColorEdit3("Cores",module.tvehicle.color.rgb) then
+                if imgui.ColorEdit3("Cor",module.tvehicle.color.rgb) then
                     ApplyColor()
                 end
-                fcommon.ConfigPanel("Cores",function()
+                fcommon.ConfigPanel("Cor",function()
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
