@@ -1033,7 +1033,7 @@ function module.BeginTabBar(label)
         imgui.EndChild()
         imgui.Spacing()
     end
-
+    imgui.BeginChild("##TabStuff" .. label)
     return true
 end
 
@@ -1089,7 +1089,8 @@ function DrawTabElements(draw_list,label)
 end
 
 function module.EndTabItem(label) end 
-function module.EndTabBar(label) 
+function module.EndTabBar(label)
+    imgui.EndChild() 
     _tabs.current_bar = nil
 end
 

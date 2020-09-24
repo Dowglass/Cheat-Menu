@@ -236,8 +236,8 @@ function module.WeaponMain()
         end
     end
     
-    if fcommon.BeginTabBar('Weapons') then
-        if fcommon.BeginTabItem('Checkboxes') then
+    if fcommon.BeginTabBar('Armas') then
+        if fcommon.BeginTabItem('Caixas de seleção') then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComando: \nQ = esquerda | E = direita",
             function()
@@ -345,6 +345,7 @@ function module.WeaponMain()
             fcommon.DrawEntries(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.IMAGE,module.GiveWeapon,nil,module.GetModelName,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH)
 
         end
+        fcommon.EndTabBar()
     end
 end
 return module

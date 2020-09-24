@@ -202,17 +202,21 @@ function module.ChangePlayerCloth(name,dont_show_msg)
     dont_show_msg = dont_show_msg or false
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
-    setPlayerModel(PLAYER_HANDLE,0)
-    
-    -- char[] Overflow ?
+    if getCharModel(PLAYER_PED) ~= 0 then
+        setPlayerModel(PLAYER_HANDLE,0)
+    end
+
     if texture == "cutoffchinosblue" then
         givePlayerClothes(PLAYER_HANDLE,-697413025,744365350,body_part)
     else 
         if texture == "sneakerbincblue" then
             givePlayerClothes(PLAYER_HANDLE,-915574819,-2099005073,body_part)
         else
-            givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
-            givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
+            if texture == "12myfac" then
+                givePlayerClothes(PLAYER_HANDLE,-1750049245,1393983095,body_part)
+            else
+                givePlayerClothes(PLAYER_HANDLE,getHashKey(texture),getHashKey(model),body_part)
+            end
         end
     end
     
@@ -279,7 +283,7 @@ function module.PlayerMain()
         if fcommon.BeginTabItem("Caixas de seleção") then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
-            fcommon.CheckBoxValue("Recompensa na cabeça",0x96913F)
+            fcommon.CheckBoxValue("Recompensa por ser morto",0x96913F)
             fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,fcommon.SingletonThread(module.RegenerateHealth,"RegenerateHealth"),
             function()
                 imgui.SliderInt("Valor para regenerar", module.tplayer.health_regeneration.increment_value, 0, 25)
@@ -320,26 +324,46 @@ function module.PlayerMain()
         if fcommon.BeginTabItem("Menus") then
             fcommon.UpdateAddress({name = "Colete",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
             fcommon.DropDownMenu("Corpo",function()
-                if imgui.RadioButtonIntPtr("Gordo",module.tplayer.cjBody,1) then
-                    callFunction(0x439110,1,1,false)
-                    fconfig.Set(fconfig.tconfig.misc_data,"Body",1)
-                    fcommon.CheatActivated()
-                end
-                if imgui.RadioButtonIntPtr("Musculoso",module.tplayer.cjBody,2) then
-                    -- body not changing to muscular after changing to fat fix
-                    callFunction(0x439190,1,1,false)
-                    callFunction(0x439150,1,1,false)
-                    fconfig.Set(fconfig.tconfig.misc_data,"Body",2)
-                    fcommon.CheatActivated()
-                end
-                if imgui.RadioButtonIntPtr("Magro",module.tplayer.cjBody,3) then
-                    callFunction(0x439190,1,1,false)
-                    fconfig.Set(fconfig.tconfig.misc_data,"Body",3)
-                    fcommon.CheatActivated()
-                end
-                if imgui.RadioButtonIntPtr("Nenhum",module.tplayer.cjBody,0) then
-                    fconfig.Set(fconfig.tconfig.misc_data,"Body",0)
-                    fcommon.CheatActivated()
+                if getCharModel(PLAYER_PED) == 0 then
+                    if imgui.RadioButtonIntPtr("Gordo",module.tplayer.cjBody,1) then
+                        callFunction(0x439110,1,1,false)
+                        fconfig.Set(fconfig.tconfig.misc_data,"Body",1)
+                        fcommon.CheatActivated()
+                    end
+                    if imgui.RadioButtonIntPtr("Musculoso",module.tplayer.cjBody,2) then
+                        -- body not changing to muscular after changing to fat fix
+                        callFunction(0x439190,1,1,false)
+                        callFunction(0x439150,1,1,false)
+                        fconfig.Set(fconfig.tconfig.misc_data,"Body",2)
+                        fcommon.CheatActivated()
+                    end
+                    if imgui.RadioButtonIntPtr("Magro",module.tplayer.cjBody,3) then
+                        callFunction(0x439190,1,1,false)
+                        fconfig.Set(fconfig.tconfig.misc_data,"Body",3)
+                        fcommon.CheatActivated()
+                    end
+                    if imgui.RadioButtonIntPtr("Nenhum",module.tplayer.cjBody,0) then
+                        fconfig.Set(fconfig.tconfig.misc_data,"Body",0)
+                        fcommon.CheatActivated()
+                    end      
+                else
+                    imgui.TextWrapped("Você precisa estar com a skin do CJ para trocar de roupa.")
+                    imgui.Spacing()
+                    if imgui.Button("Mudar para a skin do CJ",imgui.ImVec2(fcommon.GetSize(1))) then                   
+                        setPlayerModel(PLAYER_HANDLE,0)
+
+                        local veh = nil
+                        local speed = 0
+                        if isCharInAnyCar(PLAYER_PED) then
+                            veh = getCarCharIsUsing(PLAYER_PED)
+                            speed = getCarSpeed(veh)
+                        end
+                        clearCharTasksImmediately(PLAYER_PED)
+                        if veh ~= nil then
+                            taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
+                            setCarForwardSpeed(veh,speed)
+                        end
+                    end
                 end
             end)
             fcommon.UpdateStat({ name = "Energia",stat = 165})
@@ -429,15 +453,17 @@ Nota:\nOs nomes dos arquivos não podem exceder de 8 caracteres.\nNão mude os n
                             imgui.EndChild()
                         end
                     else
+                        imgui.TextWrapped("O Modloader não está instalado. Por favor, instale o modloader.")
+                        imgui.Spacing()
                         if imgui.Button("Baixar Modloader",imgui.ImVec2(fcommon.GetSize(1))) then
                             os.execute('explorer "https://gtaforums.com/topic/669520-mod-loader/"')
                         end
-                        imgui.Spacing()
-                        imgui.TextWrapped("O Modloader não está instalado. Por favor, instale o modloader.")
                     end
                 end
+                fcommon.EndTabBar()
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

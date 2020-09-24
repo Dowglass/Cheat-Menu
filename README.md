@@ -9,14 +9,13 @@
 [![Discord](https://img.shields.io/discord/689515979847237649?label=Discord&style=for-the-badge)](https://discord.gg/ZzW7kmf)
 
 [![MixMods](https://img.shields.io/badge/Topic-Mixmods-%234e4784?style=for-the-badge)](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu)
-[![GTAF](https://img.shields.io/badge/Topic-GTA%20Forums-%23244052?style=for-the-badge)](https://gtaforums.com/topic/930023-mooncheat-menu/)
+[![GTAF](https://img.shields.io/badge/Topic-GTA%20Forums-%23244052?style=for-the-badge)](https://gtaforums.com/topic/961636-moon-cheat-menu/)
 ## Introdução
 
-Cheat Menu é um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
+O Cheat Menu permite que um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
+
 
 É baseado no [Moonloader](https://gtaforums.com/topic/890987-moonloader/) e usa [mimgui](https://github.com/THE-FYP/mimgui) como interface.
-
-Pressione <kbd>Ctrl</kbd> + <kbd>M</kbd> para abrir. <b>Não funciona no SAMP</b>.
 
 ## Versões oficiais
 
@@ -24,7 +23,11 @@ Pressione <kbd>Ctrl</kbd> + <kbd>M</kbd> para abrir. <b>Não funciona no SAMP</b
 [Releases](https://github.com/inanahammad/Cheat-Menu/releases) são as versões atualizadas e estáveis. Se você deseja uma experiência tranquila com o mínimo de erros possível, esse e o recomendado.
 
 ### Master Branch
-[Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu. Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
+[Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu e é traduzida [aqui](https://github.com/Dowglass/Cheat-Menu). Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
+
+### Cheat menu
+[Cheat menu](https://github.com/user-grinch/Cheat-Menu) versão oficial.
+
 
 ## Instalação:
 
@@ -41,33 +44,32 @@ No jogo, pressione CRTL+M para abrir. Se não funcionar, crie uma postagem em um
 Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lugar. Coloque o link do [repositório oficial](https://github.com/user-grinch/Cheat-Menu). Isso ajudará o autor a fornecer um melhor suporte e desenvolvimento. Também seria ótimo se você mantivesse o nome do autor (Grinch_) na descrição do seu vídeo.
 
 ## Imagens (EN)
-![Image](https://i.imgur.com/XPbm13b.jpg)
-![Image](https://i.imgur.com/GabImU1.jpg)
-![Image](https://i.imgur.com/pCpsX2v.jpg)
-![Image](https://i.imgur.com/fu7nzjc.jpg)
-![Image](https://i.imgur.com/I9pxh9d.jpg)
-![Image](https://i.imgur.com/iGSOZzR.jpg)
-![Image](https://i.imgur.com/c1Nnuqn.jpg)
-![Image](https://i.imgur.com/2Feogff.jpg)
-![Image](https://i.imgur.com/DnsXweQ.jpg)
-![Image](https://i.imgur.com/MwmZqjM.jpg)
-(Em breve a versão em PT-BR).
+![1](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/teleport.gif)
+![2](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/player.gif)
+![3](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/ped.gif)
+![4](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/animation.gif)
+![5](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/vehicle.gif)
+![6](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/weapon.gif)
+![7](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/game.gif)
+![8](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/visual.gif)
+![9](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/menu.gif)
+(By: Grinch_).
 
-## Documentos 
+## Documentação 
 
 ### Adicionando imagens personalizadas de peds/skin - jpg
 
-Imagens de ped/skin são carregadas em '\moonloader\lib\cheat-menu\peds\' .O nome da imagem deve conter o ID do modelo ped. Os nomes dos peds personalizados devem ser adicionados no arquivo ped.json em '\moonloader\lib\cheat-menu\json\ped.json'.
+Imagens de ped/skin são carregadas em '\moonloader\lib\cheat-menu\peds\'. O nome da imagem deve conter o ID do modelo ped. Os nomes dos peds personalizados devem ser adicionados no arquivo ped.json em '\moonloader\lib\cheat-menu\json\ped.json'.
 
-### Adicionando skin de jogador personalizado #2
+### Adicionando skins personalizadas #2
 
-Você também pode adicionar skins de jogadores usando um método diferente. Coloque os arquivos txd e dff dentro da pasta 'modloader\Custom Skins\'. Nota, o uso do [Modloader](https://gtaforums.com/topic/669520-mod-loader/) é obrigatório e os nomes não podem exceder de 8 caracteres.
+Você também pode adicionar skins de jogadores (semelhante ao skin selector). Coloque os arquivos txd e dff dentro da pasta 'modloader\Custom Skins\'. Nota, o uso do [Modloader](https://gtaforums.com/topic/669520-mod-loader/) é obrigatório e os nomes não podem exceder de 8 caracteres.
 
 ### Adicionando imagens de veículo personalizadas - jpg
 
 As imagens do veículo são carregadas em '\moonloader\lib\cheat-menu\vehicles\images\'. O nome da imagem deve conter o ID do modelo do veículo. Você não precisa adicionar nomes de veículos personalizados na v2.0-beta e adiante.
 
-### Adicionando imagens personalizadas de componentes de veículos - jpg
+### Adicionando imagens personalizadas nos componentes de veículos - jpg
 
 As imagens dos componentes do veículo são carregadas em '\moonloader\lib\cheat-menu\vehicles\component\'. O nome da imagem deve conter o ID do modelo do componente.
 

@@ -1041,7 +1041,6 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                     end
                     
                 end)
-                fcommon.UpdateAddress({name = 'Quantidade de nitro',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
                 fcommon.DropDownMenu("Definir nome",function()
 
                     imgui.Text(string.format( "Nome do carro = %s",casts.CModelInfo.GetNameFromModel(getCarModel(car))))
@@ -1069,7 +1068,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                     imgui.InputInt("Definir",module.tvehicle.speed)
                      
                     imgui.Spacing()
-                    if imgui.Button("Definir velocidade",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if imgui.Button("Definir velocidade##brn",imgui.ImVec2(fcommon.GetSize(2))) then
                         if isCharInAnyCar(PLAYER_PED) then
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,module.tvehicle.speed[0])
@@ -1165,14 +1164,14 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                 imgui.Columns(1)
                 imgui.Spacing()
                 
-                if imgui.ColorEdit3("Cor",module.tvehicle.color.rgb) then
+                if imgui.ColorEdit3("Cores",module.tvehicle.color.rgb) then
                     ApplyColor()
                 end
                 fcommon.ConfigPanel("Cor",function()
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
-                    fcommon.CheckBoxVar("Mostrar todas as cores do carcol", module.tvehicle.color.show_all)
+                    fcommon.CheckBoxVar("Mostrar todas as cores", module.tvehicle.color.show_all)
                     imgui.Spacing()
                     
                     local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
@@ -1464,6 +1463,7 @@ arquivo de dados com esses valores alterados aqui.")
                 imgui.TextWrapped("O jogador precisa estar dentro de um veículo para que as opções apareçam aqui.")
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

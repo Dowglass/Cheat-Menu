@@ -527,6 +527,7 @@ a internet para baixar arquivos do github.")
 			end
 			imgui.Columns(1)
 		end
+		fcommon.EndTabBar()
 	end
 end
 
