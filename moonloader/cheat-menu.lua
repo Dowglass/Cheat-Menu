@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.1 (PT-BR)")
-script_version_number(2020092401) -- YYYYMMDDNN
+script_version("2.2-beta (PT-BR)")
+script_version_number(2020100101) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -229,7 +229,7 @@ function(self) -- render frame
         end
         imgui.SameLine()
         if imgui.Button("Ver changelog",imgui.ImVec2(fcommon.GetSize(3))) then
-            if string.find( script.this.version,"beta") then
+            if fmenu.tmenu.get_beta_updates[0] then
                 os.execute('explorer "https://github.com/Dowglass/Cheat-Menu/commits/master"')
             else
                 os.execute('explorer "https://github.com/Dowglass/Cheat-Menu/releases/tag/' .. fmenu.tmenu.repo_version ..'"')
@@ -354,6 +354,11 @@ function()
 
     imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(0,0))
+    
+    if fmenu.tmenu.overlay.transparent_bg[0] then 
+        imgui.PushStyleColor(imgui.Col.WindowBg,imgui.ImVec4(0,0,0,0))
+    end
+
     imgui.Begin("Overlay", nil, flags)
     
     if fmenu.tmenu.overlay.fps[0] then
@@ -382,6 +387,10 @@ function()
         imgui.Text(string.format("Coordenadas: %d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
     end
 
+    if fmenu.tmenu.overlay.transparent_bg[0] then 
+        imgui.PopStyleColor()
+    end
+
     imgui.PopStyleVar(2)
 
        --------------------------------------------------
@@ -405,6 +414,10 @@ function()
         end
         if imgui.MenuItemBool("Inferior direito",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
             fmenu.tmenu.overlay.position_index[0] = 4 
+        end
+        imgui.Separator()
+        if imgui.MenuItemBool("Sem fundo",nil,fmenu.tmenu.overlay.transparent_bg[0]) then 
+            fmenu.tmenu.overlay.transparent_bg[0] = not fmenu.tmenu.overlay.transparent_bg[0]
         end
         if imgui.MenuItemBool("Fechar") then
             fmenu.tmenu.overlay.fps[0] = false
