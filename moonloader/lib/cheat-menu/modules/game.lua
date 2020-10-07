@@ -34,11 +34,7 @@ module.tgame                =
         ["0x8a5a98"] = 598, -- policelv
         ["0x8a8a9c"] = 523, -- policebike
     },
-    day                     =
-    {    
-        names               = {"Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"},
-        array               = {},
-    },    
+    day_names               = {"Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"},    
     disable_cheats          = imgui.new.bool(fconfig.Get('tgame.disable_cheats',false)),
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
     disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
@@ -90,9 +86,6 @@ module.tgame                =
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
     sync_system_time        = imgui.new.bool(fconfig.Get('tgame.sync_system_time',false)), 
 }
-
-module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
-
 
 function module.SolidWater()
     while module.tgame.solid_water[0] do
@@ -154,15 +147,15 @@ function module.CameraMode()
             if total_mouse_y < -150 then total_mouse_y = -150 end
             
 
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_slow[1] and fmenu.tmenu.hot_keys.camera_mode_slow[2]) then 
                 factor = factor*0.5
             end
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_fast[1] and fmenu.tmenu.hot_keys.camera_mode_fast[2]) then 
                 factor = factor*2
             end
 
 
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_forward[1] and fmenu.tmenu.hot_keys.camera_mode_forward[2]) then 
                 local angle = getCharHeading(ped) + 90
 
                 x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
@@ -170,7 +163,7 @@ function module.CameraMode()
                 z = z + module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
             end
     
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_backward[1] and fmenu.tmenu.hot_keys.camera_mode_backward[2]) then 
                 local angle = getCharHeading(ped) + 90
                 
                 x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
@@ -178,14 +171,14 @@ function module.CameraMode()
                 z = z - module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
             end
 
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_left[1] and fmenu.tmenu.hot_keys.camera_mode_left[2]) then 
                 local angle = getCharHeading(ped)
                 
                 x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
                 y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
             end
 
-            if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
+            if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_right[1] and fmenu.tmenu.hot_keys.camera_mode_right[2]) then 
                 local angle = getCharHeading(ped)
                 
                 x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
@@ -210,34 +203,34 @@ function module.CameraMode()
                     if total_mouse_y < -170 then total_mouse_y = -170 end
                     factor = 1
                     
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_slow[1] and fmenu.tmenu.hot_keys.camera_mode_slow[2]) then 
                         factor = factor*0.5
                     end
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_fast[1] and fmenu.tmenu.hot_keys.camera_mode_fast[2]) then 
                         factor = factor*2
                     end
 
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_forward[1] and fmenu.tmenu.hot_keys.camera_mode_forward[2]) then 
                         front = front + factor * module.tgame.camera.movement_speed[0]
                     end
     
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_backward[1] and fmenu.tmenu.hot_keys.camera_mode_backward[2]) then 
                         front = front - factor * module.tgame.camera.movement_speed[0]
                     end
 
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_left[1] and fmenu.tmenu.hot_keys.camera_mode_left[2]) then 
                         right = right - factor * module.tgame.camera.movement_speed[0]
                     end
     
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_right[1] and fmenu.tmenu.hot_keys.camera_mode_right[2]) then 
                         right = right + factor * module.tgame.camera.movement_speed[0]
                     end
 
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_up[1] and tcheatmenu.hot_keys.camera_mode_up[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_up[1] and fmenu.tmenu.hot_keys.camera_mode_up[2]) then 
                         up = up - factor * module.tgame.camera.movement_speed[0]
                     end
     
-                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_down[1] and tcheatmenu.hot_keys.camera_mode_down[2]) then 
+                    if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_down[1] and fmenu.tmenu.hot_keys.camera_mode_down[2]) then 
                         up = up + factor * module.tgame.camera.movement_speed[0]
                     end
                     attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 90.0, total_mouse_y, 0.0, 2)
@@ -304,7 +297,7 @@ function module.RandomCheatsActivate()
         
         if not module.tgame.random_cheats.checkbox[0] then break end
 
-        cheatid = math.random(0,91)
+        local cheatid = math.random(0,91)
         callFunction(0x438370,1,1,cheatid)
         table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
         printHelpString("~g~" .. module.tgame.random_cheats.cheat_name[tostring(cheatid)][1])
@@ -458,7 +451,7 @@ function ShowLoadedScript(script,index)
         end
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Autor: ")
+        imgui.Text("Autores: ")
         imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(string.sub(authors,1,-3))
         imgui.Text("Versão: " .. tostring(script.version))
@@ -484,7 +477,7 @@ function ShowLoadedScript(script,index)
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(string.sub(dependencies,1,-3))
         end
-        if description ~= "" then
+        if script.description ~= "" then
             imgui.Spacing()
             imgui.SameLine()
             imgui.Text("Descrição: ")
@@ -497,9 +490,10 @@ function ShowLoadedScript(script,index)
             file_name = file_name:sub(1,-16)
         end
 
-        tcheatmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  tcheatmenu.hot_keys.script_manager_temp
+        fmenu.tmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  fmenu.tmenu.hot_keys.script_manager_temp
 
-        fcommon.HotKey("Tecla para carregar",tcheatmenu.hot_keys.script_manager_temp,fcommon.GetSize(3))
+        fcommon.HotKey("Atalho para carregar o script",fmenu.tmenu.hot_keys.script_manager_temp,fcommon.GetSize(3))
+        fcommon.InformationTooltip("Carregue e descarregue este script \npressionando esta tecla de atalho.")
         imgui.Spacing()
         
         if imgui.Button("Nunca carregar##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
@@ -513,8 +507,8 @@ function ShowLoadedScript(script,index)
             if script.name == thisScript().name then
                 printHelpString("Nao e possivel definir no Cheat Menu!")
             else
-                module.tgame.script_manager.scripts[file_name] = {tcheatmenu.hot_keys.script_manager_temp[1],tcheatmenu.hot_keys.script_manager_temp[2]}
-                printHelpString("Carregar script pressionando a tecla")
+                module.tgame.script_manager.scripts[file_name] = {fmenu.tmenu.hot_keys.script_manager_temp[1],fmenu.tmenu.hot_keys.script_manager_temp[2]}
+                printHelpString("Atalho para carregar o script.")
 
                 if not script.path:match(".loadonkeypress") then
                     os.rename(script.path,script.path.. ".loadonkeypress")
@@ -541,26 +535,6 @@ function ShowLoadedScript(script,index)
     end)
 end
 
-function FollowPed(ped)
-    local total_mouse_x = 0
-    local total_mouse_y = 0
-    while true do
-        if not doesCharExist(ped) then
-            restoreCamera()
-            break
-        end
-        local x,y,z = getCharCoordinates(ped)
-        local mouseX,mouseY = getPcMouseMovement()
-        total_mouse_x = total_mouse_x + mouseX
-        total_mouse_y = total_mouse_y + mouseY
-        
-        if doesCharExist(ped) then
-            attachCameraToChar(ped,0.0,-2,3.0,0.0,total_mouse_x/20,total_mouse_y/20,0.0,2)
-        end
-        wait(0)
-    end
-end
-
 function SpawnObject(model,obj_name,grp_name,x,y,z)
     
     if isModelAvailable(model) and casts.CBaseModelInfo.GetModelType(model) == fconst.MODEL_TYPE.ATOMIC then
@@ -574,6 +548,7 @@ function SpawnObject(model,obj_name,grp_name,x,y,z)
         if module.tgame.object_spawner.placed[grp_name] == nil then
             module.tgame.object_spawner.placed[grp_name] = {}
         end
+
         module.tgame.object_spawner.placed[grp_name][string.format("%d##%d",model,obj)] = 
         {
             name = obj_name,
@@ -641,14 +616,14 @@ function module.GameMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Modo câmera",module.tgame.camera.bool,string.format("Atalho: %s\n\nPara frente: %s\tPara trás: %s\
 Esquerda: %s\t\tDireita: %s\n\nMovimento lento: %s\nMovimento rápido: %s\n\nRotação: Mouse\nZoom Cima/Baixo : Roda do mouse \n\
-Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_right),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_fast),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_up),
-            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),
+Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode),
+            fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_backward),
+            fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_right),
+            fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_fast),
+            fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_up),
+            fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_down)),
             function()
-                fcommon.SingletonThread(module.CameraMode,"CameraMode")
+                fcommon.CreateThread(module.CameraMode)
             end,
             function()
                 fcommon.CheckBoxVar("Travar câmera",module.tgame.camera.lock_on_player,"Trava a câmera no jogador.")
@@ -688,9 +663,9 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
             fcommon.CheckBoxVar("Desativar cheats",module.tgame.disable_cheats,nil,
             function()
                 if module.tgame.disable_cheats[0] then
-                    writeMemory(0x004384D0 ,1,0xE9 ,false)
-                    writeMemory(0x004384D1 ,4,0xD0 ,false)
-                    writeMemory(0x004384D5 ,4,0x90909090 ,false)
+                    writeMemory(0x4384D0 ,1,0xE9 ,false)
+                    writeMemory(0x4384D1 ,4,0xD0 ,false)
+                    writeMemory(0x4384D5 ,4,0x90909090 ,false)
                     fcommon.CheatActivated()
                 else
                     writeMemory(0x4384D0 ,1,0x83,false)
@@ -701,7 +676,7 @@ Cima : %s (Câmera travada)\nBaixo: %s (Câmera travada)",fcommon.GetHotKeyNames
             end)
             fcommon.CheckBoxVar("Desativar caixas de ajuda",module.tgame.disable_help_popups,"Desativa caixas de ajua após ser preso ou morto\nem um novo jogo.",
             function()
-                tcheatmenu.window.restart_required = true
+                tcheatmenu.restart_required = true
             end)
             fcommon.CheckBoxValue('Pay n Spray Grátis',0x96C009)
             fcommon.CheckBoxVar("Parar tempo em missão",module.tgame.freeze_mission_timer,nil,function()
@@ -737,7 +712,7 @@ cidades sem completar missões.",
 
             fcommon.CheckBoxVar("Parar relógio",module.tgame.freeze_time,nil,
             function()
-                fcommon.SingletonThread(module.FreezeTime,"FreezeTime")
+                fcommon.CreateThread(module.FreezeTime)
             end)
 
             fcommon.CheckBoxVar("Ghost cop vehicles",module.tgame.ghost_cop_cars,nil,function()        
@@ -755,12 +730,12 @@ cidades sem completar missões.",
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end)
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats.checkbox,"Ativa cheats aleatoriamente em um determinado tempo.",function()
-                fcommon.SingletonThread(fgame.RandomCheatsActivate,"RandomCheatsActivate")
+                fcommon.CreateThread(fgame.RandomCheatsActivate)
             end,
             function()
                 fcommon.CheckBoxVar('Desativar cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Desativar cheats ativados em um determinado tempo.",
                 function()
-                    fcommon.SingletonThread(fgame.RandomCheatsDeactivate,"RandomCheatsDeactivate")
+                    fcommon.CreateThread(fgame.RandomCheatsDeactivate)
                 end)
                 imgui.Spacing()
                 imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
@@ -786,25 +761,25 @@ cidades sem completar missões.",
                     imgui.EndChild()
                 end
             end)
-            fcommon.CheckBoxVar('Captura de tela',module.tgame.ss_shortcut,"Tire uma captura de tela usando" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
+            fcommon.CheckBoxVar('Captura de tela',module.tgame.ss_shortcut,"Tire uma captura de tela usando" .. fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.quick_screenshot))
             fcommon.CheckBoxVar('Água sólida',module.tgame.solid_water,nil,
             function()
-                fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
+                fcommon.CreateThread(fgame.SolidWater)
             end)
             fcommon.CheckBoxVar('Sincronizar horário do sistema',module.tgame.sync_system_time,nil,
             function()
-                fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
+                fcommon.CreateThread(fgame.SyncSystemTime)
             end)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem('Menus') then
             if imgui.BeginChild("MenusChild") then
-                fcommon.DropDownMenu('Dia da Semana',function()
-                    local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
+                fcommon.DropDownMenu('Dia da semana',function()
+                    local current_day = imgui.new.int(readMemory(0xB7014E,1,false))
                     imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-                    if imgui.Combo("Dia", current_day,module.tgame.day.array,#module.tgame.day.names) then
-                        writeMemory(0xB7014E,1,current_day[0]+1,false)
+                    if fcommon.DropDownListNumber("Dia",module.tgame.day_names,current_day) then
+                        writeMemory(0xB7014E,1,current_day[0],false)
                         fcommon.CheatActivated()
                     end
                 end)
@@ -928,7 +903,7 @@ cidades sem completar missões.",
             imgui.Spacing()
             local width = imgui.GetWindowContentRegionWidth()
             imgui.SetNextItemWidth(width/2)
-            fcommon.DropDownList("##Lista",module.tgame.script_manager.categories,module.tgame.script_manager.selected,
+            fcommon.DropDownListStr("##List",module.tgame.script_manager.categories,module.tgame.script_manager.selected,
             function(key,val) 
                 module.tgame.script_manager.selected = key
             end)
@@ -1003,7 +978,7 @@ cidades sem completar missões.",
                     imgui.Spacing()
                     local width = imgui.GetWindowContentRegionWidth()
                     imgui.SetNextItemWidth(width/2)
-                    fcommon.DropDownList("##Lista",module.tgame.object_spawner.categories,module.tgame.object_spawner.selected,
+                    fcommon.DropDownListStr("##List",module.tgame.object_spawner.categories,module.tgame.object_spawner.selected,
                     function(key,val) 
                         module.tgame.object_spawner.selected = key
                     end)

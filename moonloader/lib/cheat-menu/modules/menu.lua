@@ -37,6 +37,24 @@ module.tmenu =
 		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
 	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',true)),
+	hot_keys     =
+    {
+        asc_key               = fconfig.Get('tmenu.hot_keys.asc_key',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
+        camera_mode           = fconfig.Get('tmenu.hot_keys.camera_mode',{vkeys.VK_LMENU,vkeys.VK_C}),
+        camera_mode_forward   = fconfig.Get('tmenu.hot_keys.camera_mode_forward',{vkeys.VK_I,vkeys.VK_I}),
+        camera_mode_backward  = fconfig.Get('tmenu.hot_keys.camera_mode_backward',{vkeys.VK_K,vkeys.VK_K}),
+        camera_mode_left      = fconfig.Get('tmenu.hot_keys.camera_mode_left',{vkeys.VK_J,vkeys.VK_J}),
+        camera_mode_right     = fconfig.Get('tmenu.hot_keys.camera_mode_right',{vkeys.VK_L,vkeys.VK_L}),
+        camera_mode_slow      = fconfig.Get('tmenu.hot_keys.camera_mode_slow',{vkeys.VK_RCONTROL,vkeys.VK_RCONTROL}),
+        camera_mode_fast      = fconfig.Get('tmenu.hot_keys.camera_mode_fast',{vkeys.VK_RSHIFT,vkeys.VK_RSHIFT}),
+        camera_mode_up        = fconfig.Get('tmenu.hot_keys.camera_mode_up',{vkeys.VK_O,vkeys.VK_O}),
+        camera_mode_down      = fconfig.Get('tmenu.hot_keys.camera_mode_down',{vkeys.VK_P,vkeys.VK_P}),
+        command_window        = fconfig.Get('tmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
+        menu_open             = fconfig.Get('tmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
+        quick_screenshot      = fconfig.Get('tmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
+        quick_teleport        = fconfig.Get('tmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
+        script_manager_temp   = {vkeys.VK_LCONTROL,vkeys.VK_1}
+    },
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -120,7 +138,7 @@ function module.RegisterAllCommands()
 	end,"Define o horário no jogo","{hora} {minuto}")
 	
 	module.RegisterCommand("cheatmenu",function(t)
-        tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+        tcheatmenu.show[0] = not tcheatmenu.show[0]
     end,"Abre ou fecha o cheat menu")
 
     module.RegisterCommand("sethealth",function(t)
@@ -155,7 +173,7 @@ function module.RegisterAllCommands()
 
 	module.RegisterCommand("cameramode",function(t)
 		fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
-		fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
+		fcommon.CreateThread(fgame.CameraMode)
 	end,"Ativa ou desativa o modo de câmera")
 	
 	module.RegisterCommand("veh",function(t)
@@ -200,37 +218,7 @@ function module.RegisterAllCommands()
     end,"Criar arma","{nome da arma}")
 end
 --------------------------------------------------
-
-function module.httpRequest(request, body, handler) -- copas.http
-    -- start polling task
-    if not copas.running then
-        copas.running = true
-        lua_thread.create(function()
-            wait(0)
-            while not copas.finished() do
-                local ok, err = copas.step(0)
-                if ok == nil then error(err) end
-                wait(0)
-            end
-            copas.running = false
-        end)
-    end
-    -- do request
-    if handler then
-        return copas.addthread(function(r, b, h)
-            copas.setErrorHandler(function(err) h(nil, err) end)
-            h(http.request(r, b))
-        end, request, body, handler)
-    else
-        local results
-        local thread = copas.addthread(function(r, b)
-            copas.setErrorHandler(function(err) results = {nil, err} end)
-            results = table.pack(http.request(r, b))
-        end, request, body)
-        while coroutine.status(thread) ~= 'dead' do wait(0) end
-        return table.unpack(results)
-    end
-end
+-- Updater code
 
 function module.CheckUpdates()
 	
@@ -295,6 +283,33 @@ function module.DownloadUpdate()
 	module.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
 end
 
+function module.InstallUpdate()
+	fmenu.tmenu.update_status = fconst.UPDATE_STATUS.HIDE_MSG
+	fgame.tgame.script_manager.skip_auto_reload = true
+	ziplib.zip_extract(tcheatmenu.dir .. "update.zip",tcheatmenu.dir,nil,nil)
+	
+	local dir = tcheatmenu.dir
+
+	if fmenu.tmenu.get_beta_updates[0] then
+		dir = dir .. "\\Cheat-Menu-master\\"
+	else
+		dir = dir .. "\\Cheat-Menu-" .. fmenu.tmenu.repo_version .. "\\"
+	end
+
+	fcommon.MoveFiles(dir,getGameDirectory())
+	
+	os.remove(tcheatmenu.dir .. "update.zip")
+
+	-- Delete the old config file too, causes crash?
+	os.remove(string.format(tcheatmenu.dir .. "/json/config.json"))
+	fconfig.tconfig.save_config = false
+
+	printHelpString("Atualizacao ~g~Instalada")
+	print("Atualizacao instalada! Recarregando script.")
+	thisScript():reload()
+end
+
+--------------------------------------------------
 
 function module.MenuMain()
 
@@ -312,14 +327,14 @@ function module.MenuMain()
 			end
 			imgui.Spacing()
 			imgui.PushItemWidth((imgui.GetWindowContentRegionWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
-			fcommon.DropDownList("##Selectfont",fmenu.tmenu.font.list,"Fonte - " ..fmenu.tmenu.font.selected,
+			fcommon.DropDownListStr("##Selectfont",fmenu.tmenu.font.list,"Font - " ..fmenu.tmenu.font.selected,
 			function(key,val)
 				imgui.GetIO().FontDefault = val
 				fmenu.tmenu.font.selected = key
 			end)
 			imgui.SameLine()
 			if imgui.SliderInt("##Fontsize", module.tmenu.font.size, 12, 48) then
-				tcheatmenu.window.restart_required = true
+				tcheatmenu.restart_required = true
 			end
 			imgui.PopItemWidth()
 			imgui.Dummy(imgui.ImVec2(0,5))
@@ -354,7 +369,7 @@ a internet para baixar arquivos do github.")
 			end
 			if fcommon.BeginTabItem('Comandos') then
 			module.tmenu.command.filter:Draw("Procurar")
-			fcommon.InformationTooltip(string.format("Abra a janela de comando usando %s\n e feche usando Enter.",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
+			fcommon.InformationTooltip(string.format("Abra a janela de comando usando %s\n e feche usando Enter.",fcommon.GetHotKeyNames(module.tmenu.hot_keys.command_window)))
 			imgui.Spacing()
 
 			if imgui.BeginChild("Command entries") then
@@ -378,26 +393,26 @@ a internet para baixar arquivos do github.")
 			local x,y = fcommon.GetSize(3)
 			y = y/1.2
 			
-			fcommon.HotKey("Abre/Fecha o cheat menu",tcheatmenu.hot_keys.menu_open)
-			fcommon.HotKey("Abre a janela de comandos",tcheatmenu.hot_keys.command_window)
+			fcommon.HotKey("Abre/Fecha o cheat menu",module.tmenu.hot_keys.menu_open)
+			fcommon.HotKey("Abre a janela de comandos",module.tmenu.hot_keys.command_window)
 
 			imgui.Dummy(imgui.ImVec2(0,10))
 
-			fcommon.HotKey("Ativa o 'aim skin changer'",tcheatmenu.hot_keys.asc_key)
-			fcommon.HotKey("Captura de tela",tcheatmenu.hot_keys.quick_screenshot)
-			fcommon.HotKey("Teleportar com 'Quick teleport'",tcheatmenu.hot_keys.quick_teleport)
+			fcommon.HotKey("Ativa o 'aim skin changer'",module.tmenu.hot_keys.asc_key)
+			fcommon.HotKey("Captura de tela",module.tmenu.hot_keys.quick_screenshot)
+			fcommon.HotKey("Teleportar com 'Quick teleport'",module.tmenu.hot_keys.quick_teleport)
 
 			imgui.Dummy(imgui.ImVec2(0,10))
 
-			fcommon.HotKey("Ativa/Desativa o modo câmera",tcheatmenu.hot_keys.camera_mode)
-			fcommon.HotKey("Câmera para frente",tcheatmenu.hot_keys.camera_mode_forward)
-			fcommon.HotKey("Câmera para trás",tcheatmenu.hot_keys.camera_mode_backward)
-			fcommon.HotKey("Câmera para esquerda",tcheatmenu.hot_keys.camera_mode_left)
-			fcommon.HotKey("Câmera para direita",tcheatmenu.hot_keys.camera_mode_right)
-			fcommon.HotKey("Movimento da câmera mais lento",tcheatmenu.hot_keys.camera_mode_slow)
-			fcommon.HotKey("Movimento da câmera mais rápido",tcheatmenu.hot_keys.camera_mode_fast)
-			fcommon.HotKey("Modo de câmera pra cima (Câmera travada)",tcheatmenu.hot_keys.camera_mode_up)
-			fcommon.HotKey("Modo de câmera pra baixo (Câmera travada)",tcheatmenu.hot_keys.camera_mode_down)
+			fcommon.HotKey("Ativa/Desativa o modo câmera",module.tmenu.hot_keys.camera_mode)
+			fcommon.HotKey("Câmera para frente",module.tmenu.hot_keys.camera_mode_forward)
+			fcommon.HotKey("Câmera para trás",module.tmenu.hot_keys.camera_mode_backward)
+			fcommon.HotKey("Câmera para esquerda",module.tmenu.hot_keys.camera_mode_left)
+			fcommon.HotKey("Câmera para direita",module.tmenu.hot_keys.camera_mode_right)
+			fcommon.HotKey("Movimento da câmera mais lento",module.tmenu.hot_keys.camera_mode_slow)
+			fcommon.HotKey("Movimento da câmera mais rápido",module.tmenu.hot_keys.camera_mode_fast)
+			fcommon.HotKey("Modo de câmera pra cima (Câmera travada)",module.tmenu.hot_keys.camera_mode_up)
+			fcommon.HotKey("Modo de câmera pra baixo (Câmera travada)",module.tmenu.hot_keys.camera_mode_down)
 			imgui.Dummy(imgui.ImVec2(0,10))
 
 			imgui.TextWrapped("Você pode redefinir essas configurações para o padrão no botão 'Configurações padrão' na guia 'Config'.")

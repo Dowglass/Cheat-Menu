@@ -272,8 +272,7 @@ function module.PlayerMain()
     imgui.SameLine()
     if imgui.Button("Suicídio",imgui.ImVec2(x,y)) then
         lua_thread.create(function()
-             --printHelpString("")
-             --wait(500)
+             ---printHelpString("")/wait(500)
             setCharHealth(PLAYER_PED,0)
         end)
     end
@@ -282,9 +281,15 @@ function module.PlayerMain()
     if fcommon.BeginTabBar("PlayerBar") then
         if fcommon.BeginTabItem("Caixas de seleção") then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Modo Deus",module.tplayer.god)
+            fcommon.CheckBoxVar("Modo Deus",module.tplayer.god,nil,
+            function()
+                if not module.tplayer.god[0] then
+                    writeMemory(0x96916D,1,0,false)
+                    setCharProofs(PLAYER_PED,false,false,false,false,false)
+                end
+            end)
             fcommon.CheckBoxValue("Recompensa por ser morto",0x96913F)
-            fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,fcommon.SingletonThread(module.RegenerateHealth,"RegenerateHealth"),
+            fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,fcommon.CreateThread(module.RegenerateHealth),
             function()
                 imgui.SliderInt("Valor para regenerar", module.tplayer.health_regeneration.increment_value, 0, 25)
                 imgui.SliderInt("Intervalo", module.tplayer.health_regeneration.interval, 0, 10000)
@@ -300,7 +305,7 @@ function module.PlayerMain()
             imgui.NextColumn()
             fcommon.CheckBoxVar("Manter posição",module.tplayer.keep_position,"Teleportar para o local em que você morreu.",
             function()
-                fcommon.SingletonThread(module.KeepPosition,"KeepPosition")
+                fcommon.CreateThread(module.KeepPosition)
             end)
             fcommon.CheckBoxValue("Bloquear controle do jogador",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Super pulo",0x96916C)
@@ -380,7 +385,7 @@ function module.PlayerMain()
         end
         if fcommon.BeginTabItem("Aparência") then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Ative usando: Mirando no ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
+            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Ative usando: Mirando no ped +".. fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.asc_key))
             imgui.NextColumn()
             fcommon.CheckBoxVar("Ativar salvamento", module.tplayer.enable_saving,"Salve & carregue roupas & skins de peds.\n(Roupas só funcionam com a skin do CJ) ")
             imgui.Columns(1)

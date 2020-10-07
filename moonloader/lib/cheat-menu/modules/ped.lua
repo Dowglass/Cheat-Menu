@@ -152,7 +152,7 @@ function module.PedMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Exibir saúde do ped",module.tped.ped_health_display,nil,
             function()
-                fcommon.SingletonThread(module.PedHealthDisplay,"PedHealthDisplay")
+                fcommon.CreateThread(module.PedHealthDisplay)
             end)
             fcommon.CheckBoxValue("Elvis em toda parte",0x969157)
             fcommon.CheckBoxValue("Todo mundo armado",0x969140)
