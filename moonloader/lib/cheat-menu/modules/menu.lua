@@ -29,7 +29,8 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
+	dont_save			= imgui.new.bool(fconfig.Get('tmenu.dont_save',false)),
+	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',true)),
 	font				=
 	{
 		list			= {},
@@ -134,7 +135,7 @@ function module.RegisterAllCommands()
 	
 	module.RegisterCommand("settime",function(t)
         setTimeOfDay(t[2],t[3])
-        printHelpString("Horario definido as")
+        printHelpString("Horario definido")
 	end,"Define o horário no jogo","{hora} {minuto}")
 	
 	module.RegisterCommand("cheatmenu",function(t)
@@ -143,12 +144,12 @@ function module.RegisterAllCommands()
 
     module.RegisterCommand("sethealth",function(t)
        setCharHealth(PLAYER_PED,tonumber(t[2]))
-       printHelpString("Saude definida como " .. t[2])
+       printHelpString("Saude definida " .. t[2])
 	end,"Define o valor da saúde do jogador","{valor}")
 	
     module.RegisterCommand("setmaxhealth",function(t)
         setCharMaxHealth(PLAYER_PED,tonumber(t[2]))
-        printHelpString("Saude maxima definida como " .. t[2])
+        printHelpString("Saude maxima definida" .. t[2])
 	end,"Define o valor máximo de vida do jogador","{saúde_max}")
 	
     module.RegisterCommand("copycoordinates",function(t)
@@ -161,7 +162,7 @@ function module.RegisterAllCommands()
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
             setCarForwardSpeed(car,tonumber(t[2]))
-            printHelpString("Velocidade do carro definida como " ..t[2])
+            printHelpString("Velocidade do carro definida" ..t[2])
         else
             printHelpString("O jogador nao esta no carro")
         end
@@ -341,11 +342,13 @@ function module.MenuMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
 			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
-a internet para baixar arquivos do github.")	
+a internet para baixar arquivos do github.")
+	        fcommon.CheckBoxVar("Não salvar as alterações",module.tmenu.dont_save,"Salva e carrega as mudanças de jogo.")
+			fcommon.CheckBoxVar("Carregar imagens mais rápido",module.tmenu.fast_load_images,"Carrega imagens na inicialização do menu. Ativar isso\npode diminuir a perda de fps ao abrir guias com imagens,\nmas pode congelar o jogo na inicialização por alguns segundos.")
+			---
+            imgui.NextColumn()
 			fcommon.CheckBoxVar("Obter atualizações beta",module.tmenu.get_beta_updates,"Receber atualizações beta frequentemente.\
 (Essas atualizações podem ser instáveis)")
-				
-			imgui.NextColumn()
 			fcommon.CheckBoxVar("Bloquear jogador",module.tmenu.lock_player,"Bloqueia os controles do jogador enquanto o menu estiver aberto.")
 			fcommon.CheckBoxVar("Mostrar mensagem de falha",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
@@ -509,7 +512,7 @@ a internet para baixar arquivos do github.")
 				os.execute('explorer "https://discord.gg/ZzW7kmf"')
 			end
 			imgui.SameLine()
-			if imgui.Button("Ir para repo oficial no Github",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Repo oficial no Github",imgui.ImVec2(fcommon.GetSize(3))) then
 				os.execute('explorer "https://github.com/user-grinch/Cheat-Menu"')
 			end
 			imgui.Spacing()

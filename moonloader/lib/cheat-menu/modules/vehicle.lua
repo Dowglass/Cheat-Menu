@@ -48,16 +48,7 @@ module.tvehicle =
         selected = imgui.new.int(0),
         value    = imgui.new.int(0),
     },
-    doors = 
-    {
-        "Capô",
-    	"Porta-malas",
-    	"Porta dianteira esquerdo",
-    	"Porta dianteira direita",
-    	"Porta traseira esquerda",
-        "Porta traseira direita",
-        "Tudo",
-    },
+    doors = {"Capô","Porta-malas","Porta dianteira esquerdo","Porta dianteira direita","Porta traseira esquerda","Porta traseira direita","Tudo"},
     door_menu_button = imgui.new.int(0),
     first_person_camera = 
     {
@@ -229,7 +220,6 @@ function module.GiveVehicleToPlayer(model)
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
 
             local hveh = getCarCharIsUsing(PLAYER_PED)
-            local previous_model = getCarModel(hveh)
             speed = getCarSpeed(hveh)
 
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
@@ -318,57 +308,61 @@ end
 
 function module.AircraftCamera()
 
-    while module.tvehicle.aircraft.camera[0] do
-        while isCharInAnyHeli(PLAYER_PED)
-        or isCharInAnyPlane(PLAYER_PED) do
-            
-            -- FirstPersonCamera controls the camera if its enabled
-            if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
+    if module.tvehicle.aircraft.camera[0] then
+        if isCharInAnyHeli(PLAYER_PED)
+        or isCharInAnyPlane(PLAYER_PED) then
+            while isCharInAnyHeli(PLAYER_PED)
+            or isCharInAnyPlane(PLAYER_PED) do
+                
+                -- FirstPersonCamera controls the camera if its enabled
+                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
 
-            local vehicle = getCarCharIsUsing(PLAYER_PED)
-            local roll = getCarRoll(vehicle)
+                local vehicle = getCarCharIsUsing(PLAYER_PED)
+                local roll = getCarRoll(vehicle)
 
-            attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
-            if isKeyDown(0x56) then
-                while isKeyDown(0x56) do
-                    wait(0)
+                attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
+                if isKeyDown(0x56) then
+                    while isKeyDown(0x56) do
+                        wait(0)
+                    end
+                    module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
+                    if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
+                        module.tvehicle.aircraft.index  = 0
+                    end
                 end
-                module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
-                if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
-                    module.tvehicle.aircraft.index  = 0
-                end
+                wait(0)
             end
-            wait(0)
+            restoreCameraJumpcut()
         end
-        wait(100)
     end
-    restoreCameraJumpcut()
 end
 
 function module.FirstPersonCamera()
     local total_x = 0
     local total_y = 0
 
-    while module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] do
+    if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] then
+        while module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] do
 
-        local hveh = getCarCharIsUsing(PLAYER_PED)        
-        
-        x,y = getPcMouseMovement()
-        total_x = total_x + x
-        total_y = total_y + y
+            local hveh = getCarCharIsUsing(PLAYER_PED)        
+            
+            x,y = getPcMouseMovement()
+            total_x = total_x + x
+            total_y = total_y + y
 
-        local roll = 0.0
-        if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
-            roll = getCarRoll(hveh)
+            local roll = 0.0
+            if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
+                roll = getCarRoll(hveh)
+            end
+
+            if fgame.tgame.camera.bool[0] then
+                break
+            end
+            attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
+            wait(0)
         end
-
-        if fgame.tgame.camera.bool[0] then
-            break
-        end
-        attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
-        wait(0)
+        restoreCameraJumpcut()  
     end
-    restoreCameraJumpcut()  
 end
 
 --------------------------------------------------
@@ -838,7 +832,7 @@ function module.VehicleMain()
     if imgui.Button("Girar veículo",imgui.ImVec2(fcommon.GetSize(3))) then
         
         if isCharInAnyCar(PLAYER_PED) then
-            local car   = getCarCharIsUsing(PLAYER_PED)
+            local car = getCarCharIsUsing(PLAYER_PED)
 
             setCarRoll(car,getCarRoll(car) + 180)
             setCarRoll(car,getCarRoll(car)) -- rotation fix
@@ -857,59 +851,54 @@ function module.VehicleMain()
             fcommon.CheckBoxValue("Todos carros com nitro",0x969165)
             fcommon.CheckBoxValue("Todos taxis com nitro",0x96918B)
             fcommon.CheckBoxValue("Barcos voam",0x969153)
-            fcommon.CheckBox3Var("Motor do carro",module.tvehicle.car_engine,"Marcado - Ligado\nMarca quadrada - Não Configurado\nCaixa em branco - Desligado\n\
-Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o sistemas de combustível (desativação do motor do carro).")
+            fcommon.CheckBox3Var("Motor do carro",module.tvehicle.car_engine,"Defina como 'Não Configurado' se estiver usando\
+algum mod que envolve o sistemas de combustível /desativação do motor.")
             fcommon.CheckBoxValue("Carros voam",0x969160)
             fcommon.CheckBoxVar("Pesar carro",module.tvehicle.heavy)
             fcommon.CheckBoxValue("Diminuir tráfego",0x96917A)
             fcommon.CheckBoxVar("Não cair de bicicletas/motos",module.tvehicle.stay_on_bike)
             fcommon.CheckBoxValue("Dirigir na água",0x969152)
-            fcommon.CheckBoxVar("Câmera em primeira pessoa",module.tvehicle.first_person_camera.bool,nil,nil,
+            if fcommon.CheckBoxVar("Câmera em primeira pessoa",module.tvehicle.first_person_camera.bool,nil,
             function()
+                fcommon.InputFloat("X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
+            end) then
                 fcommon.CreateThread(module.FirstPersonCamera)
-            end,
-            function()
-                fcommon.InputFloat("Ângulo X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
-                fcommon.InputFloat("Ângulo Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
-                fcommon.InputFloat("Ângulo Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
-            end)
-            fcommon.CheckBoxVar("Fixar câmera em aeronaves",module.tvehicle.aircraft.camera,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Fixar câmera em aeronaves",module.tvehicle.aircraft.camera) then
                 fcommon.CreateThread(module.AircraftCamera)
-            end)
+            end
             fcommon.CheckBoxValue("Fixar câmera em trens",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF)
             
             imgui.NextColumn()
 
             fcommon.CheckBoxValue("Carros flutuam ao ser atingidos",0x969166)
             fcommon.CheckBoxValue("Semáforos verde",0x96914E)
-            fcommon.CheckBoxVar("Carro invisível",module.tvehicle.invisible_car,nil,
-            function()
+            if fcommon.CheckBoxVar("Carro invisível",module.tvehicle.invisible_car) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
                     setCarVisible(car,not module.tvehicle.invisible_car[0])
                 end
-            end)
-            fcommon.CheckBoxVar("Ligar luzes",module.tvehicle.lights,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Ligar luzes",module.tvehicle.lights,nil,nil,false) then
                 if isCharInAnyCar(PLAYER_PED) then
-                    car = getCarCharIsUsing(PLAYER_PED)
+                    local hveh = getCarCharIsUsing(PLAYER_PED)
                     if module.tvehicle.lights[0] then
-                        forceCarLights(car,2)
+                        forceCarLights(hveh,2)
                         addOneOffSound(x,y,z,1052)
                         fcommon.CheatActivated()
                     else
-                        forceCarLights(car,1)
+                        forceCarLights(hveh,1)
                         addOneOffSound(x,y,z,1053)
                         fcommon.CheatDeactivated()
                     end
                 else
                     printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
-            end,nil,false)
+            end
 
-            fcommon.CheckBoxVar("Trancar portas",module.tvehicle.lock_doors,nil,
-            function()
+            if fcommon.CheckBoxVar("Trancar portas",module.tvehicle.lock_doors,nil,nil,false) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car   = getCarCharIsUsing(PLAYER_PED)
                     if getCarDoorLockStatus(car) == 4 then
@@ -922,51 +911,45 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                 else
                     printHelpString("O Jogador  ~r~nao~w~ esta no carro!")
                 end
-            end,nil,false)
+            end
  
             fcommon.CheckBoxVar("Sem dano",module.tvehicle.no_damage)
-            fcommon.CheckBoxVar("Sem trânsito de veículos",module.tvehicle.no_vehicles,nil,
-            function()
+            if fcommon.CheckBoxVar("Sem trânsito de veículos",module.tvehicle.no_vehicles) then
                 if module.tvehicle.no_vehicles[0] then
                     writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
                     writeMemory(0x434224,1,0,false)
                     writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
                     writeMemory(0x484D17,1,0,false)
-                    fcommon.CheatActivated()
                 else
                     writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
                     writeMemory(0x434224,1,940431405,false)
                     writeMemory(0x484D19,1,292493,false) -- change condition to unsigned (0-255)
                     writeMemory(0x484D17,1,1988955949,false)
-                    fcommon.CheatDeactivated()
                 end
-            end,nil,false)
+            end
             
             fcommon.CheckBoxVar("Não mostrar dano",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Handling perfeito",0x96914C)
             fcommon.CheckBoxValue("Modo tanque",0x969164) 
-            fcommon.CheckBoxVar("Tráfego neon",module.tvehicle.neon.checkbox,"Adiciona luzes de neon aos veículos de trânsito.\nApenas alguns veículos terão.",
-            function()
+            if fcommon.CheckBoxVar("Tráfego neon",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.") then
                 fcommon.CreateThread(fvehicle.TrafficNeons)
-            end)
-            fcommon.CheckBoxVar("Nitro ilimitado",module.tvehicle.unlimited_nitro,"O Nitro será ativado ao clicar com o botão esquerdo.\nAtivar isso desativa: \n'Todos os carros e taxis tem nitro'.",
-            function()
+            end
+            if fcommon.CheckBoxVar("Nitro ilimitado",module.tvehicle.unlimited_nitro,"O Nitro será ativado ao clicar com o botão esquerdo.\nAtivar isso desativa: \n'Todos os carros e taxis tem nitro'.") then
                 fcommon.CreateThread(module.UnlimitedNitro)
-            end)
-            fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
                     setCarWatertight(car,module.tvehicle.watertight_car[0])
                 end
-            end)
+            end
             fcommon.CheckBoxValue("Apenas rodas",0x96914B)
     
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem('Menus') then
             fcommon.DropDownMenu("Entrar no veículo mais próximo",function()
-                local vehicle,ped = storeClosestEntities(PLAYER_PED)
+                local vehicle = storeClosestEntities(PLAYER_PED)
                 if vehicle ~= -1 then
                     local seats = getMaximumNumberOfPassengers(vehicle)
                     imgui.Spacing()
@@ -1100,8 +1083,6 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                     end
                 end)
                 fcommon.UpdateAddress({name = 'Tamanho da roda',address = pCar+0x458,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                --fcommon.UpdateAddress({name = 'ZZZZZ',address = pCar+0x489,size = 4,min = -10,max = 10, default = 1,is_float = false})
-            
             end    
         end
         if fcommon.BeginTabItem('Criar') then
@@ -1118,8 +1099,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
         end
         if fcommon.BeginTabItem('Pintura') then
             if isCharInAnyCar(PLAYER_PED) then
-                local car = getCarCharIsUsing(PLAYER_PED)
-                local pveh = getCarPointer(car) 
+                local car = getCarCharIsUsing(PLAYER_PED) 
                 local model = getCarModel(car)
             
                 if imgui.Button("Resetar cor",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -1142,36 +1122,35 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Ativar salvamento",module.tvehicle.paintjobs.enable_saving,"Salve e carregue dados de pintura do veículo.\nAplica-se a todos os veículos deste modelo.",
-                function()
+                if fcommon.CheckBoxVar("Ativar salvamento",module.tvehicle.paintjobs.enable_saving,"Salve e carregue dados de pintura do veículo.\nAplica-se a todos os veículos deste modelo.") then
                     if module.tvehicle.paintjobs.enable_saving[0] then
                         ApplyColor(true)
                     end
-                end)
+                end
                 fcommon.CheckBoxVar("Filtrar material",module.tvehicle.apply_material_filter,"Filtra o material ao aplicar cor/textura.\nDesative se algo não funcionar corretamente.")
                 imgui.NextColumn()
-                fcommon.CheckBoxVar("Cores aleatórias",module.tvehicle.rainbow_colors.bool,"Cores aleatórias no veículo do jogador.",function()
-                    fcommon.CreateThread(module.RainbowColors)
-                end,
+                if fcommon.CheckBoxVar("Cores aleatórias",module.tvehicle.rainbow_colors.bool,"Cores aleatórias no veículo do jogador.",
                 function()
-                    fcommon.CheckBoxVar("Aplicar no tráfego",module.tvehicle.rainbow_colors.traffic,"Cores aleatórias em veículos de trânsito.",
-                    function()
+                    if fcommon.CheckBoxVar("Aplicar no tráfego",module.tvehicle.rainbow_colors.traffic,"Cores aleatórias em veículos de trânsito.") then
                         fcommon.CreateThread(module.RainbowColors)
-                    end)
+                    end
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Velocidade",module.tvehicle.rainbow_colors.speed,0,2)
-                end)
-                fcommon.CheckBoxVar("Neons aleatórios",module.tvehicle.rainbow_neons.bool,"Neons aleatórios no veículo do jogador.",function()
-                    fcommon.CreateThread(module.RainbowNeons)
-                end,
-                function()
-                    fcommon.CheckBoxVar("Aplicar no tráfego",module.tvehicle.rainbow_neons.traffic,"Neons aleatórios em veículos de trânsito.",
+                end) then
+                    fcommon.CreateThread(module.RainbowColors)
+                end
+
+                if fcommon.CheckBoxVar("Neons aleatórios",module.tvehicle.rainbow_neons.bool,"Neons aleatórios no veículo do jogador.",
                     function()
-                        fcommon.CreateThread(module.RainbowNeons)
-                    end)
+                        fcommon.CheckBoxVar("Aplicar no tráfego",module.tvehicle.rainbow_neons.traffic,"Neons aleatórios em veículos de trânsito.",
+                        function()
+                            fcommon.CreateThread(module.RainbowNeons)
+                        end)
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Velocidade",module.tvehicle.rainbow_neons.speed,0,2)
-                end)
+                end) then
+                    fcommon.CreateThread(module.RainbowNeons)
+                end
                 imgui.Columns(1)
                 imgui.Spacing()
                 
@@ -1289,8 +1268,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                     printHelpString("Componentes do veiculo resetados!")
                 end
                 
-                fcommon.CheckBoxVar("Ativar salvamento",module.tvehicle.components.enable_saving,"Salve e carregue ajustes de tunagem do veículo.\nAplica-se a todos os veículos deste modelo.",
-                function()
+                if fcommon.CheckBoxVar("Ativar salvamento",module.tvehicle.components.enable_saving,"Salve e carregue ajustes de tunagem do veículo.\nAplica-se a todos os veículos deste modelo.") then
                     if module.tvehicle.components.enable_saving[0] then
                         for tmodel,table in pairs(module.tvehicle.components.save_data) do
                             if tmodel == tostring(model) then
@@ -1301,7 +1279,7 @@ Defina como 'Não Configurado' se você estiver usando algum mod\nque envolve o 
                             end
                         end
                     end
-                end)                
+                end
                 imgui.Dummy(imgui.ImVec2(0,10))
                 fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,
                 function(component)

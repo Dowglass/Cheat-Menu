@@ -239,48 +239,41 @@ function module.WeaponMain()
     if fcommon.BeginTabBar('Armas') then
         if fcommon.BeginTabItem('Caixas de seleção') then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComando: \nQ = esquerda | E = direita",
-            function()
+            if fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Ativa a mira automática.\nComando: \nQ = esquerda | E = direita") then
                 fcommon.CreateThread(fweapon.AutoAim)
-            end)
-            fcommon.CheckBoxVar("Recarregamento rápido",module.tweapon.fast_reload,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Recarregamento rápido",module.tweapon.fast_reload) then
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
-            end)
-            fcommon.CheckBoxVar("Aumentar dano",module.tweapon.huge_damage,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Aumentar dano",module.tweapon.huge_damage) then
                 if not module.tweapon.huge_damage[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end)
+            end
             fcommon.CheckBoxValue("Munição infinita",0x969178)
 
             imgui.NextColumn()
 
-            fcommon.CheckBoxVar("Longo alcance de tiro",module.tweapon.long_range,nil,
-            function()
+            if fcommon.CheckBoxVar("Longo alcance de tiro",module.tweapon.long_range) then
                 if not module.tweapon.long_range[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end)
-            fcommon.CheckBoxVar("Precisão máxima",module.tweapon.max_accuracy,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Precisão máxima",module.tweapon.max_accuracy) then
                 if not module.tweapon.max_accuracy[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end)
-            fcommon.CheckBoxVar("Munição máxima",module.tweapon.max_ammo_clip,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Munição máxima",module.tweapon.max_ammo_clip) then
                 if not module.tweapon.max_ammo_clip[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end)
-            fcommon.CheckBoxVar("Velocidade máxima de movimento",module.tweapon.max_move_speed,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Velocidade máxima de movimento",module.tweapon.max_move_speed) then
                 if not module.tweapon.max_move_speed[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end)
+            end
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem('Menus') then

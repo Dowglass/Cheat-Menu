@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.2-beta (PT-BR)")
-script_version_number(2020100702) -- YYYYMMDDNN
+script_version_number(2020102001) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
@@ -83,7 +83,7 @@ tcheatmenu   =
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
     fail_loading_json = tcheatmenu.fail_loading_json,
     restart_required = false,
-    show     = imgui.new.bool(false),
+    show     = imgui.new.bool(fmenu.tmenu.fast_load_images[0]),
     size     =
     {
         X    = fconfig.Get('tcheatmenu.size.X',resX/4),
@@ -93,7 +93,7 @@ tcheatmenu   =
 }
 
 imgui.OnInitialize(function() -- Called once
-
+    
     local io = imgui.GetIO()
 
     -- Load fonts
@@ -131,8 +131,13 @@ imgui.OnInitialize(function() -- Called once
         print("Falha ao carregar estilos!")
     end
 
--- Indexing images
-lua_thread.create(
+    if fmenu.tmenu.fast_load_images[0] then
+        showCursor(false)
+        tcheatmenu.show[0] = false
+    end
+    
+    -- Indexing images
+    lua_thread.create(
     function() 
         fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,"jpg")
         fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,"jpg")
@@ -141,6 +146,7 @@ lua_thread.create(
         fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,"jpg")
         fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,"png")
     end)
+
 end)
 
 imgui.OnFrame(
@@ -250,9 +256,11 @@ function(self) -- render frame
 
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto recarregar",fmenu.tmenu.auto_reload,"Recarrega o  cheat menu automaticamente\nem caso de crash.\n\nPode causar crash em loop.")
-            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check," Cheat Menu irá verificar automaticamente se há atualizações\nonline. Isso requer uma conexão com internet \
+            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check,"O Cheat Menu irá verificar se há atualizações\nonline. Isso requer conexão com internet\
 para baixar arquivos no repo do github.")
             imgui.NextColumn()
+            fcommon.CheckBoxVar("Carregar imagens mais rápido",fmenu.tmenu.fast_load_images,"Carrega imagens na inicialização do menu. Ativar isso\npode diminuir a perda de fps ao abrir guias com imagens,\nmas pode congelar o jogo na inicialização por alguns segundos.")
+            ---
             fcommon.CheckBoxVar("Mostrar dicas",fmenu.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
             imgui.Columns(1)
             imgui.Spacing()
@@ -518,13 +526,7 @@ function main()
     end
     
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
-
-    if  fgame.tgame.ghost_cop_cars[0] then
-        for key,value in pairs(fgame.tgame.cop) do
-            writeMemory(tonumber(key),4,math.random(400,611),false)
-        end
-    end
-
+    
     if fgame.tgame.disable_replay[0] then
         writeMemory(0x460500,4,0xC3,false)
     end
@@ -629,7 +631,7 @@ function main()
         if fgame.tgame.ss_shortcut[0] then
             fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.quick_screenshot,function()
                 takePhoto(true)
-                printHelpString("Screenshot ~g~taken")
+                printHelpString("Captura de tela ~g~Feita!")
             end)
         end
 

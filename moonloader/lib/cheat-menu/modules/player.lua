@@ -83,13 +83,6 @@ function module.SetPlayerInvisible(bool)
     end
 end
 
-function SetRwObjectAlpha(handle, alpha)
-    local pedEn = getCharPointer(handle)
-    if pedEn ~= 0 then
-        ffi.cast("void (__thiscall *)(int, int)", 0x5332C0)(pedEn, alpha)
-    end
-end
-
 function module.ChangePlayerModel(model,dont_show_msg)
     dont_show_msg = dont_show_msg or false
     local modeldff = (model .. ".dff")
@@ -272,7 +265,6 @@ function module.PlayerMain()
     imgui.SameLine()
     if imgui.Button("Suicídio",imgui.ImVec2(x,y)) then
         lua_thread.create(function()
-             ---printHelpString("")/wait(500)
             setCharHealth(PLAYER_PED,0)
         end)
     end
@@ -281,40 +273,38 @@ function module.PlayerMain()
     if fcommon.BeginTabBar("PlayerBar") then
         if fcommon.BeginTabItem("Caixas de seleção") then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Modo Deus",module.tplayer.god,nil,
-            function()
+            if fcommon.CheckBoxVar("Modo Deus",module.tplayer.god) then
                 if not module.tplayer.god[0] then
                     writeMemory(0x96916D,1,0,false)
                     setCharProofs(PLAYER_PED,false,false,false,false,false)
                 end
-            end)
+            end
             fcommon.CheckBoxValue("Recompensa por ser morto",0x96913F)
-            fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,fcommon.CreateThread(module.RegenerateHealth),
-            function()
+            if fcommon.CheckBoxVar("Regeneração de saúde",module.tplayer.health_regeneration.bool,nil,
+            function()  
                 imgui.SliderInt("Valor para regenerar", module.tplayer.health_regeneration.increment_value, 0, 25)
                 imgui.SliderInt("Intervalo", module.tplayer.health_regeneration.interval, 0, 10000)
                 fcommon.InformationTooltip("Tempo de espera para regenerar\nem milissegundos.")
-            end)
+            end) then
+                fcommon.CreateThread(module.RegenerateHealth)
+            end
             fcommon.CheckBoxValue("Saltos mais altos de bicicleta",0x969161)
             fcommon.CheckBoxValue("Oxigênio infinito",0x96916E)
             fcommon.CheckBoxValue("Corrida infinita",0xB7CEE4)
-            fcommon.CheckBoxVar("Jogador invisível",module.tplayer.invisible,nil,
-            function()
+            if fcommon.CheckBoxVar("Jogador invisível",module.tplayer.invisible) then
                 module.SetPlayerInvisible(module.tplayer.invisible[0])
-            end)
+            end
             imgui.NextColumn()
-            fcommon.CheckBoxVar("Manter posição",module.tplayer.keep_position,"Teleportar para o local em que você morreu.",
-            function()
+            if fcommon.CheckBoxVar("Manter posição",module.tplayer.keep_position,"Teleportar para o local em que você morreu.") then
                 fcommon.CreateThread(module.KeepPosition)
-            end)
+            end
             fcommon.CheckBoxValue("Bloquear controle do jogador",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Super pulo",0x96916C)
             fcommon.CheckBoxValue("Super soco",0x969173)
             fcommon.CheckBoxValue("Nunca sentir fome",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBoxVar("Nunca ser procurado",module.tplayer.never_wanted,nil,
-            function()
+            if fcommon.CheckBoxVar("Nunca ser procurado",module.tplayer.never_wanted) then
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
                     fcommon.CheatActivated()
@@ -322,7 +312,7 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
                 fconfig.Set(fconfig.tconfig.misc_data,"Never Wanted",module.tplayer.never_wanted[0])
-            end)
+            end
            
             imgui.Columns(1)
         end

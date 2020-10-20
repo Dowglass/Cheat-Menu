@@ -58,6 +58,13 @@ module.tped =
     spawned_peds= 
     {
         list = {},
+        ped_bleed = imgui.new.bool(false),
+        ped_health = imgui.new.int(100),
+        ped_type_list = {"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
+                        "San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
+                        "Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute"},
+        ped_type_selected = imgui.new.int(1),
+        stand_still = imgui.new.bool(fconfig.Get('tped.spawned_peds.stand_still',true)),
     },
     special     = fcommon.LoadJson("ped special"),
 }
@@ -80,26 +87,39 @@ end
 function module.SpawnPed(model)  
  
     if  module.tped.names[model] ~= nil then
+        local ped = nil
         if module.tped.special[model] == nil then
             model = tonumber(model)
             requestModel(model)
             loadAllModelsNow()
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(5,model,x,y,z) -- CIVMALE
+            
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,model,x,y,z) -- CIVMALE
+
             markModelAsNoLongerNeeded(model)
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
+
         else
             if hasSpecialCharacterLoaded(model) then
                 unloadSpecialCharacter(model)
             end
             loadSpecialCharacter(module.tped.special[tostring(model)],1)
             loadAllModelsNow()
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(5,290,x,y,z) -- CIVMALE
+
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,290,x,y,z) -- CIVMALE
+
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
         end
-        printHelpString("Ped ~g~Criado!")
+        if ped ~= nil then
+            if not module.tped.spawned_peds.stand_still[0] then
+                markCharAsNoLongerNeeded(ped)
+            end
+            setCharHealth(ped,module.tped.spawned_peds.ped_health[0])
+            setCharBleeding(ped,module.tped.spawned_peds.ped_bleed[0])
+            printHelpString("Ped ~g~Criado!")
+        end
     end
 end
 
@@ -150,19 +170,14 @@ function module.PedMain()
     if fcommon.BeginTabBar('Ped') then
         if fcommon.BeginTabItem('Caixas de seleção') then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Exibir saúde do ped",module.tped.ped_health_display,nil,
-            function()
+            if fcommon.CheckBoxVar("Exibir saúde do ped",module.tped.ped_health_display) then
                 fcommon.CreateThread(module.PedHealthDisplay)
-            end)
+            end
             fcommon.CheckBoxValue("Elvis em toda parte",0x969157)
             fcommon.CheckBoxValue("Todo mundo armado",0x969140)
             fcommon.CheckBoxValue("Gangues controlam ruas",0x96915B)
             fcommon.CheckBoxValue("Gangues em todos os lugares",0x96915A)
-            fcommon.CheckBoxVar("Zona de gangues",module.tped.gang.wars,nil,
-            function()
-                setGangWarsActive(module.tped.gang.wars[0])
-                if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-            end,
+            if fcommon.CheckBoxVar("Zona de gangues",module.tped.gang.wars,nil,
             function()
                 if imgui.Button("Iniciar gerra de gangues",imgui.ImVec2(fcommon.GetSize(2))) then
                     if GetLargestGangInZone() == 1 then
@@ -195,14 +210,16 @@ function module.PedMain()
                 imgui.PopItemWidth()
                 imgui.Dummy(imgui.ImVec2(0,20))
                 if not module.tped.gang.is_exgangwars_installed then
-                    imgui.TextWrapped("Você precisará do ExGangWars para exibir algumas cores de gangue")
+                    imgui.TextWrapped("Você precisa do ExGangWars para exibir algumas cores de gangue")
                     imgui.Spacing()
                     if imgui.Button("Baixar ExGangWars",imgui.ImVec2(fcommon.GetSize(1))) then
                         os.execute('explorer "https://gtaforums.com/topic/682194-extended-gang-wars/"')
                     end
                 end
-            end)
-            
+            end) then
+                setGangWarsActive(module.tped.gang.wars[0])
+            end
+
             imgui.NextColumn()
 
             fcommon.CheckBoxValue("Sem peds nas ruas",0x8D2538,nil,0,25)
@@ -225,9 +242,24 @@ function module.PedMain()
                 module.RemoveAllSpawnedPeds()  
                 printHelpString("Peds removidos")        
             end
+            imgui.Spacing()
             
-            imgui.Dummy(imgui.ImVec2(0,10))                
-            fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+            if fcommon.BeginTabBar("SpawnPedBar") then
+                if fcommon.BeginTabItem('Criar') then
+                    fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+                end
+                if fcommon.BeginTabItem('Config') then
+                    imgui.Columns(2,nil,false)
+                    fcommon.CheckBoxVar("Não andar",module.tped.spawned_peds.stand_still)   
+                    imgui.NextColumn()
+                    fcommon.CheckBoxVar("Ped sangrando",module.tped.spawned_peds.ped_bleed)   
+                    imgui.Columns(1)                 
+                    imgui.Spacing()
+                    imgui.SliderInt("Saúde do Ped", module.tped.spawned_peds.ped_health, 0.0, 100.0)
+                    fcommon.DropDownListNumber("Tipo de Ped",module.tped.spawned_peds.ped_type_list,module.tped.spawned_peds.ped_type_selected)
+                end
+                fcommon.EndTabBar()
+            end
         end
         fcommon.EndTabBar()
     end
