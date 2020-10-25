@@ -30,7 +30,8 @@ module.tmenu =
 	},
 	crash_text          = "",
 	dont_save			= imgui.new.bool(fconfig.Get('tmenu.dont_save',false)),
-	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',true)),
+	enable_stat_saving  = imgui.new.bool(fconfig.Get('tmenu.enable_stat_saving',false)),
+	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	font				=
 	{
 		list			= {},
@@ -341,11 +342,13 @@ function module.MenuMain()
 			imgui.Dummy(imgui.ImVec2(0,5))
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
-			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\nIsso requer uma conexão com\
-a internet para baixar arquivos do github.")
-	        fcommon.CheckBoxVar("Não salvar as alterações",module.tmenu.dont_save,"Salva e carrega as mudanças de jogo.")
+			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\
+Isso requer uma conexão com a internet para baixar arquivos do github.")
+	        fcommon.CheckBoxVar("Não salvar alterações",module.tmenu.dont_save,"Não salvar as alterações feitas no menu.\nO menu sempre iniciará como uma nova instalação (confirações padrão).")
+			fcommon.CheckBoxVar("Ativar salvamento de estatísticas",module.tmenu.enable_stat_saving,"Salve estatísticas no arquivo de configuração. \nEles serão carregados no início de um novo jogo ou em um save game. \n\
+Isto inclui saúde, colete, stamina, corpo e etc.")
 			fcommon.CheckBoxVar("Carregar imagens mais rápido",module.tmenu.fast_load_images,"Carrega imagens na inicialização do menu. Ativar isso\npode diminuir a perda de fps ao abrir guias com imagens,\nmas pode congelar o jogo na inicialização por alguns segundos.")
-			---
+				---
             imgui.NextColumn()
 			fcommon.CheckBoxVar("Obter atualizações beta",module.tmenu.get_beta_updates,"Receber atualizações beta frequentemente.\
 (Essas atualizações podem ser instáveis)")

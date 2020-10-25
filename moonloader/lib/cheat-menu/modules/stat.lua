@@ -26,7 +26,6 @@ module.tstat      =
 
 -- Main function
 function module.StatMain()
-    
     if fcommon.BeginTabBar('Estatísticas') then
         if fcommon.BeginTabItem('Veículo') then
             if imgui.Button("Estatísticas máximas em veículos",imgui.ImVec2(fcommon.GetSize(1))) then

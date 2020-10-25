@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.2-beta (PT-BR)")
-script_version_number(2020102001) -- YYYYMMDDNN
+script_version_number(2020102601) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
@@ -76,8 +76,8 @@ tcheatmenu   =
 {   
     coord    = 
     {
-        X    = fconfig.Get('tcheatmenu.coord.X',50),
-        Y    = fconfig.Get('tcheatmenu.coord.Y',50),
+        X    = fconfig.Get('tcheatmenu.coord.X',5),
+        Y    = fconfig.Get('tcheatmenu.coord.Y',4),
     },
     dir          = tcheatmenu.dir,
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
@@ -86,8 +86,8 @@ tcheatmenu   =
     show     = imgui.new.bool(fmenu.tmenu.fast_load_images[0]),
     size     =
     {
-        X    = fconfig.Get('tcheatmenu.size.X',resX/4),
-        Y    = fconfig.Get('tcheatmenu.size.Y',resY/1.2),
+        X    = fconfig.Get('tcheatmenu.size.X',resX/3.4),
+        Y    = fconfig.Get('tcheatmenu.size.Y',resY/1.3),
     },
     title    = string.format("%s v%s",script.this.name,script.this.version),
 }
@@ -256,8 +256,8 @@ function(self) -- render frame
 
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto recarregar",fmenu.tmenu.auto_reload,"Recarrega o  cheat menu automaticamente\nem caso de crash.\n\nPode causar crash em loop.")
-            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check,"O Cheat Menu irá verificar se há atualizações\nonline. Isso requer conexão com internet\
-para baixar arquivos no repo do github.")
+            fcommon.CheckBoxVar("Verificar atualizações",fmenu.tmenu.auto_update_check,"O Cheat Menu irá verificar se há atualizações\nonline. Isso requer conexão com internet \npara baixar arquivos no repo do github.")
+            ----
             imgui.NextColumn()
             fcommon.CheckBoxVar("Carregar imagens mais rápido",fmenu.tmenu.fast_load_images,"Carrega imagens na inicialização do menu. Ativar isso\npode diminuir a perda de fps ao abrir guias com imagens,\nmas pode congelar o jogo na inicialização por alguns segundos.")
             ---

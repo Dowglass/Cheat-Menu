@@ -58,12 +58,16 @@ module.tped =
     spawned_peds= 
     {
         list = {},
-        ped_bleed = imgui.new.bool(false),
-        ped_health = imgui.new.int(100),
+        ped_bleed = imgui.new.bool(fconfig.Get('tped.spawned_peds.ped_bleed',false)),
+        ped_accuracy= imgui.new.int(fconfig.Get('tped.spawned_peds.ped_accuracy',50)),
+        ped_health = imgui.new.int(fconfig.Get('tped.spawned_peds.ped_health',100)),
         ped_type_list = {"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
                         "San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
                         "Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute"},
-        ped_type_selected = imgui.new.int(1),
+        ped_type_selected = imgui.new.int(fconfig.Get('tped.spawned_peds.ped_type_selected',1)),
+        ped_weapon_ammo = imgui.new.int(fconfig.Get('tped.spawned_peds.ped_weapon_ammo',99999)),
+        ped_weapon_selected = fconfig.Get('tped.spawned_peds.ped_weapon_selected',"Nenhuma"),
+        ped_weapon_id = imgui.new.int(fconfig.Get('tped.spawned_peds.ped_weapon_id',-1)),
         stand_still = imgui.new.bool(fconfig.Get('tped.spawned_peds.stand_still',true)),
     },
     special     = fcommon.LoadJson("ped special"),
@@ -118,6 +122,17 @@ function module.SpawnPed(model)
             end
             setCharHealth(ped,module.tped.spawned_peds.ped_health[0])
             setCharBleeding(ped,module.tped.spawned_peds.ped_bleed[0])
+            setCharAccuracy(ped,module.tped.spawned_peds.ped_accuracy[0])
+
+            if module.tped.spawned_peds.ped_weapon_id ~= -1 then
+                local model = getWeapontypeModel(module.tped.spawned_peds.ped_weapon_id)
+
+                if isModelAvailable(model) then
+                    requestModel(model)
+                    loadAllModelsNow()
+                    giveWeaponToChar(ped,module.tped.spawned_peds.ped_weapon_id,module.tped.spawned_peds.ped_weapon_ammo[0])
+                end
+            end
             printHelpString("Ped ~g~Criado!")
         end
     end
@@ -163,6 +178,12 @@ function GetLargestGangInZone()
         end
     end
     return gang
+end
+
+
+function SetSelectedWeapon(weapon)
+    module.tped.spawned_peds.ped_weapon_id = weapon
+    module.tped.spawned_peds.ped_weapon_selected = fweapon.GetModelName(weapon)
 end
 
 function module.PedMain()
@@ -255,7 +276,21 @@ function module.PedMain()
                     fcommon.CheckBoxVar("Ped sangrando",module.tped.spawned_peds.ped_bleed)   
                     imgui.Columns(1)                 
                     imgui.Spacing()
-                    imgui.SliderInt("Saúde do Ped", module.tped.spawned_peds.ped_health, 0.0, 100.0)
+                    imgui.Text("Arma selecionada: " .. module.tped.spawned_peds.ped_weapon_selected)
+                    fcommon.ConfigPanel("Seleção de arma",function()
+                        if imgui.Button("Limpar seleção de armas",imgui.ImVec2(fcommon.GetSize(1))) then
+                            module.tped.spawned_peds.ped_weapon_id = -1
+                            module.tped.spawned_peds.ped_weapon_selected = "Nenhuma"
+                        end
+                        imgui.Spacing()
+                        imgui.InputInt("Munição", module.tped.spawned_peds.ped_weapon_ammo) 
+                        imgui.Spacing()
+                        imgui.Text("Arma selecionada: " .. module.tped.spawned_peds.ped_weapon_selected)
+                        fcommon.DrawEntries(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.IMAGE,SetSelectedWeapon,nil,fweapon.GetModelName,fweapon.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,function(a) return a ~= "Jetpack"end )
+                    end)
+                    imgui.Spacing()
+                    imgui.SliderInt("Precisão", module.tped.spawned_peds.ped_accuracy, 0.0, 100.0)
+                    imgui.SliderInt("Saúde", module.tped.spawned_peds.ped_health, 0.0, 100.0) 
                     fcommon.DropDownListNumber("Tipo de Ped",module.tped.spawned_peds.ped_type_list,module.tped.spawned_peds.ped_type_selected)
                 end
                 fcommon.EndTabBar()
