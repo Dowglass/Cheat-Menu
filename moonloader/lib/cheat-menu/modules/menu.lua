@@ -344,7 +344,7 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto recarregar",module.tmenu.auto_reload,"Recarrega o cheat menu automaticamente em caso de crash.\nÁs vezes, pode causar alguma falha.")
 			fcommon.CheckBoxVar("Verificar se há atualizações",module.tmenu.auto_update_check,"O Cheat Menu irá verificar automaticamente se há atualizações online.\
 Isso requer uma conexão com a internet para baixar arquivos do github.")
-	        fcommon.CheckBoxVar("Não salvar alterações",module.tmenu.dont_save,"Não salvar as alterações feitas no menu.\nO menu sempre iniciará como uma nova instalação (confirações padrão).")
+	        fcommon.CheckBoxVar("Não salvar alterações",module.tmenu.dont_save,"Não salvar as alterações feitas no menu.\nO menu sempre iniciará como uma nova instalação.")
 			fcommon.CheckBoxVar("Ativar salvamento de estatísticas",module.tmenu.enable_stat_saving,"Salve estatísticas no arquivo de configuração. \nEles serão carregados no início de um novo jogo ou em um save game. \n\
 Isto inclui saúde, colete, stamina, corpo e etc.")
 			fcommon.CheckBoxVar("Carregar imagens mais rápido",module.tmenu.fast_load_images,"Carrega imagens na inicialização do menu. Ativar isso\npode diminuir a perda de fps ao abrir guias com imagens,\nmas pode congelar o jogo na inicialização por alguns segundos.")
