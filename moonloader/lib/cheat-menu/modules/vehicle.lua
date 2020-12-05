@@ -1161,7 +1161,7 @@ algum mod que envolve o sistemas de combustível /desativação do motor.")
                     if isCharInAnyCar(PLAYER_PED) then
                         fcommon.CheckBoxVar("Mostrar todas as cores", module.tvehicle.color.show_all)
                         imgui.Spacing()
-                        
+                        local car = getCarCharIsUsing(PLAYER_PED)
                         local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
                         
                         local shown_colors = {}
