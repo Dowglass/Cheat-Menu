@@ -1,4 +1,4 @@
-
+# A versão oficial em lua está descontinuada. Novas versões oficiais estão no [repositório oficial](https://github.com/user-grinch/Cheat-Menu).
 <p align="center">
   <img width="400" height="250" src="https://i.imgur.com/fZ71SbF.png">
 </p>
@@ -14,7 +14,6 @@
 
 O Cheat Menu permite que um grande conjunto de modificações/truques, permitindo uma jogabilidade muito mais fácil e divertida.
 
-
 É baseado no [Moonloader](https://gtaforums.com/topic/890987-moonloader/) e usa [mimgui](https://github.com/THE-FYP/mimgui) como interface.
 
 ## Versões oficiais
@@ -26,18 +25,17 @@ O Cheat Menu permite que um grande conjunto de modificações/truques, permitind
 [Master branch](https://github.com/inanahammad/Cheat-Menu) contém a versão mais recente do cheat menu e é traduzida [aqui](https://github.com/Dowglass/Cheat-Menu). Embora essa seja a melhor forma para uma boa gameplay e experimentar os recursos mais recentes, ela pode vir com alguns bugs.
 
 ### Cheat menu
-[Cheat menu](https://github.com/user-grinch/Cheat-Menu) versão oficial.
-
+[Cheat menu](https://github.com/user-grinch/Cheat-Menu/tree/master) versão oficial **(atualmente descontinuada)**.
 
 ## Instalação:
 
 1. Instale [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) e [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) se ainda não estiver instalado.
 2. Se a sua versão do jogo não for a v1.0, será necessário fazer [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
 3. Baixe o [Moonloader](https://gtaforums.com/topic/890987-moonloader/) [aqui](https://blast.hk/moonloader/files/moonloader-026.zip). Em seguida, extraia os arquivos para a pasta do jogo (substitua, se necessário).
-4. Baixe o Cheat Menu [aqui](https://github.com/Dowglass/Cheat-Menu) .
+4. Baixe o Cheat Menu [aqui](https://github.com/Dowglass/Cheat-Menu).
 5. Abra o arquivo e extraia tudo no diretório do jogo (substitua, se necessário).
 
-No jogo, pressione CRTL+M para abrir. Se não funcionar, crie uma postagem em um dos tópicos no [repositório oficial](https://github.com/user-grinch/Cheat-Menu) com 'moonloader.log'. 
+No jogo, pressione <kbd>Ctrl</kbd> + <kbd>M</kbd>. Se não funcionar, crie uma postagem em um dos tópicos no [repositório oficial](https://github.com/user-grinch/Cheat-Menu) com 'moonloader.log'. 
 
 ## Youtubers
 
