@@ -253,22 +253,16 @@ end
 
 -- Main function
 function module.PlayerMain()
-
-    local x,y = fcommon.GetSize(2)
-    x = x -  imgui.CalcTextSize("?").x
-    
-    if imgui.Button("Copiar coordenadas",imgui.ImVec2(x,y)) then
+ 
+    if imgui.Button("Copiar coordenadas",imgui.ImVec2(fcommon.GetSize(2))) then
         local x,y,z = getCharCoordinates(PLAYER_PED)
-        setClipboardText(string.format( "%d, %d, %d",x,y,z))
+        setClipboardText(string.format( "%d,%d,%d",x,y,z))
         printHelpString("Coordenadas copiadas!")
     end
     imgui.SameLine()
-    if imgui.Button("Suicídio",imgui.ImVec2(x,y)) then
-        lua_thread.create(function()
-            setCharHealth(PLAYER_PED,0)
-        end)
+    if imgui.Button("Suicídio",imgui.ImVec2(fcommon.GetSize(2))) then
+        setCharHealth(PLAYER_PED,0)
     end
-    fcommon.InformationTooltip("|C.V.V (Centro de Valorização da Vida)|\n|Fone: 188\n|Site: https://www.cvv.org.br/")
 
     if fcommon.BeginTabBar("PlayerBar") then
         if fcommon.BeginTabItem("Caixas de seleção") then

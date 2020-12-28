@@ -572,7 +572,7 @@ function SpawnObject(model,obj_name,grp_name,x,y,z)
         markModelAsNoLongerNeeded(model)
         printHelpString("Objeto criado")
     else
-        printHelpString("Modelo invalido")
+        printHelpString("Modelo invalido!")
     end
 end
 

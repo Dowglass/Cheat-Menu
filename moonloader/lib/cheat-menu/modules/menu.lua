@@ -357,7 +357,7 @@ Isto inclui saúde, colete, stamina, corpo e etc.")
 			fcommon.CheckBoxVar("Mostrar dicas de ferramentas",module.tmenu.show_tooltips,"Mostra dicas de uso ao lado das opções.")
 			imgui.Columns(1)
 		end
-		if fcommon.BeginTabItem('Info') then
+		if fcommon.BeginTabItem('Overlay') then
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Sem fundo",module.tmenu.overlay.transparent_bg)
 			fcommon.CheckBoxVar("Mostrar coordenadas",module.tmenu.overlay.coordinates)

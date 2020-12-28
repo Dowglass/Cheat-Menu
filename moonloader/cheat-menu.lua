@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.3-beta (PT-BR)")
-script_version_number(2020112201) -- YYYYMMDDNN
+script_version_number(2020112202) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
@@ -76,7 +76,7 @@ tcheatmenu   =
 {   
     coord    = 
     {
-        X    = fconfig.Get('tcheatmenu.coord.X',5),
+        X    = fconfig.Get('tcheatmenu.coord.X',3),
         Y    = fconfig.Get('tcheatmenu.coord.Y',4),
     },
     dir          = tcheatmenu.dir,
@@ -86,7 +86,7 @@ tcheatmenu   =
     show     = imgui.new.bool(fmenu.tmenu.fast_load_images[0]),
     size     =
     {
-        X    = fconfig.Get('tcheatmenu.size.X',resX/3.4),
+        X    = fconfig.Get('tcheatmenu.size.X',resX/3.2),
         Y    = fconfig.Get('tcheatmenu.size.Y',resY/1.3),
     },
     title    = string.format("%s v%s",script.this.name,script.this.version),
@@ -181,7 +181,7 @@ function(self) -- render frame
     end
 
     if tcheatmenu.restart_required then
-        imgui.Button("Reinicialização necessária para aplicar algumas alterações",imgui.ImVec2(fcommon.GetSize(1)))
+        imgui.Button("Reinicialização necessária para aplicar alterações",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Reiniciar menu",imgui.ImVec2(fcommon.GetSize(2))) then
             fmenu.tmenu.crash_text = "Cheat Menu ~g~recarregado!"
 			thisScript():reload()
@@ -444,7 +444,7 @@ function main()
     --writeMemory(0x4b331f,6,0xE9,false)
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
-        print("SAMP detectado! desativando script.")
+        print("SAMP detectado! Desativando script.")
         thisScript():unload()
     end
 

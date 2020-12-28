@@ -35,7 +35,7 @@ function module.MemoryMain()
     
     if fcommon.BeginTabBar("MemoryBar") then
         if fcommon.BeginTabItem("Ler") then
-            imgui.Text("Ponto")
+            imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
             imgui.SameLine()
@@ -47,7 +47,7 @@ function module.MemoryMain()
             imgui.Dummy(imgui.ImVec2(0,10))
 
             imgui.Columns(2,nil,false)
-            imgui.Text("Valor da memória : " .. module.tmemory.value[0])
+            imgui.Text("Memory value : " .. module.tmemory.value[0])
             imgui.NextColumn()
 
             local car,ped = storeClosestEntities(PLAYER_PED)
@@ -68,10 +68,10 @@ function module.MemoryMain()
             imgui.Columns(1)
             imgui.Spacing()
 
-            imgui.InputTextWithHint("Endereço","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
-            imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
+            imgui.SliderInt("Size", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
                 imgui.Columns(2,nil,false)
@@ -82,7 +82,7 @@ function module.MemoryMain()
             end
 
 
-            imgui.Checkbox("Proteção Virtual", module.tmemory.vp)
+            imgui.Checkbox("Virtual protect", module.tmemory.vp)
             imgui.Columns(1)
             imgui.Dummy(imgui.ImVec2(0,10))
             if imgui.Button("Ler",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -94,7 +94,7 @@ function module.MemoryMain()
                 if ffi.string(module.tmemory.address) ~= "" then
                     module.tmemory.value[0] = fcommon.RwMemory((tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset))),module.tmemory.size[0],nil,module.tmemory.vp[0],module.tmemory.is_float[0])
                 else 
-                    printHelpString("No address found")
+                    printHelpString("Nenhum endereco encontrado")
                 end
             end
             imgui.SameLine()
@@ -106,11 +106,11 @@ function module.MemoryMain()
                 module.tmemory.vp[0] = false
                 module.tmemory.is_float[0] = false
                 module.tmemory.radio_button[0] = 0
-                printHelpString("Entradas limpas")
+                printHelpString("Entries cleared")
             end
         end
         if fcommon.BeginTabItem("Escrever") then
-            imgui.Text("Ponto")
+            imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Nenhum", module.tmemory.radio_button, 0)
             imgui.SameLine()
@@ -138,9 +138,9 @@ function module.MemoryMain()
             end
             
             imgui.InputInt("Valor", module.tmemory.value)
-            imgui.InputTextWithHint("Endereço","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
-            imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
+            imgui.SliderInt("Size", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
                 imgui.Columns(2,nil,false)
@@ -151,7 +151,7 @@ function module.MemoryMain()
             end
 
 
-            imgui.Checkbox("Proteção Virtual", module.tmemory.vp)
+            imgui.Checkbox("Virtual protect", module.tmemory.vp)
             imgui.Columns(1)
             imgui.Dummy(imgui.ImVec2(0,10))
 
@@ -165,7 +165,7 @@ function module.MemoryMain()
                     fcommon.RwMemory(tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset)),module.tmemory.size[0],module.tmemory.value[0],module.tmemory.vp[0],module.tmemory.is_float[0])
                     printHelpString("Valor Atualizado")
                 else 
-                    printHelpString("Nenhum endereco encontrado")
+                    printHelpString("Nenhum address encontrado")
                 end
             end
             imgui.SameLine()
@@ -177,7 +177,7 @@ function module.MemoryMain()
                 module.tmemory.vp[0] = false
                 module.tmemory.is_float[0] = false
                 module.tmemory.radio_button[0] = 0
-                printHelpString("Entradas limpas")
+                printHelpString("Entries cleared")
             end
         end
         if fcommon.BeginTabItem("Procurar") then
@@ -201,10 +201,10 @@ function module.MemoryMain()
                         module.tmemory.size[0] = 4
                         module.tmemory.is_float[0] = true
                     end
-                    printHelpString("Endereco definido!")
+                    printHelpString("Address definido!")
                 end,
                 function(text)
-                    if imgui.MenuItemBool("Remover endereço") then
+                    if imgui.MenuItemBool("Remover address") then
                         for category,table in pairs(module.tmemory.list) do
                             for key,val in pairs(table) do
                                 if key == text then
@@ -215,24 +215,24 @@ function module.MemoryMain()
                         end
                         ::end_loop::
 
-                        printHelpString("Endereco removido")
+                        printHelpString("Address removido")
                     end
                 end,
                 function(a) return a end,module.tmemory.list)
         end
         if fcommon.BeginTabItem("Personalizar") then
             imgui.InputTextWithHint("Nome","Novo endereço",module.tmemory.name,ffi.sizeof(module.tmemory.name))
-            imgui.InputTextWithHint("Endereço","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            imgui.SliderInt("Tamanho", module.tmemory.size,1,4)
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            imgui.SliderInt("Size", module.tmemory.size,1,4)
             imgui.Checkbox("Float",module.tmemory.is_float)
             imgui.Spacing()
-            if imgui.Button("Adicionar endereço",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Adicionar address",imgui.ImVec2(fcommon.GetSize(1))) then
 
                 if ffi.string(module.tmemory.name) == "" then 
                     printHelpString("Nenhum nome encontrado")
                 else
                     if ffi.string(module.tmemory.address) == "" or tonumber(ffi.string(module.tmemory.address)) == nil then
-                        printHelpString("Nenhum endereco encontrado")
+                        printHelpString("Nenhum address encontrado")
                     else
                         local mem_type = ""
                         if module.tmemory.size[0] == 1 then 
@@ -252,7 +252,7 @@ function module.MemoryMain()
                         module.tmemory.list[mem_type][ffi.string(module.tmemory.name)] = ffi.string(module.tmemory.address)
                         fcommon.SaveJson("memory",module.tmemory.list)
                         module.tmemory.list = fcommon.LoadJson("memory")
-                        printHelpString("Endereco adicionado")
+                        printHelpString("Address adicionado")
                     end
                 end
                 
