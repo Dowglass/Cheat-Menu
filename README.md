@@ -51,7 +51,6 @@ Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lu
 ![7](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/game.gif)
 ![8](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/visual.gif)
 ![9](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/menu.gif)
-(By: Grinch_).
 
 ## Documentação 
 
