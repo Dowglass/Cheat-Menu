@@ -17,7 +17,6 @@ O Cheat Menu permite que um grande conjunto de modificações/truques, permitind
 É baseado no [Moonloader](https://gtaforums.com/topic/890987-moonloader/) e usa [mimgui](https://github.com/THE-FYP/mimgui) como interface.
 
 ## Versões oficiais
-
 ### Releases
 [Releases](https://github.com/inanahammad/Cheat-Menu/releases) são as versões atualizadas e estáveis. Se você deseja uma experiência tranquila com o mínimo de erros possível, esse e o recomendado.
 
@@ -28,7 +27,6 @@ O Cheat Menu permite que um grande conjunto de modificações/truques, permitind
 [Cheat menu](https://github.com/user-grinch/Cheat-Menu/tree/master) versão oficial **(atualmente descontinuada)**.
 
 ## Instalação:
-
 1. Instale [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) e [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) se ainda não estiver instalado.
 2. Se a sua versão do jogo não for a v1.0, será necessário fazer [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
 3. Baixe o [Moonloader](https://gtaforums.com/topic/890987-moonloader/) [aqui](https://blast.hk/moonloader/files/moonloader-026.zip). Em seguida, extraia os arquivos para a pasta do jogo (substitua, se necessário).
@@ -38,7 +36,6 @@ O Cheat Menu permite que um grande conjunto de modificações/truques, permitind
 No jogo, pressione <kbd>Ctrl</kbd> + <kbd>M</kbd>. Se não funcionar, crie uma postagem em um dos tópicos no [repositório oficial](https://github.com/user-grinch/Cheat-Menu) com 'moonloader.log'. 
 
 ## Youtubers
-
 Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lugar. Coloque o link do [repositório oficial](https://github.com/user-grinch/Cheat-Menu). Isso ajudará o autor a fornecer um melhor suporte e desenvolvimento. Também seria ótimo se você mantivesse o nome do autor (Grinch_) na descrição do seu vídeo.
 
 ## Imagens (EN)
@@ -53,7 +50,6 @@ Se você estiver criando vídeos sobre esse mod, não faça o upload em outro lu
 ![9](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/menu.gif)
 
 ## Documentação 
-
 ### Adicionando imagens personalizadas de peds/skin - jpg
 
 Imagens de ped/skin são carregadas em '\moonloader\lib\cheat-menu\peds\'. O nome da imagem deve conter o ID do modelo ped. Os nomes dos peds personalizados devem ser adicionados no arquivo ped.json em '\moonloader\lib\cheat-menu\json\ped.json'.
